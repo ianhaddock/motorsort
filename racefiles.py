@@ -5,23 +5,25 @@ import os
 filetype = "mkv"
 raceseries = "Formula1"
 
+try:
+    os.symlink('../sourcefiles/sourcefile_names.txt', 'mediafiles/files.txt')
+except FileExistsError as err:
+    pass
+
 def listfiles():
     filelist = os.listdir('sourcefiles/')
     return filelist
-    #return ("Formula1.2023.Round19.USA.COTA.Teds.Race.Notebook.Sky.F1TV.WEB-DL.1080p.H264.English-DC46.mkv")
 
 
 def parsefilename(sourcefilename):
+    done = False
+    teds = False
+
     for i, c in enumerate(sourcefilename):
-    #    print(sourcefilename[i:i+18])
+        print(sourcefilename[i:i+4])
         if c == "T":
-            if sourcefilename[i:i+18] == 'Teds.Race.Notebook':
-                racesession = sourcefilename[i:i+18]
-                racename = sourcefilename[22:i-1]
-                #print("race name is: " + racename)
-                raceinfo = sourcefilename[i+19:-4]
-                raceepisode = '13'
-                return (racename, raceepisode, racesession, raceinfo)
+            if sourcefilename[i:i+4] == 'Teds':
+                teds = True
         if c == "F":
             if sourcefilename[i:i+2] == 'FP':
                 racesession = sourcefilename[i:i+3]
@@ -34,44 +36,58 @@ def parsefilename(sourcefilename):
                     raceepisode = '05'
                 elif racesession == 'FP3':
                     raceepisode = '09'
-                return (racename, raceepisode, racesession, raceinfo)
-        if c == "Q":
+                done = True  #return (racename, raceepisode, racesession, raceinfo)
+        elif c == "Q":
             if sourcefilename[i:i+10] == 'Qualifying':
                 racesession = sourcefilename[i:i+10]
                 racename = sourcefilename[22:i-1]
                 raceinfo = sourcefilename[i+11:-4]
-                raceepisode = '03'
-                return (racename, raceepisode, racesession, raceinfo)
-        if c == "R":
+                if teds is True:
+                    raceepisode = '05'
+                    racename = str(racesession + " Notebook")
+                else:
+                    raceepisode = '03'
+                done = True  #return (racename, raceepisode, racesession, raceinfo)
+        elif c == "R":
             if sourcefilename[i:i+4] == 'Race' or sourcefilename[i:i+4] == 'RACE':
+                # if Teds.Notebooks is after Race, this is a ...
                 racesession = sourcefilename[i:i+4]
                 racename = sourcefilename[22:i-1]
                 raceinfo = sourcefilename[i+5:-4]
-                raceepisode = '11'
-                return (racename, raceepisode, racesession, raceinfo)
-        if c == "S":
+                if teds is True:
+                    raceepisode = '15'
+                    racename = str(racesession + " Notebook")
+                else:
+                    raceepisode = '13'
+                done = True  #return (racename, raceepisode, racesession, raceinfo)
+        elif c == "S":
             if sourcefilename[i:i+15] == 'Sprint.Shootout':
                 racesession = sourcefilename[i:i+15]
                 racename = sourcefilename[22:i-1]
                 raceinfo = sourcefilename[i+16:-4]
                 raceepisode = '06'
-                return (racename, raceepisode, racesession, raceinfo)
+                done = True  #return (racename, raceepisode, racesession, raceinfo)
             elif sourcefilename[i:i+6] == 'Sprint':
                 racesession = sourcefilename[i:i+6]
                 racename = sourcefilename[22:i-1]
                 raceinfo = sourcefilename[i+7:-4]
-                raceepisode = '07'
+                if teds is True:
+                    raceepisode = '10'
+                    racename = str(racesession + " Notebook")
+                else:
+                    raceepisode = '08'
+                done = True  #return (racename, raceepisode, racesession, raceinfo)
+        if done is True:
                 return (racename, raceepisode, racesession, raceinfo)
 
-
-
 sourcefilenames = listfiles()
+
 
 for sourcefilename in sourcefilenames:
     print()
     print("Source filename: " + sourcefilename)
 
-    sourcefilename = sourcefilename.replace('.',' ')
+    sourcefilename_clean = sourcefilename.replace('.', ' ')
 
     # file checks 
     if sourcefilename[-3:] == 'mp4' or sourcefilename[-3:] == 'mkv':
@@ -81,9 +97,19 @@ for sourcefilename in sourcefilenames:
                 raceseason = sourcefilename[9:13]
             if sourcefilename[14:19] == 'Round':
                 raceround = sourcefilename[19:21]
-    
-            racename, raceepisode, racesession, raceinfo = parsefilename(sourcefilename)
-    
-            print("Folder Name: " + raceseason + "-" + raceround + " - " + racename + " GP/")
-            print("Parsed filename: " + racename + " - S" + raceround + "E" + raceepisode + " - " + racesession + " [" + raceinfo + "]." + filetype)
+
+            racename, raceepisode, racesession, raceinfo = parsefilename(sourcefilename_clean)
+            foldername = str(raceseason + "-" + raceround + " - " + racename + " GP")
+            finalfilename = str(racename + " - S" + raceround + "E" + raceepisode + " - " + racesession + " [" + raceinfo + "]." + filetype)
+            print("Folder Name: " + foldername)
+            destfolder = str("mediafiles/" + foldername)
+            os.makedirs(destfolder, exist_ok=True)
+            print("Parsed filename: " + finalfilename)
+            sourcefilepath = str('../sourcefiles/' + sourcefilename)
+            finalfilepath = str(destfolder + '/' + finalfilename)
+#            try:
+#                os.symlink(sourcefilepath, finalfilepath)
+#            except FileExistsError as err:
+#                print("Symlink exists: " + str(err))
+
 
