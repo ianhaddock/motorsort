@@ -5,10 +5,12 @@ import os
 filetype = "mkv"
 raceseries = "Formula1"
 
-try:
-    os.symlink('../sourcefiles/sourcefile_names.txt', 'mediafiles/files.txt')
-except FileExistsError as err:
-    pass
+test_chars = ['T', 'F', 'Q', 'R', 'S']
+
+#try:
+#    os.symlink('../sourcefiles/sourcefile_names.txt', 'mediafiles/files.txt')
+#except FileExistsError as err:
+#    pass
 
 def listfiles():
     filelist = os.listdir('sourcefiles/')
@@ -16,11 +18,13 @@ def listfiles():
 
 
 def parsefilename(sourcefilename):
-    done = False
     teds = False
 
     for i, c in enumerate(sourcefilename):
-        print(sourcefilename[i:i+4])
+#        print(sourcefilename[i-6:i-2])
+        if c in test_chars:
+            print("FOUND IT! " + c)
+
         if c == "T":
             if sourcefilename[i:i+4] == 'Teds':
                 teds = True
@@ -33,55 +37,53 @@ def parsefilename(sourcefilename):
                 if racesession == 'FP1':
                     raceepisode = '01'
                 elif racesession == 'FP2':
-                    raceepisode = '05'
+                    raceepisode = '06'
                 elif racesession == 'FP3':
-                    raceepisode = '09'
-                done = True  #return (racename, raceepisode, racesession, raceinfo)
+                    raceepisode = '11'
         elif c == "Q":
             if sourcefilename[i:i+10] == 'Qualifying':
                 racesession = sourcefilename[i:i+10]
                 racename = sourcefilename[22:i-1]
                 raceinfo = sourcefilename[i+11:-4]
-                if teds is True:
-                    raceepisode = '05'
-                    racename = str(racesession + " Notebook")
-                else:
-                    raceepisode = '03'
-                done = True  #return (racename, raceepisode, racesession, raceinfo)
+                raceepisode = '03'
+            #elif Quali Buildup
+            #elif Quali Analysis
         elif c == "R":
             if sourcefilename[i:i+4] == 'Race' or sourcefilename[i:i+4] == 'RACE':
-                # if Teds.Notebooks is after Race, this is a ...
-                racesession = sourcefilename[i:i+4]
-                racename = sourcefilename[22:i-1]
-                raceinfo = sourcefilename[i+5:-4]
-                if teds is True:
-                    raceepisode = '15'
-                    racename = str(racesession + " Notebook")
+                if sourcefilename[i-5:i-1] == 'Teds':
+                    racename = sourcefilename[22:i-6]
                 else:
-                    raceepisode = '13'
-                done = True  #return (racename, raceepisode, racesession, raceinfo)
+                    racename = sourcefilename[22:i-1]
+                racesession = sourcefilename[i:i+4]
+                raceinfo = sourcefilename[i+5:-4]
+                raceepisode = '13'
         elif c == "S":
             if sourcefilename[i:i+15] == 'Sprint.Shootout':
                 racesession = sourcefilename[i:i+15]
                 racename = sourcefilename[22:i-1]
                 raceinfo = sourcefilename[i+16:-4]
-                raceepisode = '06'
-                done = True  #return (racename, raceepisode, racesession, raceinfo)
+                raceepisode = '07'
             elif sourcefilename[i:i+6] == 'Sprint':
                 racesession = sourcefilename[i:i+6]
                 racename = sourcefilename[22:i-1]
                 raceinfo = sourcefilename[i+7:-4]
-                if teds is True:
-                    raceepisode = '10'
-                    racename = str(racesession + " Notebook")
-                else:
-                    raceepisode = '08'
-                done = True  #return (racename, raceepisode, racesession, raceinfo)
-        if done is True:
-                return (racename, raceepisode, racesession, raceinfo)
+                raceepisode = '08'
+
+    if teds is True:
+        if racesession == 'Qualifying':
+            raceepisode = '05'
+            racesession = 'Qualifying Notebook'
+        elif racesession == 'Sprint':
+            raceepisode = '10'
+            racesession = 'Spint Notebook'
+        elif racesession == 'Race':
+            raceepisode = '15'
+            racesession = 'Race Notebook'
+
+
+    return (racename, raceepisode, racesession, raceinfo)
 
 sourcefilenames = listfiles()
-
 
 for sourcefilename in sourcefilenames:
     print()
