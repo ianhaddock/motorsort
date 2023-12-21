@@ -2,21 +2,20 @@
 
 import os
 
-test_chars = ['2', 'T', 'F', 'Q', 'R', 'S', 'W']
 file_types = ['mkv', 'mp4']
+source_files = 'sourcefiles/'
 
-#try:
-#    os.symlink('../sourcefiles/sourcefile_names.txt', 'mediafiles/files.txt')
-#except FileExistsError as err:
-#    pass
 
 def listfiles():
-    filelist = os.listdir('sourcefiles/')
+    filelist = os.listdir(source_files)
     return filelist
 
 
 def parsefilename(sourcefilename):
+    """ parse source file names for keywords based on test_cars list"""
+    test_chars = ['2', 'T', 'F', 'Q', 'R', 'S', 'W']
     teds = False
+
     for i, c in enumerate(sourcefilename):
 #        print(sourcefilename[i-6:i-2])
         if c in test_chars:
@@ -66,16 +65,17 @@ def parsefilename(sourcefilename):
             #    print(sourcefilename[i:i+6])
             #    print(sourcefilename[i+7:i+10])
                 if sourcefilename[i+7:i+10] == 'Sky':
-                    racesession = sourcefilename[i:i+6]
+                    racesession = 'Sprint'
                     racename = sourcefilename[race_name_index_start:i-1]
                     raceinfo = sourcefilename[i+7:-4]
                     raceepisode = '08'
                 if sourcefilename[i+7:i+10] == 'Sho':
-                    racesession = 'Sprint Shootout' #sourcefilename[i:i+15]
+                    racesession = 'Sprint Shootout'
                     racename = sourcefilename[race_name_index_start:i-1]
                     raceinfo = sourcefilename[i+16:-4]
                     raceepisode = '07'
 
+    # if Teds is found in the filename, modify output as Notebook episodes
     if teds is True:
         if racesession == 'Qualifying':
             raceepisode = '05'
@@ -113,12 +113,12 @@ for sourcefilename in sourcefilenames:
         os.makedirs(destfolder, exist_ok=True)
 
 
-        sourcefilepath = str('../sourcefiles/' + sourcefilename)
+        sourcefilepath = str('sourcefiles/' + sourcefilename)
         finalfilepath = str(destfolder + '/' + finalfilename)
 
         try:
-            os.symlink(sourcefilepath, finalfilepath)
+            os.link(sourcefilepath, finalfilepath)
         except FileExistsError as err:
-            print("Symlink exists: ") #  + str(err))
+            print("file exists: ") #  + str(err))
 
 
