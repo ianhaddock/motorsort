@@ -49,6 +49,7 @@ def parsefilename(sourcefilename):
 
     test_chars = ['2', 'A', 'T', 'F', 'O', 'Q', 'R', 'S', 'W']
     teds = False
+    race_name = sourcefilename
 
     for i, c in enumerate(sourcefilename):
         # print(sourcefilename[i-6:i-2])
@@ -65,7 +66,7 @@ def parsefilename(sourcefilename):
                 race_name_index_start = i+8
             if sourcefilename[i:i+4] == 'Teds':
                 teds = True
-                print('TEDS IS TRUE')
+                teds_race_name = sourcefilename[race_name_index_start:i-1]
 
             # print(sourcefilename[i:i+7])
             if sourcefilename[i:i+7].lower() == 'onboard':
@@ -105,9 +106,10 @@ def parsefilename(sourcefilename):
                     race_session = 'Qualifying'
                     race_info = sourcefilename[i+6:-4]
 
-            # print(sourcefilename[i:i+5])
+            #print(sourcefilename[i-7:i-1])
             if sourcefilename[i:i+5].lower() == 'race ':
-                race_name = sourcefilename[race_name_index_start:i-1]
+                if len(race_name) > len(sourcefilename[race_name_index_start:i-1]):
+                    race_name = sourcefilename[race_name_index_start:i-1]
                 if sourcefilename[i:i+13] == 'Race Analysis':
                     race_session = 'Race Analysis'
                     race_info = sourcefilename[i+14:-4]
@@ -129,6 +131,8 @@ def parsefilename(sourcefilename):
                     race_info = sourcefilename[i+7:-4]
 
     if teds is True:
+        if len(teds_race_name) < len(race_name):
+            race_name = teds_race_name
         if race_session[0:5] == 'Quali':
             race_session = 'Quali Notebook'
         if race_session[0:6] == 'Sprint':
