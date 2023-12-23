@@ -44,7 +44,8 @@ def list_files(source_path):
     file_list = []
     for root, dirs, files in os.walk(source_path):
         for file in files:
-            if file.endswith(('.mkv', '.mp4')) and file.startswith(('Formula1', 'Formula.1')):
+            if file.endswith(('.mkv', '.mp4')) and \
+               file.startswith(('Formula1', 'Formula.1')):
                 file_list.append(os.path.join(root, file))
     return file_list
 
@@ -68,8 +69,12 @@ def parse_file_name(source_file_name):
             if source_file_name[i:i+4].isnumeric():
                 race_season = source_file_name[i:i+4]
             if source_file_name[i:i+5] == 'Round':
-                race_round = source_file_name[i+5:i+7]
-                race_name_index_start = i+8
+                if source_file_name[i+5:i+7].isnumeric():
+                    race_round = source_file_name[i+5:i+7]
+                    race_name_index_start = i+8
+                else:
+                    race_round = source_file_name[i+6:i+8]
+                    race_name_index_start = i+9
             if source_file_name[i:i+8] == 'Notebook':
                 teds = True
                 if len(teds_race_name) > len(source_file_name[race_name_index_start:i-1]):
@@ -104,6 +109,12 @@ def parse_file_name(source_file_name):
                 elif source_file_name[i:i+18] == 'Qualifying Buildup':
                     race_session = 'Quali Buildup'
                     race_info = source_file_name[i+19:-4]
+                elif source_file_name[i-5:i+5] == 'Post Quali':
+                    race_session = 'Quali Analysis'
+                    race_info = source_file_name[i+6:-4]
+                elif source_file_name[i-4:i+5] == 'Pre Quali':
+                    race_session = 'Quali Buildup'
+                    race_info = source_file_name[i+6:-4]
                 else:
                     race_session = 'Qualifying'
                     race_info = source_file_name[i+11:-4]
@@ -144,7 +155,7 @@ def parse_file_name(source_file_name):
                 elif source_file_name[i-4:i+4] == 'Pre Race':
                     race_session = 'Race Buildup'
                     race_info = source_file_name[i+5:-4]
-                else:
+                elif not source_file_name[i-7:i+4] == 'Sprint Race':
                     race_session = 'Race'
                     race_info = source_file_name[i+5:-4]
 
@@ -198,9 +209,8 @@ def build_out_files(source_file_names, sprint_weekends):
     folders, link files to destination directory"""
 
     for source_file_name in source_file_names:
-        print()
-        print(source_file_name)
-
+        # print()
+        # print(source_file_name)
         if source_file_name[-3:] in file_types:
 
             filetype = source_file_name[-3:]
@@ -223,11 +233,10 @@ def build_out_files(source_file_names, sprint_weekends):
 
             # print(destination_folder + "/" + final_file_name)
             os.makedirs(destination_folder, exist_ok=True)
-
             final_file_path = str(destination_folder + '/' + final_file_name)
+            # print(final_file_path)
 
             try:
-                print(final_file_path)
                 os.link(source_file_name, final_file_path)
             except FileExistsError as err:
                 print(str(err))
@@ -236,7 +245,13 @@ def build_out_files(source_file_names, sprint_weekends):
 if __name__ == "__main__":
     source_file_names = list_files(source_path)
 
+    print("Found " + str(len(source_file_names)) + " items to process.")
+
     sprint_weekends = find_sprint_weekends(source_file_names, sprint_weekends)
+
+    print("Found " + str(len(sprint_weekends)) + " sprint weekends.")
+
+    print("Linking files.")
 
     build_out_files(source_file_names, sprint_weekends)
 
