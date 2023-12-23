@@ -41,16 +41,21 @@ regular_order = ['Free Practice 1',
 
 
 def list_files(source_path):
-    filelist = os.listdir(source_path)
-    return filelist
+    file_list = []
+    for root, dirs, files in os.walk(source_path):
+        for file in files:
+            if file.endswith(('.mkv', '.mp4')) and file.startswith(('Formula1', 'Formula.1')):
+                file_list.append(os.path.join(root, file))
+    return file_list
 
 
 def parse_file_name(source_file_name):
     """ parse source file names for keywords based on test_chars list"""
 
-    test_chars = ['2', 'A', 'T', 'F', 'O', 'Q', 'R', 'S', 'W']
+    test_chars = ['2', 'A', 'T', 'F', 'N', 'O', 'P', 'Q', 'R', 'S', 'W']
     teds = False
     race_name = source_file_name
+    teds_race_name = source_file_name
 
     for i, c in enumerate(source_file_name):
         # print(source_file_name[i-6:i-2])
@@ -65,9 +70,17 @@ def parse_file_name(source_file_name):
             if source_file_name[i:i+5] == 'Round':
                 race_round = source_file_name[i+5:i+7]
                 race_name_index_start = i+8
+            if source_file_name[i:i+8] == 'Notebook':
+                teds = True
+                if len(teds_race_name) > len(source_file_name[race_name_index_start:i-1]):
+                    teds_race_name = source_file_name[race_name_index_start:i-1]
             if source_file_name[i:i+4] == 'Teds':
                 teds = True
                 teds_race_name = source_file_name[race_name_index_start:i-1]
+            if source_file_name[i:i+3] == 'Pre':
+                race_name = source_file_name[race_name_index_start:i-1]
+            if source_file_name[i:i+4] == 'Post':
+                race_name = source_file_name[race_name_index_start:i-1]
 
             # print(source_file_name[i:i+7])
             if source_file_name[i:i+7].lower() == 'onboard':
@@ -83,7 +96,8 @@ def parse_file_name(source_file_name):
 
             # print(source_file_name[i:i+10])
             if source_file_name[i:i+11].lower() == 'qualifying ':
-                race_name = source_file_name[race_name_index_start:i-1]
+                if len(race_name) > len(source_file_name[race_name_index_start:i-1]):
+                    race_name = source_file_name[race_name_index_start:i-1]
                 if source_file_name[i:i+19] == 'Qualifying Analysis':
                     race_session = 'Quali Analysis'
                     race_info = source_file_name[i+20:-4]
@@ -96,13 +110,20 @@ def parse_file_name(source_file_name):
 
             # print(source_file_name[i:i+6])
             if source_file_name[i:i+6].lower() == 'quali ':
-                race_name = source_file_name[race_name_index_start:i-1]
+                if len(race_name) > len(source_file_name[race_name_index_start:i-1]):
+                    race_name = source_file_name[race_name_index_start:i-1]
                 if source_file_name[i:i+14] == 'Quali Analysis':
                     race_session = 'Quali Analysis'
                     race_info = source_file_name[i+15:-4]
                 elif source_file_name[i:i+13] == 'Quali Buildup':
                     race_session = 'Quali Buildup'
                     race_info = source_file_name[i+14:-4]
+                elif source_file_name[i-5:i+5] == 'Post Quali':
+                    race_session = 'Quali Analysis'
+                    race_info = source_file_name[i+6:-4]
+                elif source_file_name[i-4:i+5] == 'Pre Quali':
+                    race_session = 'Quali Buildup'
+                    race_info = source_file_name[i+6:-4]
                 else:
                     race_session = 'Qualifying'
                     race_info = source_file_name[i+6:-4]
@@ -117,6 +138,12 @@ def parse_file_name(source_file_name):
                 elif source_file_name[i:i+12] == 'Race Buildup':
                     race_session = 'Race Buildup'
                     race_info = source_file_name[i+13:-4]
+                elif source_file_name[i-5:i+4] == 'Post Race':
+                    race_session = 'Race Analysis'
+                    race_info = source_file_name[i+5:-4]
+                elif source_file_name[i-4:i+4] == 'Pre Race':
+                    race_session = 'Race Buildup'
+                    race_info = source_file_name[i+5:-4]
                 else:
                     race_session = 'Race'
                     race_info = source_file_name[i+5:-4]
@@ -197,12 +224,11 @@ def build_out_files(source_file_names, sprint_weekends):
             # print(destination_folder + "/" + final_file_name)
             os.makedirs(destination_folder, exist_ok=True)
 
-            source_file_path = str(source_path + "/" + source_file_name)
             final_file_path = str(destination_folder + '/' + final_file_name)
 
             try:
                 print(final_file_path)
-                # os.link(source_file_path, final_file_path)
+                os.link(source_file_name, final_file_path)
             except FileExistsError as err:
                 print(str(err))
 
