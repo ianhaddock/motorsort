@@ -6,6 +6,7 @@ import os
 file_types = ['mkv', 'mp4']
 source_path = 'sourcefiles'
 destination_path = 'mediafiles'
+image_path = 'images'
 
 sprint_weekends = [('2024', '00')]
 
@@ -208,6 +209,9 @@ def build_out_files(source_file_names, sprint_weekends):
     """ check if this is a media file, parse filename, sort by keywords into
     folders, link files to destination directory"""
 
+    images_linked = []
+    backgrounds_linked = []
+
     for source_file_name in source_file_names:
         # print()
         # print(source_file_name)
@@ -235,6 +239,22 @@ def build_out_files(source_file_names, sprint_weekends):
             os.makedirs(destination_folder, exist_ok=True)
             final_file_path = str(destination_folder + '/' + final_file_name)
             # print(final_file_path)
+
+            if destination_folder not in backgrounds_linked:
+                try:
+                    os.link(str(image_path + "/" + race_season + "-background.jpg"), str(destination_folder + "/background.jpg"))
+                except FileExistsError as err:
+                    print(str(err))
+                else:
+                    backgrounds_linked.append(destination_folder)
+
+            if destination_folder not in images_linked:
+                try:
+                    os.link(str(image_path + "/" + race_season + ".png"), str(destination_folder + "/show.png"))
+                except FileExistsError as err:
+                    print(str(err))
+                else:
+                    images_linked.append(destination_folder)
 
             try:
                 os.link(source_file_name, final_file_path)
