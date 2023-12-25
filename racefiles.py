@@ -212,25 +212,41 @@ def find_sprint_weekends(source_file_names, sprint_weekends):
     return sprint_weekends
 
 
-def create_background_image(image_path, destination_folder, race_season):
+def create_background_image(image_path, destination_folder, race_season, race_round, race_name):
     """ generates images with imagemagick"""
 
+    background_image = str(image_path + "/" + race_season + "-background.jpg")
+    background_destination = str(destination_folder + "/background.jpg")
+
+    generate_background_cmd = ["magick", background_image,
+                               "-resize", "1920x1080\!",
+                               "-blur", "0x1",
+                               "-gravity", "SouthWest",
+                               "-font", "Formula1-Display-Wide",
+                               "-pointsize", "65",
+                               "-fill", "white",
+                               "-stroke", "white",
+                               "-strokewidth", "2",
+                               "-annotate", "+30+20", race_name,
+                               "-gravity", "SouthEast",
+                               "-font", "Formula1-Display-Regular",
+                               "-pointsize", "160",
+                               "-fill", "none",
+                               "-stroke", "white",
+                               "-strokewidth", "10",
+                               "-annotate", "+10+10", race_round,
+                               background_destination]
+
     try:
-        os.link(str(image_path + "/" + race_season + "-background.jpg"), str(destination_folder + "/background.jpg"))
+        subprocess.call(generate_background_cmd)
     except FileExistsError as err:
-        return err
+        print(err)
 
     return
 
 
 def create_poster_image(image_path, destination_folder, race_season, race_round, race_name):
     """ generates images with imagemagick"""
-
-    # $ magick 2022.png -blur 0x1 -resize 600x900\! 
-    # -font Formula1-Display-Regular -fill white -stroke black -strokewidth 2 -pointsize 65 -gravity SouthWest -annotate +30+20 '2022'
-    # -gravity Center -font Formula1-Display-Black -pointsize 65 -fill red -stroke black -strokewidth 4  -annotate +0-350 'USA Las Vegas'
-    # -gravity SouthEast -font Formula1-Display-Regular  -pointsize 160 -fill none -stroke white -strokewidth 10  -annotate +10+10 '04'
-    # test.png
 
     race_poster = str(image_path + "/" + race_season + ".png")
     race_poster_destination = str(destination_folder + "/show.png")
@@ -264,7 +280,7 @@ def create_poster_image(image_path, destination_folder, race_season, race_round,
     try:
         subprocess.call(generate_race_poster_cmd)
     except FileExistsError as err:
-        return err
+        print(err)
     else:
         print("Created image: " + race_poster_destination)
 
@@ -307,11 +323,13 @@ def build_out_files(source_file_names, sprint_weekends):
             # print(final_file_path)
 
             if destination_folder not in backgrounds_linked:
-                create_background_image(image_path, destination_folder, race_season)
+                create_background_image(image_path, destination_folder,
+                                        race_season, race_round, race_name)
                 backgrounds_linked.append(destination_folder)
 
             if destination_folder not in images_linked:
-                create_poster_image(image_path, destination_folder, race_season, race_round, race_name)
+                create_poster_image(image_path, destination_folder,
+                                    race_season, race_round, race_name)
                 images_linked.append(destination_folder)
 
             try:
