@@ -1,7 +1,14 @@
 # racefiles.py
 # sort and rename files into folder structure based on keywords
 
+# # # Reference Font Files:
+# https://www.formula1.com/etc/designs/fom-website/fonts/F1Regular/Formula1-Regular.ttf
+# https://www.formula1.com/etc/designs/fom-website/fonts/F1Bold/Formula1-Bold.ttf
+# https://www.formula1.com/etc/designs/fom-website/fonts/F1Wide/Formula1-Wide.ttf
+# https://www.formula1.com/etc/designs/fom-website/fonts/F1Black/Formula1-Black.ttf
+
 import os
+import subprocess
 
 file_types = ['mkv', 'mp4']
 source_path = 'sourcefiles'
@@ -205,6 +212,65 @@ def find_sprint_weekends(source_file_names, sprint_weekends):
     return sprint_weekends
 
 
+def create_background_image(image_path, destination_folder, race_season):
+    """ generates images with imagemagick"""
+
+    try:
+        os.link(str(image_path + "/" + race_season + "-background.jpg"), str(destination_folder + "/background.jpg"))
+    except FileExistsError as err:
+        return err
+
+    return
+
+
+def create_poster_image(image_path, destination_folder, race_season, race_round, race_name):
+    """ generates images with imagemagick"""
+
+    # $ magick 2022.png -blur 0x1 -resize 600x900\! 
+    # -font Formula1-Display-Regular -fill white -stroke black -strokewidth 2 -pointsize 65 -gravity SouthWest -annotate +30+20 '2022'
+    # -gravity Center -font Formula1-Display-Black -pointsize 65 -fill red -stroke black -strokewidth 4  -annotate +0-350 'USA Las Vegas'
+    # -gravity SouthEast -font Formula1-Display-Regular  -pointsize 160 -fill none -stroke white -strokewidth 10  -annotate +10+10 '04'
+    # test.png
+
+    race_poster = str(image_path + "/" + race_season + ".png")
+    race_poster_destination = str(destination_folder + "/show.png")
+
+    generate_race_poster_cmd = ["magick", race_poster,
+                                "-blur", "0x2",
+                                "-gravity", "Center",
+                                "-font", "Formula1-Display-Black",
+                                "-pointsize", "65",
+                                "-fill", "red",
+                                "-stroke", "black",
+                                "-strokewidth", "2",
+                                "-annotate", "+0-300", race_name,
+                                "-resize", "600x900\!",
+                                "-font", "Formula1-Display-Regular",
+                                "-fill", "white",
+                                "-stroke", "black",
+                                "-strokewidth", "4",
+                                "-pointsize", "65",
+                                "-gravity", "SouthWest",
+                                "-annotate", "+30+20", race_season,
+                                "-gravity", "SouthEast",
+                                "-font", "Formula1-Display-Regular",
+                                "-pointsize", "160",
+                                "-fill", "none",
+                                "-stroke", "white",
+                                "-strokewidth", "10",
+                                "-annotate", "+10+10", race_round,
+                                race_poster_destination]
+
+    try:
+        subprocess.call(generate_race_poster_cmd)
+    except FileExistsError as err:
+        return err
+    else:
+        print("Created image: " + race_poster_destination)
+
+    return
+
+
 def build_out_files(source_file_names, sprint_weekends):
     """ check if this is a media file, parse filename, sort by keywords into
     folders, link files to destination directory"""
@@ -241,20 +307,12 @@ def build_out_files(source_file_names, sprint_weekends):
             # print(final_file_path)
 
             if destination_folder not in backgrounds_linked:
-                try:
-                    os.link(str(image_path + "/" + race_season + "-background.jpg"), str(destination_folder + "/background.jpg"))
-                except FileExistsError as err:
-                    print(str(err))
-                else:
-                    backgrounds_linked.append(destination_folder)
+                create_background_image(image_path, destination_folder, race_season)
+                backgrounds_linked.append(destination_folder)
 
             if destination_folder not in images_linked:
-                try:
-                    os.link(str(image_path + "/" + race_season + ".png"), str(destination_folder + "/show.png"))
-                except FileExistsError as err:
-                    print(str(err))
-                else:
-                    images_linked.append(destination_folder)
+                create_poster_image(image_path, destination_folder, race_season, race_round, race_name)
+                images_linked.append(destination_folder)
 
             try:
                 os.link(source_file_name, final_file_path)
