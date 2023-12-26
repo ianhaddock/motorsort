@@ -7,6 +7,21 @@
 # https://www.formula1.com/etc/designs/fom-website/fonts/F1Wide/Formula1-Wide.ttf
 # https://www.formula1.com/etc/designs/fom-website/fonts/F1Black/Formula1-Black.ttf
 
+# vector tracks attribute: 'Image by Freepik'
+# https://www.freepik.com/free-vector/collection-f1-racing-tracks_2775878.htm#query=formula%201%20track&position=0&from_view=keyword&track=ais&uuid=6372b8e8-4d92-45f0-a56c-a054f3e13ff1
+
+# f1 track svg files
+# https://github.com/f1laps/f1-track-vectors
+
+# $ magick composite  -background none -gravity Center -compose Multiply ../track_svgs/usa.svg 2024.png  output-poster.png
+
+
+# testing on devbox
+# wget https://imagemagick.org/archive/binaries/magick
+# mv magick to /usr/local/sbin/
+# chmod 777 /usr/local/sbin/magick
+# sudo ln -s /home/ansible/fonts /usr/share/fonts/formula1
+
 import os
 import subprocess
 
@@ -79,10 +94,16 @@ def parse_file_name(source_file_name):
             if source_file_name[i:i+5] == 'Round':
                 if source_file_name[i+5:i+7].isnumeric():
                     race_round = source_file_name[i+5:i+7]
-                    race_name_index_start = i+8
+                    if source_file_name[i+8:i+11] == 'USA':
+                        race_name_index_start = i+12
+                    else: 
+                        race_name_index_start = i+8
                 else:
                     race_round = source_file_name[i+6:i+8]
-                    race_name_index_start = i+9
+                    if source_file_name[i+9:i+12] == 'USA':
+                        race_name_index_start = i+13
+                    else: 
+                        race_name_index_start = i+9
             if source_file_name[i:i+8] == 'Notebook':
                 teds = True
                 if len(teds_race_name) > len(source_file_name[race_name_index_start:i-1]):
@@ -221,20 +242,13 @@ def create_background_image(image_path, destination_folder, race_season, race_ro
     generate_background_cmd = ["magick", background_image,
                                "-resize", "1920x1080\!",
                                "-blur", "0x1",
-                               "-gravity", "SouthWest",
-                               "-font", "Formula1-Display-Wide",
-                               "-pointsize", "65",
-                               "-fill", "white",
-                               "-stroke", "white",
-                               "-strokewidth", "2",
-                               "-annotate", "+30+20", race_name,
-                               "-gravity", "SouthEast",
+                               "-gravity", "NorthEast",
                                "-font", "Formula1-Display-Regular",
-                               "-pointsize", "160",
+                               "-pointsize", "240",
                                "-fill", "none",
                                "-stroke", "white",
                                "-strokewidth", "10",
-                               "-annotate", "+10+10", race_round,
+                               "-annotate", "+120+120", race_round,
                                background_destination]
 
     try:
@@ -251,23 +265,28 @@ def create_poster_image(image_path, destination_folder, race_season, race_round,
     race_poster = str(image_path + "/" + race_season + ".png")
     race_poster_destination = str(destination_folder + "/show.png")
 
+    if len(race_name) > 10:
+        point_size = "65"
+    else:
+        point_size = "86"
+
     generate_race_poster_cmd = ["magick", race_poster,
+                                "-resize", "600x900\!",
                                 "-blur", "0x2",
                                 "-gravity", "Center",
                                 "-font", "Formula1-Display-Black",
-                                "-pointsize", "65",
+                                "-pointsize", point_size,
                                 "-fill", "red",
                                 "-stroke", "black",
                                 "-strokewidth", "2",
-                                "-annotate", "+0-300", race_name,
-                                "-resize", "600x900\!",
-                                "-font", "Formula1-Display-Regular",
-                                "-fill", "white",
-                                "-stroke", "black",
-                                "-strokewidth", "4",
-                                "-pointsize", "65",
-                                "-gravity", "SouthWest",
-                                "-annotate", "+30+20", race_season,
+                                "-annotate", "+0-220", race_name,
+                                "-font", "Formula1-Display-Wide",
+                                "-fill", "black",
+                                "-stroke", "white",
+                                "-strokewidth", "1",
+                                "-pointsize", "40",
+                                "-gravity", "NorthWest",
+                                "-annotate", "+30+30", race_season,
                                 "-gravity", "SouthEast",
                                 "-font", "Formula1-Display-Regular",
                                 "-pointsize", "160",
