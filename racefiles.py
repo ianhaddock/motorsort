@@ -119,7 +119,10 @@ def parse_file_name(source_file_name):
             # print(source_file_name[i:i+7])
             if source_file_name[i:i+7].lower() == 'onboard':
                 race_session = 'Onboard Channel'
-                race_name = source_file_name[race_name_index_start:i-1]
+                if source_file_name[i-5:i-1].lower() == 'race':
+                    race_name = source_file_name[race_name_index_start:i-6]
+                else:
+                    race_name = source_file_name[race_name_index_start:i-1]
                 race_info = source_file_name[i+16:-4]
 
             # print(source_file_name[i:i+2])
@@ -236,7 +239,10 @@ def find_sprint_weekends(source_file_names, sprint_weekends):
 def create_background_image(image_path, destination_folder, race_season, race_round, race_name):
     """ generates images with imagemagick"""
 
-    background_image = str(image_path + "/" + race_season + "-background.jpg")
+    if os.path.isfile(str(image_path + "/" + race_name + "-background.jpg")):
+        background_image = str(image_path + "/" + race_name + "-background.jpg")
+    else:
+        background_image = str(image_path + "/" + race_season + "-background.jpg")
     background_destination = str(destination_folder + "/background.jpg")
 
     generate_background_cmd = ["magick", background_image,
@@ -283,7 +289,7 @@ def create_poster_image(image_path, destination_folder, race_season, race_round,
                                 "-font", "Formula1-Display-Wide",
                                 "-fill", "black",
                                 "-stroke", "white",
-                                "-strokewidth", "1",
+                                "-strokewidth", "2",
                                 "-pointsize", "40",
                                 "-gravity", "NorthWest",
                                 "-annotate", "+30+30", race_season,
