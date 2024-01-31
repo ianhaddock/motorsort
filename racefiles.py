@@ -1,20 +1,8 @@
 # racefiles.py
 # sort and rename files into folder structure based on keywords
 
-# # # Reference Font Files:
-# https://www.formula1.com/etc/designs/fom-website/fonts/F1Regular/Formula1-Regular.ttf
-# https://www.formula1.com/etc/designs/fom-website/fonts/F1Bold/Formula1-Bold.ttf
-# https://www.formula1.com/etc/designs/fom-website/fonts/F1Wide/Formula1-Wide.ttf
-# https://www.formula1.com/etc/designs/fom-website/fonts/F1Black/Formula1-Black.ttf
-
-# vector tracks attribute: 'Image by Freepik'
-# https://www.freepik.com/free-vector/collection-f1-racing-tracks_2775878.htm#query=formula%201%20track&position=0&from_view=keyword&track=ais&uuid=6372b8e8-4d92-45f0-a56c-a054f3e13ff1
-
 # f1 track svg files
 # https://github.com/f1laps/f1-track-vectors
-
-# $ magick composite  -background none -gravity Center -compose Multiply ../track_svgs/usa.svg 2024.png  output-poster.png
-
 
 # testing on devbox
 # wget https://imagemagick.org/archive/binaries/magick
@@ -24,11 +12,27 @@
 
 import os
 import subprocess
+from shutil import which
+import urllib.request
 
-file_types = ['mkv', 'mp4']
 source_path = 'sourcefiles'
 destination_path = 'mediafiles'
+
+file_types = ('.mkv', '.mp4')
+file_prefix = ('Formula1', 'Formula.1')
+
+font_path = 'fonts'
+font_list = [('https://www.formula1.com/etc/designs/fom-website/fonts/\
+F1Regular/Formula1-Regular.ttf', 'Formula1-Regular.ttf'),
+             ('https://www.formula1.com/etc/designs/fom-website/fonts/\
+F1Bold/Formula1-Bold.ttf', 'Formula1-Bold.ttf'),
+             ('https://www.formula1.com/etc/designs/fom-website/fonts/\
+F1Wide/Formula1-Wide.ttf', 'Formula1-Wide.ttf'),
+             ('https://www.formula1.com/etc/designs/fom-website/fonts/\
+F1Black/Formula1-Black.ttf', 'Formula1-Black.ttf')]
+
 image_path = 'images'
+track_path = 'track_png'
 
 sprint_weekends = [('2024', '00')]
 
@@ -67,8 +71,8 @@ def list_files(source_path):
     file_list = []
     for root, dirs, files in os.walk(source_path):
         for file in files:
-            if file.endswith(('.mkv', '.mp4')) and \
-               file.startswith(('Formula1', 'Formula.1')):
+            if file.endswith(file_types) and \
+               file.startswith(file_prefix):
                 file_list.append(os.path.join(root, file))
     return file_list
 
@@ -236,8 +240,27 @@ def find_sprint_weekends(source_file_names, sprint_weekends):
     return sprint_weekends
 
 
-def create_background_image(image_path, destination_folder, race_season, race_round, race_name):
+def create_background_image(f1_fonts, image_path, destination_folder, race_season, race_round, race_name):
     """ generates images with imagemagick"""
+
+# $ magick composite  -background none -gravity NorthEast -compose atop -geometry 960x960+160+160 ../track_svgs/usa.svg COTA-background.jpg track-output-poster.png
+# $ magick COTA-background.jpg ../track_svgs/usa.png -compose Src_Over -background None -gravity East -geometry 960x960+160+160 -composite -gravity NorthEast -font Formula1-Display-Regular  -pointsize 160 -fill none -stroke white -strokewidth 10  -annotate +120+120 '04' track-output-poster3.png
+   ## include pull svgs https://github.com/f1laps/f1-track-vectors
+   ## these are modified to increase track width and size
+   ## convert svg to png with alphas
+   ## $ for i in *; do echo "$i"; magick -background none  "$i" -resize 540x540 ../track_png/"$(echo "$i" | sed 's/svg/png/')" ; done
+   ## rotate and rename specific races
+
+    if not f1_fonts:
+        font_regular = 'Copperplate'
+        font_bold = 'Copperplate-Bold'
+        font_wide = 'Copperplate-Bold'
+        font_black = 'Copperplate-Bold'
+    else:
+        font_regular = 'Formula1-Display-Regular'
+        font_bold = 'Formula1-Display-Bold'
+        font_wide = 'Formula1-Display-Wide'
+        font_black = 'Formula1-Display-Black'
 
     if os.path.isfile(str(image_path + "/" + race_name + "-background.jpg")):
         background_image = str(image_path + "/" + race_name + "-background.jpg")
@@ -245,17 +268,39 @@ def create_background_image(image_path, destination_folder, race_season, race_ro
         background_image = str(image_path + "/" + race_season + "-background.jpg")
     background_destination = str(destination_folder + "/background.jpg")
 
-    generate_background_cmd = ["magick", background_image,
-                               "-resize", "1920x1080\!",
-                               "-blur", "0x1",
-                               "-gravity", "NorthEast",
-                               "-font", "Formula1-Display-Regular",
-                               "-pointsize", "240",
-                               "-fill", "none",
-                               "-stroke", "white",
-                               "-strokewidth", "10",
-                               "-annotate", "+120+120", race_round,
-                               background_destination]
+    if os.path.isfile(str(track_path + "/" + race_name.lower() + ".png")):
+        track_map_image = str(track_path + "/" + race_name.lower() + ".png")
+        track_geometry = '540x540+160+160'
+        generate_background_cmd = ["magick", background_image,
+                                   "-resize", "1920x1080\!",
+                                   "-blur", "0x4",
+                                   track_map_image,
+                                   "-compose", "Src_Over",
+                                   "-background", "None",
+                                   "-gravity", "NorthEast",
+                                   "-geometry", track_geometry,
+                                   "-composite",
+                                   "-gravity", "NorthEast",
+                                   "-font", font_regular,
+                                   "-pointsize", "240",
+                                   "-fill", "none",
+                                   "-stroke", "white",
+                                   "-strokewidth", "10",
+                                   "-annotate", "+120+120", race_round,
+                                   background_destination]
+
+    else:
+        generate_background_cmd = ["magick", background_image,
+                                   "-resize", "1920x1080\!",
+                                   "-blur", "0x1",
+                                   "-gravity", "NorthEast",
+                                   "-font", font_regular,
+                                   "-pointsize", "240",
+                                   "-fill", "none",
+                                   "-stroke", "white",
+                                   "-strokewidth", "10",
+                                   "-annotate", "+120+120", race_round,
+                                   background_destination]
 
     try:
         subprocess.call(generate_background_cmd)
@@ -265,42 +310,89 @@ def create_background_image(image_path, destination_folder, race_season, race_ro
     return
 
 
-def create_poster_image(image_path, destination_folder, race_season, race_round, race_name):
+def create_poster_image(f1_fonts, image_path, destination_folder, race_season, race_round, race_name):
     """ generates images with imagemagick"""
 
     race_poster = str(image_path + "/" + race_season + ".png")
     race_poster_destination = str(destination_folder + "/show.png")
 
+    if not f1_fonts:
+        font_regular = 'Copperplate'
+        font_bold = 'Copperplate-Bold'
+        font_wide = 'Copperplate-Bold'
+        font_black = 'Copperplate-Bold'
+    else:
+        font_regular = 'Formula1-Display-Regular'
+        font_bold = 'Formula1-Display-Bold'
+        font_wide = 'Formula1-Display-Wide'
+        font_black = 'Formula1-Display-Black'
+
+    # adjust title size for longer race_name
     if len(race_name) > 10:
         point_size = "65"
     else:
         point_size = "86"
 
-    generate_race_poster_cmd = ["magick", race_poster,
-                                "-resize", "600x900\!",
-                                "-blur", "0x2",
-                                "-gravity", "Center",
-                                "-font", "Formula1-Display-Black",
-                                "-pointsize", point_size,
-                                "-fill", "red",
-                                "-stroke", "black",
-                                "-strokewidth", "2",
-                                "-annotate", "+0-220", race_name,
-                                "-font", "Formula1-Display-Wide",
-                                "-fill", "black",
-                                "-stroke", "white",
-                                "-strokewidth", "2",
-                                "-pointsize", "40",
-                                "-gravity", "NorthWest",
-                                "-annotate", "+30+30", race_season,
-                                "-gravity", "SouthEast",
-                                "-font", "Formula1-Display-Regular",
-                                "-pointsize", "160",
-                                "-fill", "none",
-                                "-stroke", "white",
-                                "-strokewidth", "10",
-                                "-annotate", "+10+10", race_round,
-                                race_poster_destination]
+    if os.path.isfile(str(track_path + "/" + race_name.lower() + ".png")):
+        track_map_image = str(track_path + "/" + race_name.lower() + ".png")
+        track_geometry = '300x300+60'
+        generate_race_poster_cmd = ["magick", race_poster,
+                                    "-resize", "600x900\!",
+                                    "-blur", "0x6",
+                                    track_map_image,
+                                    "-compose", "Src_Over",
+                                    "-background", "None",
+                                    "-gravity", "Center",
+                                    "-geometry", track_geometry,
+                                    "-composite",
+                                    "-gravity", "Center",
+                                    "-font", font_black,
+                                    "-pointsize", point_size,
+                                    "-fill", "red",
+                                    "-stroke", "black",
+                                    "-strokewidth", "2",
+                                    "-annotate", "+0-220", race_name,
+                                    "-font", font_wide,
+                                    "-fill", "black",
+                                    "-stroke", "white",
+                                    "-strokewidth", "2",
+                                    "-pointsize", "40",
+                                    "-gravity", "NorthWest",
+                                    "-annotate", "+30+30", race_season,
+                                    "-gravity", "SouthEast",
+                                    "-font", font_regular,
+                                    "-pointsize", "160",
+                                    "-fill", "none",
+                                    "-stroke", "white",
+                                    "-strokewidth", "10",
+                                    "-annotate", "+10+10", race_round,
+                                    race_poster_destination]
+    else:
+        generate_race_poster_cmd = ["magick", race_poster,
+                                    "-resize", "600x900\!",
+                                    "-blur", "0x2",
+                                    "-gravity", "Center",
+                                    "-font", font_black,
+                                    "-pointsize", point_size,
+                                    "-fill", "red",
+                                    "-stroke", "black",
+                                    "-strokewidth", "2",
+                                    "-annotate", "+0-220", race_name,
+                                    "-font", font_wide,
+                                    "-fill", "black",
+                                    "-stroke", "white",
+                                    "-strokewidth", "2",
+                                    "-pointsize", "40",
+                                    "-gravity", "NorthWest",
+                                    "-annotate", "+30+30", race_season,
+                                    "-gravity", "SouthEast",
+                                    "-font", font_regular,
+                                    "-pointsize", "160",
+                                    "-fill", "none",
+                                    "-stroke", "white",
+                                    "-strokewidth", "10",
+                                    "-annotate", "+10+10", race_round,
+                                    race_poster_destination]
 
     try:
         subprocess.call(generate_race_poster_cmd)
@@ -322,7 +414,7 @@ def build_out_files(source_file_names, sprint_weekends):
     for source_file_name in source_file_names:
         # print()
         # print(source_file_name)
-        if source_file_name[-3:] in file_types:
+        if source_file_name[-4:] in file_types:
 
             filetype = source_file_name[-3:]
 
@@ -348,12 +440,12 @@ def build_out_files(source_file_names, sprint_weekends):
             # print(final_file_path)
 
             if destination_folder not in backgrounds_linked:
-                create_background_image(image_path, destination_folder,
+                create_background_image(f1_fonts, image_path, destination_folder,
                                         race_season, race_round, race_name)
                 backgrounds_linked.append(destination_folder)
 
             if destination_folder not in images_linked:
-                create_poster_image(image_path, destination_folder,
+                create_poster_image(f1_fonts, image_path, destination_folder,
                                     race_season, race_round, race_name)
                 images_linked.append(destination_folder)
 
@@ -363,7 +455,41 @@ def build_out_files(source_file_names, sprint_weekends):
                 print(str(err))
 
 
+def get_f1_fonts(fonts, path):
+    """ download F1 official fonts if missing"""
+
+    f1_fonts = True
+
+    os.makedirs(path, exist_ok=True)
+    for url_path, font_name in fonts:
+        if not os.path.isfile(str(font_path + "/" + font_name)):
+            try:
+                urllib.request.urlretrieve(url_path, str(path + "/" + font_name))
+            except OSError as err:
+                print("Can't download F1 Font: " + str(err))
+                f1_fonts = False
+            else:
+                print("Downloaded " + font_name)
+    return f1_fonts
+
+
 if __name__ == "__main__":
+    """ main """
+
+    # sanity checks
+    f1_fonts = get_f1_fonts(font_list, font_path)
+
+    if not f1_fonts:
+        print("Can't download required fonts")
+        raise SystemExit()
+    elif not which('magick'):
+        print("imagemagick not found")
+        raise SystemExit()
+    else:
+        print("checks passed")
+
+    # main start
+
     source_file_names = list_files(source_path)
 
     print("Found " + str(len(source_file_names)) + " items to process.")
