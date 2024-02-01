@@ -1,11 +1,5 @@
 # racefiles.py
-# sort and rename files into folder structure based on keywords
-
-# testing on devbox
-# wget https://imagemagick.org/archive/binaries/magick
-# mv magick to /usr/local/sbin/
-# chmod 777 /usr/local/sbin/magick
-# sudo ln -s fonts /usr/share/fonts/formula1
+# Organise racing videos and create poster images for use with a personal media server.
 
 import os
 import subprocess
@@ -15,6 +9,7 @@ from configparser import ConfigParser
 
 
 file_types = ('.mkv', '.mp4')
+
 file_prefix = ('Formula1', 'Formula.1')
 
 font_list = [('https://www.formula1.com/etc/designs/fom-website/fonts/\
@@ -249,18 +244,16 @@ def create_background_image(image_path, destination_folder, race_season, race_ro
     else:
         background_image = str(image_path + "/background.jpg")
 
-    track_map_image = str(image_path + "/f1-logo.png")
+    f1_logo = str(image_path + "/f1-logo.png")
 
     background_destination = str(destination_folder + "/background.jpg")
-    track_geometry = '540x540+160+160'
     generate_background_cmd = ["magick", background_image,
                                "-resize", "1920x1080\!",
                                "-blur", "0x4",
-                               track_map_image,
+                               f1_logo,
                                "-compose", "Src_Over",
                                "-background", "None",
                                "-gravity", "NorthEast",
-                               "-geometry", track_geometry,
                                "-composite",
                                "-gravity", "NorthEast",
                                "-font", font_name['font_regular'],
