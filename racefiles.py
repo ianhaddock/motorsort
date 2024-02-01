@@ -14,14 +14,12 @@ import os
 import subprocess
 from shutil import which
 import urllib.request
+from configparser import ConfigParser
 
-source_path = 'sourcefiles'
-destination_path = 'mediafiles'
 
 file_types = ('.mkv', '.mp4')
 file_prefix = ('Formula1', 'Formula.1')
 
-font_path = 'fonts'
 font_list = [('https://www.formula1.com/etc/designs/fom-website/fonts/\
 F1Regular/Formula1-Regular.ttf', 'Formula1-Regular.ttf'),
              ('https://www.formula1.com/etc/designs/fom-website/fonts/\
@@ -30,9 +28,6 @@ F1Bold/Formula1-Bold.ttf', 'Formula1-Bold.ttf'),
 F1Wide/Formula1-Wide.ttf', 'Formula1-Wide.ttf'),
              ('https://www.formula1.com/etc/designs/fom-website/fonts/\
 F1Black/Formula1-Black.ttf', 'Formula1-Black.ttf')]
-
-image_path = 'images'
-track_path = 'track_png'
 
 sprint_weekends = [('2024', '00')]
 
@@ -67,6 +62,14 @@ regular_order = ['Free Practice 1',
                  'Onboard Channel']
 
 
+def get_config(item, config_file='config.ini'):
+    """get settings in config file"""
+    config = ConfigParser()
+    config.read(config_file)
+
+    return config.get('paths', str(item))
+
+
 def list_files(source_path):
     file_list = []
     for root, dirs, files in os.walk(source_path):
@@ -74,6 +77,7 @@ def list_files(source_path):
             if file.endswith(file_types) and \
                file.startswith(file_prefix):
                 file_list.append(os.path.join(root, file))
+
     return file_list
 
 
@@ -100,13 +104,13 @@ def parse_file_name(source_file_name):
                     race_round = source_file_name[i+5:i+7]
                     if source_file_name[i+8:i+11] == 'USA':
                         race_name_index_start = i+12
-                    else: 
+                    else:
                         race_name_index_start = i+8
                 else:
                     race_round = source_file_name[i+6:i+8]
                     if source_file_name[i+9:i+12] == 'USA':
                         race_name_index_start = i+13
-                    else: 
+                    else:
                         race_name_index_start = i+9
             if source_file_name[i:i+8] == 'Notebook':
                 teds = True
@@ -265,7 +269,7 @@ def create_background_image(f1_fonts, image_path, destination_folder, race_seaso
     if os.path.isfile(str(image_path + "/" + race_name + "-background.jpg")):
         background_image = str(image_path + "/" + race_name + "-background.jpg")
     else:
-        background_image = str(image_path + "/" + race_season + "-background.jpg")
+        background_image = str(image_path + "/background.jpg")
     background_destination = str(destination_folder + "/background.jpg")
 
     if os.path.isfile(str(track_path + "/" + race_name.lower() + ".png")):
@@ -313,7 +317,10 @@ def create_background_image(f1_fonts, image_path, destination_folder, race_seaso
 def create_poster_image(f1_fonts, image_path, destination_folder, race_season, race_round, race_name):
     """ generates images with imagemagick"""
 
-    race_poster = str(image_path + "/" + race_season + ".png")
+    if os.path.isfile(str(image_path + "/" + race_season + "-poster.jpg")):
+        race_poster = str(image_path + "/" + race_season + "-poster.jpg")
+    else:
+        race_poster = str(image_path + "/poster.jpg")
     race_poster_destination = str(destination_folder + "/show.png")
 
     if not f1_fonts:
@@ -339,6 +346,7 @@ def create_poster_image(f1_fonts, image_path, destination_folder, race_season, r
         generate_race_poster_cmd = ["magick", race_poster,
                                     "-resize", "600x900\!",
                                     "-blur", "0x6",
+                                    "-level", "0.5",
                                     track_map_image,
                                     "-compose", "Src_Over",
                                     "-background", "None",
@@ -476,6 +484,13 @@ def get_f1_fonts(fonts, path):
 if __name__ == "__main__":
     """ main """
 
+    # config
+    source_path = get_config('source_path')
+    destination_path = get_config('destination_path')
+    font_path = get_config('font_path')
+    image_path = get_config('image_path')
+    track_path = get_config('track_path')
+
     # sanity checks
     f1_fonts = get_f1_fonts(font_list, font_path)
 
@@ -489,21 +504,11 @@ if __name__ == "__main__":
         print("checks passed")
 
     # main start
-
     source_file_names = list_files(source_path)
-
     print("Found " + str(len(source_file_names)) + " items to process.")
 
     sprint_weekends = find_sprint_weekends(source_file_names, sprint_weekends)
-
     print("Found " + str(len(sprint_weekends)) + " sprint weekends.")
 
     print("Linking files.")
-
     build_out_files(source_file_names, sprint_weekends)
-
-
-
-
-
-
