@@ -244,17 +244,10 @@ def create_background_image(image_path, destination_folder, race_season, race_ro
     else:
         background_image = str(image_path + "/background.jpg")
 
-    f1_logo = str(image_path + "/f1-logo.png")
-
     background_destination = str(destination_folder + "/background.jpg")
     generate_background_cmd = ["magick", background_image,
                                "-resize", "1920x1080\!",
                                "-blur", "0x4",
-                               f1_logo,
-                               "-compose", "Src_Over",
-                               "-background", "None",
-                               "-gravity", "NorthEast",
-                               "-composite",
                                "-gravity", "NorthEast",
                                "-font", font_name['font_regular'],
                                "-pointsize", "240",
