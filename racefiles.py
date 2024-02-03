@@ -242,7 +242,7 @@ def find_sprint_weekends(source_file_names, sprint_weekends):
 def create_background_image(image_path, destination_folder, race_season, race_round, race_name):
     """ generates images with imagemagick"""
 
-    # use race name background, or race year background, or default background
+    # use race name, or race year, or default
     if os.path.isfile(str(image_path + "/" + race_name + "-background.jpg")):
         background_image = str(image_path + "/" + race_name + "-background.jpg")
     elif os.path.isfile(str(image_path + "/" + race_season + "-background.jpg")):
@@ -273,10 +273,13 @@ def create_background_image(image_path, destination_folder, race_season, race_ro
 def create_poster_image(image_path, destination_folder, race_season, race_round, race_name):
     """ generates images with imagemagick"""
 
-    if os.path.isfile(str(image_path + "/" + race_season + "-poster.jpg")):
-        race_poster = str(image_path + "/" + race_season + "-poster.jpg")
+    # use race name, or race year, or default
+    if os.path.isfile(str(image_path + "/" + race_name + "-poster.jpg")):
+        poster_image = str(image_path + "/" + race_name + "-poster.jpg")
+    elif os.path.isfile(str(image_path + "/" + race_season + "-poster.jpg")):
+        poster_image = str(image_path + "/" + race_season + "-poster.jpg")
     else:
-        race_poster = str(image_path + "/poster.jpg")
+        poster_image = str(image_path + "/poster.jpg")
 
     race_poster_destination = str(destination_folder + "/show.png")
 
@@ -285,7 +288,7 @@ def create_poster_image(image_path, destination_folder, race_season, race_round,
 
     if os.path.isfile(str(track_path + "/" + race_name + ".png")):
         track_map_image = str(track_path + "/" + race_name + ".png")
-        generate_race_poster_cmd = ["magick", race_poster,
+        generate_race_poster_cmd = ["magick", poster_image,
                                     "-resize", "600x900\!",
                                     "-blur", "0x2",
                                     track_map_image,
@@ -315,7 +318,8 @@ def create_poster_image(image_path, destination_folder, race_season, race_round,
                                     "-annotate", "+10+10", race_round,
                                     race_poster_destination]
     else:
-        generate_race_poster_cmd = ["magick", race_poster,
+        # build without track map
+        generate_race_poster_cmd = ["magick", poster_image,
                                     "-resize", "600x900\!",
                                     "-gravity", "Center",
                                     "-font", font_name['font_bold'],
