@@ -239,7 +239,10 @@ def find_sprint_weekends(source_file_names, sprint_weekends):
 def create_background_image(image_path, destination_folder, race_season, race_round, race_name):
     """ generates images with imagemagick"""
 
-    if os.path.isfile(str(image_path + "/" + race_season + "-background.jpg")):
+    # use race name background, or race year background, or default background
+    if os.path.isfile(str(image_path + "/" + race_name + "-background.jpg")):
+        background_image = str(image_path + "/" + race_name + "-background.jpg")
+    elif os.path.isfile(str(image_path + "/" + race_season + "-background.jpg")):
         background_image = str(image_path + "/" + race_season + "-background.jpg")
     else:
         background_image = str(image_path + "/background.jpg")
