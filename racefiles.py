@@ -1,5 +1,8 @@
+#!/usr/bin/python
 # racefiles.py
-# Organise racing videos and create poster images for use with a personal media server.
+# Automatically organize racing videos into seasons and create custom poster
+# images. For use with a personal media server.
+
 
 import os
 import subprocess
