@@ -345,7 +345,7 @@ def create_poster_image(image_path, destination_folder, race_season, race_round,
     except FileExistsError as err:
         print(err)
     else:
-        print("Created image: " + race_poster_destination)
+        print("Created: " + destination_folder)
 
     return
 
