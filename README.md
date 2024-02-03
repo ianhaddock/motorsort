@@ -73,8 +73,8 @@ mediafiles/Formula 1/2022-00 - Example GP/
 * Posters and Backgrounds created in [Assetto Corsa][022] using [Race Sim Studios][023] cars with skins found online.
 
 ### Notes:
-* Poster and background images are unique by year and can be easily customized.
-* [Plex Media Server][025] users should select TV Shows as the library type, install the [Absolute Series Scanner][024], and select the 'Personal Media Shows' Agent when creating a library for these files. This will keep Plex from incorrectly matching files to its online medatata sources.
+* Poster and background images can be unique by track or year and can be customized.
+* [Plex Media Server][025] users will need to select 'TV Shows' as the library type, install the [Absolute Series Scanner][024], and select the 'Personal Media Shows' Agent when creating a library. This will keep Plex from incorrectly sorting files and applying medatata from other sources.
 * This script is provided AS-IS with no warranty expressed or implied. Use at your own risk.
 
 
