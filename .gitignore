@@ -1,0 +1,6 @@
+.DS_Store
+
+sourcefiles/*
+mediafiles/*
+reference/*
+fonts/*
