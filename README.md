@@ -93,8 +93,13 @@ mediafiles/Formula 1/2022-00 - Example GP/
 ### Notes:
 * Poster and background images can be unique by track or year and can be customized.
 * [Plex Media Server][025] users will need to select 'TV Shows' as the library type, install the [Absolute Series Scanner][024], and select the 'Personal Media Shows' Agent when creating a library. This will keep Plex from incorrectly sorting files and applying medatata from other sources.
-* This script is provided AS-IS with no warranty expressed or implied. Use at your own risk.
 
+### Support:
+If you found this useful or would like to support projects like this you can buy me a coffee:
+
+<p>
+<a href="https://www.buymeacoffee.com/ianhaddock" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" alt="Buy Me A Coffee" style="height: 41px !important;width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a>
+</p>  
 
 [021]: https://commons.wikimedia.org/w/index.php?fulltext=1&profile=advanced&search=%E3%81%94%E3%81%B2%E3%82%87%E3%81%86%E3%81%86%E3%81%B9%E3%81%93+svg&title=Special%3ASearch&ns0=1&ns6=1&ns12=1&ns14=1&ns100=1&ns106=1
 [022]:https://store.steampowered.com/app/244210/Assetto_Corsa/
