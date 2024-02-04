@@ -24,7 +24,9 @@ F1Wide/Formula1-Wide.ttf', 'Formula1-Wide.ttf'),
              ('https://www.formula1.com/etc/designs/fom-website/fonts/\
 F1Black/Formula1-Black.ttf', 'Formula1-Black.ttf')]
 
-sprint_weekends = [('2024', '00')]
+# Sprint Weekends as of 5 Dec 2023:
+sprint_weekends = [('2024', '05'), ('2024', '06'), ('2024', '11'),
+                   ('2024', '19'), ('2024', '21'), ('2024', '23')]
 
 sprint_order = ['Free Practice 1',
                 'Quali Buildup',
