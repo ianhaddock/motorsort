@@ -17,9 +17,35 @@ Automatically organize racing videos into seasons and create custom poster image
 * Creates background images with event number.
 * Links files to target directory, saving space and leaving source files unaltered.
 
-### Example:
+### Setup:
+* Install ImageMagick
+* Run the script once to automatically download the needed font files.
+* Copy the subdirectory created in fonts/ to your system fonts dirctory (often in /usr/share/fonts/). 
+* Edit the config.ini to set your source and destination directories.
+* Make sure your user has correct permissions on source (read) and target (read write) directories.
+* Run the script.
 
-Source files:
+### Usage:
+```
+$ ./racefiles.py
+Downloaded Formula1-Regular.ttf
+Downloaded Formula1-Bold.ttf
+Downloaded Formula1-Wide.ttf
+Downloaded Formula1-Black.ttf
+Downloaded fonts need to be installed before proceeding.
+$
+$ cp fonts/* /usr/share/fonts/
+$
+$ ./racefiles.py
+Found 182 items to process.
+Found 11 sprint weekends.
+Linking files.
+Created: mediafiles/Formula 1/2022-00 - Example GP
+...
+$
+```
+
+Example source files:
 ```
 sourcefiles/
 ├── Formula1.2022.Round00.Example.FP1.SimSportHD.1080p.mkv
@@ -59,14 +85,6 @@ mediafiles/Formula 1/2022-00 - Example GP/
 ├── background.jpg
 └── show.png
 ```
-
-### Setup:
-* Install ImageMagick
-* Run the script once to automatically download the needed font files.
-* Copy the subdirectory created in fonts/ to your system fonts dirctory (often in /usr/share/fonts/). 
-* Edit the config.ini to set your source and destination directories.
-* Make sure your user has correct permissions on source (read) and target (read write) directories.
-* Run the script.
 
 ### Images:
 * Track SVGs from [Wikimedia][021]
