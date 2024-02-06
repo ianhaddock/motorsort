@@ -80,12 +80,15 @@ mediafiles/Formula 1/2022-00 - Example GP/
 └── show.png
 ```
 
-### Images:
-* Track SVGs from [Wikimedia][021]
-* Posters and Backgrounds created in [Assetto Corsa][022] using [Race Sim Studios][023] cars with skins found online.
+### Using Custom Images:
+* Replacement poster art should be 600x900 .jpg files and will be reformatted to fit 600x900 otherwise.
+* Replacement background art should be 1920x1080 .jpg files and will be reformatted to fit 1920x1080 otherwise.
+* Poster art is selected in order of track name, season, or default. e.g. cota-poster.jpg, 2022-poster.jpg, poster.jpg.
+* Background art is selected in order of track name, season, or default. E.g. COTA-background.jpg, 2022-background.jpg, background.jpg
 
 ### Notes:
-* Poster and background images can be unique by track or year and can be customized.
+* Track SVGs from [Wikimedia][021]
+* Posters and Backgrounds created in [Assetto Corsa][022] using [Race Sim Studios][023] cars with skins found online.
 * [Plex Media Server][025] users should select 'TV Shows' as the library type, install the [Absolute Series Scanner][024], and select the 'Personal Media Shows' Agent when creating a library. This will keep Plex from incorrectly sorting files and applying medatata from other sources.
 
 ### Support:
