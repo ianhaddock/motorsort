@@ -284,63 +284,43 @@ def create_poster_image(image_path, destination_folder, race_season, race_round,
     # adjust title size for longer race_name
     point_size = str(100-len(race_name)*2)
 
+    # start building up the imagemagic command
+    generate_race_poster_cmd = ["magick", poster_image,
+                                "-resize", "600x900\!"]
+
+    # if a map is available, add it to the command
     if os.path.isfile(str(track_path + "/" + race_name + ".png")):
         track_map_image = str(track_path + "/" + race_name + ".png")
-        generate_race_poster_cmd = ["magick", poster_image,
-                                    "-resize", "600x900\!",
-                                    "-blur", "0x2",
-                                    track_map_image,
-                                    "-compose", "Src_Over",
-                                    "-background", "None",
-                                    "-gravity", "Center",
-                                    "-composite",
-                                    "-font", font_name['font_bold'],
-                                    "-pointsize", point_size,
-                                    "-fill", "red2",
-                                    "-stroke", "red4",
-                                    "-strokewidth", "4",
-                                    "-annotate", "+0-310", race_name,
-                                    "-font", font_name['font_black'],
-                                    "-fill", "red4",
-                                    "-stroke", "white",
-                                    "-strokewidth", "2",
-                                    "-pointsize", "65",
-                                    "-gravity", "SouthWest",
-                                    "-annotate", "+20+20", race_season,
-                                    "-gravity", "SouthEast",
-                                    "-font", font_name['font_regular'],
-                                    "-pointsize", "120",
-                                    "-fill", "none",
-                                    "-stroke", "white",
-                                    "-strokewidth", "8",
-                                    "-annotate", "+10+10", race_round,
-                                    race_poster_destination]
-    else:
-        # build without track map
-        generate_race_poster_cmd = ["magick", poster_image,
-                                    "-resize", "600x900\!",
-                                    "-gravity", "Center",
-                                    "-font", font_name['font_bold'],
-                                    "-pointsize", point_size,
-                                    "-fill", "red2",
-                                    "-stroke", "red4",
-                                    "-strokewidth", "4",
-                                    "-annotate", "+0-310", race_name,
-                                    "-font", font_name['font_black'],
-                                    "-fill", "red4",
-                                    "-stroke", "white",
-                                    "-strokewidth", "2",
-                                    "-pointsize", "65",
-                                    "-gravity", "SouthWest",
-                                    "-annotate", "+20+20", race_season,
-                                    "-gravity", "SouthEast",
-                                    "-font", font_name['font_regular'],
-                                    "-pointsize", "120",
-                                    "-fill", "none",
-                                    "-stroke", "white",
-                                    "-strokewidth", "8",
-                                    "-annotate", "+10+10", race_round,
-                                    race_poster_destination]
+        generate_race_poster_cmd.extend(["-blur", "0x2",
+                                         track_map_image,
+                                         "-compose", "Src_Over",
+                                         "-gravity", "Center",
+                                         "-background", "None",
+                                         "-composite"])
+
+    # add the rest of the imagemagic command
+    generate_race_poster_cmd.extend(["-gravity", "Center",
+                                     "-font", font_name['font_bold'],
+                                     "-pointsize", point_size,
+                                     "-fill", "red2",
+                                     "-stroke", "red4",
+                                     "-strokewidth", "4",
+                                     "-annotate", "+0-310", race_name,
+                                     "-font", font_name['font_black'],
+                                     "-fill", "red4",
+                                     "-stroke", "white",
+                                     "-strokewidth", "2",
+                                     "-pointsize", "65",
+                                     "-gravity", "SouthWest",
+                                     "-annotate", "+20+20", race_season,
+                                     "-gravity", "SouthEast",
+                                     "-font", font_name['font_regular'],
+                                     "-pointsize", "120",
+                                     "-fill", "none",
+                                     "-stroke", "white",
+                                     "-strokewidth", "8",
+                                     "-annotate", "+10+10", race_round,
+                                     race_poster_destination])
 
     try:
         subprocess.call(generate_race_poster_cmd)
