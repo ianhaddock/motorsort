@@ -80,10 +80,10 @@ mediafiles/Formula 1/2022-00 - Example GP/
 └── show.png
 ```
 
-### Using Custom Images:
+### Custom Images:
 * Replacement poster art should be 600x900 .jpg files and will be reformatted to fit 600x900 otherwise.
 * Replacement background art should be 1920x1080 .jpg files and will be reformatted to fit 1920x1080 otherwise.
-* Poster art is selected in order of track name, season, or default. e.g. cota-poster.jpg, 2022-poster.jpg, poster.jpg.
+* Poster art is selected in order of track name, season, or default. e.g. COTA-poster.jpg, 2022-poster.jpg, poster.jpg.
 * Background art is selected in order of track name, season, or default. E.g. COTA-background.jpg, 2022-background.jpg, background.jpg
 
 ### Notes:
