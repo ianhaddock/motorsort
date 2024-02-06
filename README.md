@@ -30,7 +30,7 @@ Automatically organize racing videos into seasons and create custom poster image
 $ ./racefiles.py
 Found 182 items to process.
 Found 16 sprint weekends.
-Linking files.
+Creating files.
 Background: 2022-00 - Example GP
 Poster: 2022-00 - Example GP
 Linked: Example GP - S00E01 - Free Practice 1 [SimSportHD 1080p].mkv
