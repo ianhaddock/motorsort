@@ -12,21 +12,9 @@ from configparser import ConfigParser
 
 
 file_types = ('.mkv', '.mp4')
-
 file_prefix = ('Formula1', 'Formula.1')
-
-font_list = [('https://www.formula1.com/etc/designs/fom-website/fonts/\
-F1Regular/Formula1-Regular.ttf', 'Formula1-Regular.ttf'),
-             ('https://www.formula1.com/etc/designs/fom-website/fonts/\
-F1Bold/Formula1-Bold.ttf', 'Formula1-Bold.ttf'),
-             ('https://www.formula1.com/etc/designs/fom-website/fonts/\
-F1Wide/Formula1-Wide.ttf', 'Formula1-Wide.ttf'),
-             ('https://www.formula1.com/etc/designs/fom-website/fonts/\
-F1Black/Formula1-Black.ttf', 'Formula1-Black.ttf')]
-
-# Sprint Weekends as of 5 Dec 2023:
-sprint_weekends = [('2024', '05'), ('2024', '06'), ('2024', '11'),
-                   ('2024', '19'), ('2024', '21'), ('2024', '23')]
+fonts = ['font_regular', 'font_bold', 'font_wide', 'font_black']
+sprint_weekends = []
 
 sprint_order = ['Free Practice 1',
                 'Quali Buildup',
@@ -64,7 +52,7 @@ def get_config(item, config_file='config.ini'):
     config = ConfigParser()
     config.read(config_file)
 
-    return config.get('paths', str(item))
+    return config.get('config', str(item))
 
 
 def list_files(source_path):
@@ -75,7 +63,7 @@ def list_files(source_path):
                file.startswith(file_prefix):
                 file_list.append(os.path.join(root, file))
 
-    return file_list
+    return sorted(file_list)
 
 
 def parse_file_name(source_file_name):
@@ -244,6 +232,9 @@ def find_sprint_weekends(source_file_names, sprint_weekends):
 def create_background_image(image_path, destination_folder, race_season, race_round, race_name):
     """ generates images with imagemagick"""
 
+    if os.path.isfile(str(destination_folder + "/background.jpg")):
+        return
+
     # use race name, or race year, or default
     if os.path.isfile(str(image_path + "/" + race_name + "-background.jpg")):
         background_image = str(image_path + "/" + race_name + "-background.jpg")
@@ -268,12 +259,17 @@ def create_background_image(image_path, destination_folder, race_season, race_ro
         subprocess.call(generate_background_cmd)
     except FileExistsError as err:
         print(err)
+    else:
+        print("Background: " + os.path.basename(destination_folder))
 
     return
 
 
 def create_poster_image(image_path, destination_folder, race_season, race_round, race_name):
     """ generates images with imagemagick"""
+
+    if os.path.isfile(str(destination_folder + "/show.png")):
+        return
 
     # use race name, or race year, or default
     if os.path.isfile(str(image_path + "/" + race_name + "-poster.jpg")):
@@ -351,7 +347,7 @@ def create_poster_image(image_path, destination_folder, race_season, race_round,
     except FileExistsError as err:
         print(err)
     else:
-        print("Created: " + destination_folder)
+        print("Poster: " + os.path.basename(destination_folder))
 
     return
 
@@ -398,11 +394,13 @@ def build_out_files(source_file_names, sprint_weekends):
             final_file_path = str(destination_folder + '/' + final_file_name)
             # print(final_file_path)
 
+            # only build a background image once for each directory
             if destination_folder not in backgrounds_linked:
                 create_background_image(image_path, destination_folder,
                                         race_season, race_round, race_name)
                 backgrounds_linked.append(destination_folder)
 
+            # only build a poster once for each directory
             if destination_folder not in images_linked:
                 create_poster_image(image_path, destination_folder,
                                     race_season, race_round, race_name)
@@ -410,21 +408,26 @@ def build_out_files(source_file_names, sprint_weekends):
 
             try:
                 os.link(source_file_name, final_file_path)
-            except FileExistsError as err:
-                print(str(err))
+            except FileExistsError:
+                pass  # print("Skipping: " + final_file_name)
+            else:
+                print("Linked: " + os.path.basename(final_file_name))
 
 
-def get_f1_fonts(fonts, path):
-    """ download F1 official fonts if missing"""
+def get_fonts(fonts, path):
+    """ download fonts if missing"""
 
-    font_name = {'font_regular': 'Formula1-Display-Regular',
-                 'font_bold': 'Formula1-Display-Bold-Bold',
-                 'font_wide': 'Formula1-Display-Wide',
-                 'font_black': 'Formula1-Display-Black'}
     downloaded = False
+    fonts_list = []
+    font_name = {}
+
+    for font in fonts:
+        fonts_list.append((get_config(font).split(',')))
+        font_name[font] = fonts_list[-1][0]
 
     os.makedirs(path, exist_ok=True)
-    for url_path, font in fonts:
+    for name, url_path in fonts_list:
+        font = os.path.basename(url_path)
         if not os.path.isfile(str(font_path + "/" + font)):
             try:
                 urllib.request.urlretrieve(url_path, str(path + "/" + font))
@@ -436,7 +439,7 @@ def get_f1_fonts(fonts, path):
                 print("Downloaded " + font)
 
     if downloaded:
-        print("Downloaded fonts need to be installed before proceeding.")
+        print("Please install downloaded fonts to proceed.")
         raise SystemExit()
 
     return font_name
@@ -445,12 +448,17 @@ def get_f1_fonts(fonts, path):
 if __name__ == "__main__":
     """ main """
 
-    # config
+    # config, paths
     source_path = get_config('source_path')
     destination_path = get_config('destination_path')
     font_path = get_config('font_path')
     image_path = get_config('image_path')
     track_path = get_config('track_path')
+
+    # config, build sprint weekends list from string
+    weekends = get_config('sprint_weekends').split(',')
+    for weekend in weekends:
+        sprint_weekends.append(('2024', weekend))
 
     # sanity checks
     if not os.path.isdir(str(source_path)):
@@ -461,8 +469,8 @@ if __name__ == "__main__":
         print("imagemagick not found")
         raise SystemExit()
 
-    # main start
-    font_name = get_f1_fonts(font_list, font_path)
+    # download fonts if missing, get font names for imagemagick
+    font_name = get_fonts(fonts, font_path)
 
     source_file_names = list_files(source_path)
     print("Found " + str(len(source_file_names)) + " items to process.")
