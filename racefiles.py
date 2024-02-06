@@ -1,7 +1,9 @@
 #!/usr/bin/python
 # racefiles.py
+#
 # Automatically organize racing videos into seasons and create custom poster
 # images. For use with a personal media server.
+# 17 Dec 2023
 
 
 import os
@@ -55,6 +57,37 @@ def get_config(item, config_file='config.ini'):
     return config.get('config', str(item))
 
 
+def get_fonts(fonts, path):
+    """ download fonts if missing"""
+
+    downloaded = False
+    fonts_list = []
+    font_name = {}
+
+    for font in fonts:
+        fonts_list.append((get_config(font).split(',')))
+        font_name[font] = fonts_list[-1][0]
+
+    os.makedirs(path, exist_ok=True)
+    for name, url_path in fonts_list:
+        font = os.path.basename(url_path)
+        if not os.path.isfile(str(font_path + "/" + font)):
+            try:
+                urllib.request.urlretrieve(url_path, str(path + "/" + font))
+            except OSError as err:
+                print("Can't download F1 Font: " + str(err))
+                raise SystemExit()
+            else:
+                downloaded = True
+                print("Downloaded " + name)
+
+    if downloaded:
+        print("Please install downloaded fonts to proceed.")
+        raise SystemExit()
+
+    return font_name
+
+
 def list_files(source_path):
     file_list = []
     for root, dirs, files in os.walk(source_path):
@@ -64,6 +97,27 @@ def list_files(source_path):
                 file_list.append(os.path.join(root, file))
 
     return sorted(file_list)
+
+
+def find_sprint_weekends(source_file_names, sprint_weekends):
+    """ search for sprint weekends before parsing names """
+    for source_file_name in source_file_names:
+        for i, c in enumerate(source_file_name):
+            if c == '2':
+                if source_file_name[i:i+4].isnumeric():
+                    race_season = source_file_name[i:i+4]
+                # print(source_file_name[i:i+4])
+            if c == 'R':
+                # print(source_file_name[i:i+5])
+                if source_file_name[i:i+5] == 'Round':
+                    race_round = source_file_name[i+5:i+7]
+                    # print(source_file_name[i+5:i+7])
+            if c == 'S':
+                # print(source_file_name[i:i+6])
+                if source_file_name[i:i+6] == 'Sprint':
+                    if (race_season, race_round) not in sprint_weekends:
+                        sprint_weekends.append((race_season, race_round))
+    return sprint_weekends
 
 
 def parse_file_name(source_file_name):
@@ -206,27 +260,6 @@ def parse_file_name(source_file_name):
 
     return (race_series, race_season, race_round, race_name, race_session,
             race_info)
-
-
-def find_sprint_weekends(source_file_names, sprint_weekends):
-    """ search for sprint weekends before parsing names """
-    for source_file_name in source_file_names:
-        for i, c in enumerate(source_file_name):
-            if c == '2':
-                if source_file_name[i:i+4].isnumeric():
-                    race_season = source_file_name[i:i+4]
-                # print(source_file_name[i:i+4])
-            if c == 'R':
-                # print(source_file_name[i:i+5])
-                if source_file_name[i:i+5] == 'Round':
-                    race_round = source_file_name[i+5:i+7]
-                    # print(source_file_name[i+5:i+7])
-            if c == 'S':
-                # print(source_file_name[i:i+6])
-                if source_file_name[i:i+6] == 'Sprint':
-                    if (race_season, race_round) not in sprint_weekends:
-                        sprint_weekends.append((race_season, race_round))
-    return sprint_weekends
 
 
 def create_background_image(image_path, destination_folder, race_season, race_round, race_name):
@@ -392,37 +425,6 @@ def build_out_files(source_file_names, sprint_weekends):
                 pass  # print("Skipping: " + final_file_name)
             else:
                 print("Linked: " + os.path.basename(final_file_name))
-
-
-def get_fonts(fonts, path):
-    """ download fonts if missing"""
-
-    downloaded = False
-    fonts_list = []
-    font_name = {}
-
-    for font in fonts:
-        fonts_list.append((get_config(font).split(',')))
-        font_name[font] = fonts_list[-1][0]
-
-    os.makedirs(path, exist_ok=True)
-    for name, url_path in fonts_list:
-        font = os.path.basename(url_path)
-        if not os.path.isfile(str(font_path + "/" + font)):
-            try:
-                urllib.request.urlretrieve(url_path, str(path + "/" + font))
-            except OSError as err:
-                print("Can't download F1 Font: " + str(err))
-                raise SystemExit()
-            else:
-                downloaded = True
-                print("Downloaded " + name)
-
-    if downloaded:
-        print("Please install downloaded fonts to proceed.")
-        raise SystemExit()
-
-    return font_name
 
 
 if __name__ == "__main__":
