@@ -28,24 +28,17 @@ Automatically organize racing videos into seasons and create custom poster image
 ### Usage:
 ```
 $ ./racefiles.py
-Downloaded Formula1-Regular.ttf
-Downloaded Formula1-Bold.ttf
-Downloaded Formula1-Wide.ttf
-Downloaded Formula1-Black.ttf
-Downloaded fonts need to be installed before proceeding.
-$
-$ cp fonts/* /usr/share/fonts/
-$
-$ ./racefiles.py
 Found 182 items to process.
-Found 11 sprint weekends.
+Found 16 sprint weekends.
 Linking files.
-Created: mediafiles/Formula 1/2022-00 - Example GP
+Background: 2022-00 - Example GP
+Poster: 2022-00 - Example GP
+Linked: Example GP - S00E01 - Free Practice 1 [SimSportHD 1080p].mkv
+Linked: Example GP - S00E06 - Free Practice 2 [SimSportHD 1080p].mkv
 ...
-$
 ```
 
-Example source files:
+Source files:
 ```
 sourcefiles/
 ├── Formula1.2022.Round00.Example.FP1.SimSportHD.1080p.mkv
@@ -64,6 +57,7 @@ sourcefiles/
 ├── Formula1.2022.Round00.Example.Teds.Race.Notebook.SimSportHD.1080p.mkv
 ├── Formula1.2022.Round00.Example.Teds.Sprint.Notebook.SimSportHD.1080p.mkv
 ```
+
 Resulting structure:
 ```
 mediafiles/Formula 1/2022-00 - Example GP/
