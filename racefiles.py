@@ -232,18 +232,19 @@ def find_sprint_weekends(source_file_names, sprint_weekends):
 def create_background_image(image_path, destination_folder, race_season, race_round, race_name):
     """ generates images with imagemagick"""
 
-    if os.path.isfile(str(destination_folder + "/background.jpg")):
+    background_destination = str(destination_folder + "/background.jpg")
+
+    # if image already exists, dont recreate
+    if os.path.isfile(background_destination):
         return
 
-    # use race name, or race year, or default
-    if os.path.isfile(str(image_path + "/" + race_name + "-background.jpg")):
-        background_image = str(image_path + "/" + race_name + "-background.jpg")
-    elif os.path.isfile(str(image_path + "/" + race_season + "-background.jpg")):
+    # prefer race name to race year to default
+    background_image = str(image_path + "/" + race_name + "-background.jpg")
+    if not os.path.isfile(background_image):
         background_image = str(image_path + "/" + race_season + "-background.jpg")
-    else:
+    if not os.path.isfile(background_image):
         background_image = str(image_path + "/background.jpg")
 
-    background_destination = str(destination_folder + "/background.jpg")
     generate_background_cmd = ["magick", background_image,
                                "-resize", "1920x1080\!",
                                "-gravity", "NorthEast",
@@ -268,18 +269,19 @@ def create_background_image(image_path, destination_folder, race_season, race_ro
 def create_poster_image(image_path, destination_folder, race_season, race_round, race_name):
     """ generates images with imagemagick"""
 
-    if os.path.isfile(str(destination_folder + "/show.png")):
+    race_poster_destination = str(destination_folder + "/show.png")
+    track_map_image = str(track_path + "/" + race_name + ".png")
+
+    # if image already exists, dont recreate
+    if os.path.isfile(race_poster_destination):
         return
 
-    # use race name, or race year, or default
-    if os.path.isfile(str(image_path + "/" + race_name + "-poster.jpg")):
-        poster_image = str(image_path + "/" + race_name + "-poster.jpg")
-    elif os.path.isfile(str(image_path + "/" + race_season + "-poster.jpg")):
+    # prefer race name to race year to default
+    poster_image = str(image_path + "/" + race_name + "-poster.jpg")
+    if not os.path.isfile(poster_image):
         poster_image = str(image_path + "/" + race_season + "-poster.jpg")
-    else:
+    if not os.path.isfile(poster_image):
         poster_image = str(image_path + "/poster.jpg")
-
-    race_poster_destination = str(destination_folder + "/show.png")
 
     # adjust title size for longer race_name
     point_size = str(100-len(race_name)*2)
@@ -289,8 +291,7 @@ def create_poster_image(image_path, destination_folder, race_season, race_round,
                                 "-resize", "600x900\!"]
 
     # if a map is available, add it to the command
-    if os.path.isfile(str(track_path + "/" + race_name + ".png")):
-        track_map_image = str(track_path + "/" + race_name + ".png")
+    if os.path.isfile(track_map_image):
         generate_race_poster_cmd.extend(["-blur", "0x2",
                                          track_map_image,
                                          "-compose", "Src_Over",
@@ -339,12 +340,11 @@ def build_out_files(source_file_names, sprint_weekends):
     images_linked = []
     backgrounds_linked = []
 
-    if not os.path.isdir(destination_path):
-        try:
-            os.mkdir(destination_path)
-        except OSError as err:
-            print("Can't create " + destination_path + ": " + err)
-            raise SystemExit()
+    try:
+        os.makedirs(destination_path, exist_ok=True)
+    except OSError as err:
+        print("Can't create " + destination_path + ": " + err)
+        raise SystemExit()
 
     for source_file_name in source_file_names:
         # print()
@@ -449,7 +449,6 @@ if __name__ == "__main__":
         print("imagemagick not found")
         raise SystemExit()
 
-    # download fonts if missing, get font names for imagemagick
     font_name = get_fonts(fonts, font_path)
 
     source_file_names = list_files(source_path)
@@ -458,6 +457,6 @@ if __name__ == "__main__":
     sprint_weekends = find_sprint_weekends(source_file_names, sprint_weekends)
     print("Found " + str(len(sprint_weekends)) + " sprint weekends.")
 
-    print("Linking files.")
+    print("Creating files.")
     build_out_files(source_file_names, sprint_weekends)
 
