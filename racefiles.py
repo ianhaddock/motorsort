@@ -436,7 +436,7 @@ def get_fonts(fonts, path):
                 raise SystemExit()
             else:
                 downloaded = True
-                print("Downloaded " + font)
+                print("Downloaded " + name)
 
     if downloaded:
         print("Please install downloaded fonts to proceed.")
