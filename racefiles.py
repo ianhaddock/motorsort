@@ -188,6 +188,9 @@ def parse_file_name(source_file_name):
                 elif source_file_name[i:i+18] == 'Qualifying Buildup':
                     race_session = 'Quali Buildup'
                     race_info = source_file_name[i+19:-4]
+                elif source_file_name[i:i+19] == 'Qualifying Build-Up':
+                    race_session = 'Quali Buildup'
+                    race_info = source_file_name[i+20:-4]
                 elif source_file_name[i-5:i+5] == 'Post Quali':
                     race_session = 'Quali Analysis'
                     race_info = source_file_name[i+6:-4]
@@ -228,6 +231,9 @@ def parse_file_name(source_file_name):
                 elif source_file_name[i:i+12] == 'Race Buildup':
                     race_session = 'Race Buildup'
                     race_info = source_file_name[i+13:-4]
+                elif source_file_name[i:i+13] == 'Race Build-Up':
+                    race_session = 'Race Buildup'
+                    race_info = source_file_name[i+14:-4]
                 elif source_file_name[i-5:i+4] == 'Post Race':
                     race_session = 'Race Analysis'
                     race_info = source_file_name[i+5:-4]
