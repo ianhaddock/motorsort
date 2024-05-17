@@ -155,9 +155,13 @@ def parse_file_name(source_file_name):
                 teds = True
                 if len(teds_race_name) > len(source_file_name[race_name_index_start:i-1]):
                     teds_race_name = source_file_name[race_name_index_start:i-1]
+                # print("Notebook found: " + teds_race_name)
             if source_file_name[i:i+4] == 'Teds':
                 teds = True
                 teds_race_name = source_file_name[race_name_index_start:i-1]
+                # print("Teds found: " + teds_race_name) 
+                race_info = source_file_name[i+5:-4]
+                # print("race_info: " + race_info)
             if source_file_name[i:i+3] == 'Pre':
                 race_name = source_file_name[race_name_index_start:i-1]
             if source_file_name[i:i+4] == 'Post':
