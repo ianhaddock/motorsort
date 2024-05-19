@@ -18,7 +18,7 @@ file_types = ('.mkv', '.mp4')
 
 file_prefix = ('Formula1', 'Formula.1', 'WEC')
 series_prefix = [('Formula1', 'Formula 1'),
-                 ('Formula.1', 'Formula 1'),
+                 ('Formula 1', 'Formula 1'),
                  ('WEC', 'WEC')]
 fonts = ['font_regular',
          'font_bold',
@@ -70,8 +70,9 @@ session_map = [('fp1', 'Free Practice 1'),
                ('quali analysis', 'Quali Analysis'),
                ('quali buildup', 'Quali Buildup'),
                ('qualifying analysis', 'Quali Analysis'),
-               ('sprint shootout', 'Sprint Shootout'),
                ('sprint', 'Sprint'),
+               ('sprint shootout', 'Sprint Shootout'),
+               ('sprint quali', 'Sprint Shootout'),
                ('sprint race', 'Sprint'),
                ('pre race', 'Race Buildup'),
                ('race buildup', 'Race Buildup'),
@@ -81,6 +82,7 @@ session_map = [('fp1', 'Free Practice 1'),
                ('race analysis', 'Race Analysis'),
                ('race notebook', 'Race Notebook'),
                ('quali notebook', 'Quali Notebook'),
+               ('teds notebook', 'Race Notebook'),
                ('teds quali notebook', 'Quali Notebook'),
                ('qualifying notebook', 'Quali Notebook'),
                ('teds qualifying notebook', 'Quali Notebook'),
@@ -184,7 +186,7 @@ def parse_file_name(source_file_name):
     # get round number
     if 'Round' in source_file_name:
         i = source_file_name.index('Round')
-        race_round = source_file_name[i+5:i+7]
+        race_round = source_file_name[i+5:i+8].strip()
         race_name_index_start = source_file_name.index('Round') + len('Round00') + 1
 
     # get race year
@@ -203,8 +205,10 @@ def parse_file_name(source_file_name):
         if key in source_file_name.lower():
             if len(race_session) <= len(key):
                 race_session = value
-                race_name = source_file_name[race_name_index_start:source_file_name.lower().index(key) - 1]
-                race_info = source_file_name[source_file_name.lower().index(key) + len(key) + 1:-4]
+                race_name = source_file_name[race_name_index_start:source_file_name.lower().index(key) - 1].strip()
+                race_info = source_file_name[source_file_name.lower().index(key) + len(key) + 1:-4].strip()
+
+    # print(source_file_name)
 
     return (race_series, race_season, race_round, race_name, race_session,
             race_info)
