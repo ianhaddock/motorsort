@@ -7,6 +7,7 @@
 
 
 import os
+import glob
 import subprocess
 from shutil import which
 import urllib.request
@@ -14,8 +15,15 @@ from configparser import ConfigParser
 
 
 file_types = ('.mkv', '.mp4')
-file_prefix = ('Formula1', 'Formula.1')
-fonts = ['font_regular', 'font_bold', 'font_wide', 'font_black']
+
+file_prefix = ('Formula1', 'Formula.1', 'WEC')
+series_prefix = [('Formula1', 'Formula 1'),
+                 ('Formula.1', 'Formula 1'),
+                 ('WEC', 'WEC')]
+fonts = ['font_regular',
+         'font_bold',
+         'font_wide',
+         'font_black']
 sprint_weekends = []
 
 sprint_order = ['Free Practice 1',
@@ -47,6 +55,42 @@ regular_order = ['Free Practice 1',
                  'Race Analysis',
                  'Race Notebook',
                  'Onboard Channel']
+
+session_map = [('fp1', 'Free Practice 1'),
+               ('fp2', 'Free Practice 2'),
+               ('fp3', 'Free Practice 3'),
+               ('qualifying', 'Qualifying'),
+               ('pre quali', 'Quali Buildup'),
+               ('pre qualifying', 'Quali Buildup'),
+               ('qualifying buildup', 'Quali Buildup'),
+               ('qualifying build-up', 'Quali Buildup'),
+               ('quali', 'Qualifying'),
+               ('post quali', 'Quali Analysis'),
+               ('post qualifying', 'Quali Analysis'),
+               ('quali analysis', 'Quali Analysis'),
+               ('quali buildup', 'Quali Buildup'),
+               ('qualifying analysis', 'Quali Analysis'),
+               ('sprint shootout', 'Sprint Shootout'),
+               ('sprint', 'Sprint'),
+               ('sprint race', 'Sprint'),
+               ('pre race', 'Race Buildup'),
+               ('race buildup', 'Race Buildup'),
+               ('race build-up', 'Race Buildup'),
+               ('race', 'Race'),
+               ('post race', 'Race Analysis'),
+               ('race analysis', 'Race Analysis'),
+               ('race notebook', 'Race Notebook'),
+               ('quali notebook', 'Quali Notebook'),
+               ('teds quali notebook', 'Quali Notebook'),
+               ('qualifying notebook', 'Quali Notebook'),
+               ('teds qualifying notebook', 'Quali Notebook'),
+               ('qualifying teds notebook', 'Quali Notebook'),
+               ('teds race notebook', 'Race Notebook'),
+               ('teds sprint notebook', 'Sprint Notebook'),
+               ('race teds notebook', 'Race Notebook'),
+               ('onboard channel', 'Onboard Channel'),
+               ('race onboard channel', 'Onboard Channel'),
+               ('onboard', 'Onboard Channel')]
 
 
 def get_config(item, config_file='config.ini'):
@@ -121,152 +165,46 @@ def find_sprint_weekends(source_file_names, sprint_weekends):
 
 
 def parse_file_name(source_file_name):
-    """ parse source file names for keywords based on test_chars list"""
+    """parse source file names for keywords to build folder structures and
+    file names"""
 
-    test_chars = ['2', 'A', 'T', 'F', 'N', 'O', 'P', 'Q', 'R', 'S', 'W']
-    teds = False
-    race_name = source_file_name
-    teds_race_name = source_file_name
+    race_session = ''
+    race_name = ''
+    race_info = ''
 
-    for i, c in enumerate(source_file_name):
-        # print(source_file_name[i-6:i-2])
-        if c in test_chars:
-            if source_file_name[i:i+3] == 'WEC':
-                race_series = 'WEC'
-            if source_file_name[i:i+8] == 'Formula1' or \
-               source_file_name[i:i+9] == 'Formula 1':
-                race_series = 'Formula 1'
-            if source_file_name[i:i+4].isnumeric():
-                race_season = source_file_name[i:i+4]
-            if source_file_name[i:i+5] == 'Round':
-                if source_file_name[i+5:i+7].isnumeric():
-                    race_round = source_file_name[i+5:i+7]
-                    if source_file_name[i+8:i+11] == 'USA':
-                        race_name_index_start = i+12
-                    else:
-                        race_name_index_start = i+8
-                else:
-                    race_round = source_file_name[i+6:i+8]
-                    if source_file_name[i+9:i+12] == 'USA':
-                        race_name_index_start = i+13
-                    else:
-                        race_name_index_start = i+9
-            if source_file_name[i:i+8] == 'Notebook':
-                teds = True
-                if len(teds_race_name) > len(source_file_name[race_name_index_start:i-1]):
-                    teds_race_name = source_file_name[race_name_index_start:i-1]
-                # print("Notebook found: " + teds_race_name)
-            if source_file_name[i:i+4] == 'Teds':
-                teds = True
-                teds_race_name = source_file_name[race_name_index_start:i-1]
-                # print("Teds found: " + teds_race_name) 
-                race_info = source_file_name[i+5:-4]
-                # print("race_info: " + race_info)
-            if source_file_name[i:i+3] == 'Pre':
-                race_name = source_file_name[race_name_index_start:i-1]
-            if source_file_name[i:i+4] == 'Post':
-                race_name = source_file_name[race_name_index_start:i-1]
+    # remove subfolders from path before sorting by filename
+    while '/' in source_file_name:
+        source_file_name = source_file_name[source_file_name.index('/') + 1:]
 
-            # print(source_file_name[i:i+7])
-            if source_file_name[i:i+7].lower() == 'onboard':
-                race_session = 'Onboard Channel'
-                if source_file_name[i-5:i-1].lower() == 'race':
-                    race_name = source_file_name[race_name_index_start:i-6]
-                else:
-                    race_name = source_file_name[race_name_index_start:i-1]
-                race_info = source_file_name[i+16:-4]
+    # cleanup race series naming
+    for prefix, name in series_prefix:
+        if prefix in source_file_name:
+            race_series = name
 
-            # print(source_file_name[i:i+2])
-            if source_file_name[i:i+2].lower() == 'fp':
-                race_session = str("Free Practice " + source_file_name[i+2])
-                race_name = source_file_name[race_name_index_start:i-1]
-                race_info = source_file_name[i+4:-4]
+    # get round number
+    if 'Round' in source_file_name:
+        i = source_file_name.index('Round')
+        race_round = source_file_name[i+5:i+7]
+        race_name_index_start = source_file_name.index('Round') + len('Round00') + 1
 
-            # print(source_file_name[i:i+10])
-            if source_file_name[i:i+11].lower() == 'qualifying ':
-                if len(race_name) > len(source_file_name[race_name_index_start:i-1]):
-                    race_name = source_file_name[race_name_index_start:i-1]
-                if source_file_name[i:i+19] == 'Qualifying Analysis':
-                    race_session = 'Quali Analysis'
-                    race_info = source_file_name[i+20:-4]
-                elif source_file_name[i:i+18] == 'Qualifying Buildup':
-                    race_session = 'Quali Buildup'
-                    race_info = source_file_name[i+19:-4]
-                elif source_file_name[i:i+19] == 'Qualifying Build-Up':
-                    race_session = 'Quali Buildup'
-                    race_info = source_file_name[i+20:-4]
-                elif source_file_name[i-5:i+5] == 'Post Quali':
-                    race_session = 'Quali Analysis'
-                    race_info = source_file_name[i+6:-4]
-                elif source_file_name[i-4:i+5] == 'Pre Quali':
-                    race_session = 'Quali Buildup'
-                    race_info = source_file_name[i+6:-4]
-                else:
-                    race_session = 'Qualifying'
-                    race_info = source_file_name[i+11:-4]
+    # get race year
+    if '20' in source_file_name:
+        i = source_file_name.index('20')
+        year = source_file_name[i:i+4]
+        if year.isnumeric():
+            race_season = year
 
-            # print(source_file_name[i:i+6])
-            if source_file_name[i:i+6].lower() == 'quali ':
-                if len(race_name) > len(source_file_name[race_name_index_start:i-1]):
-                    race_name = source_file_name[race_name_index_start:i-1]
-                if source_file_name[i:i+14] == 'Quali Analysis':
-                    race_session = 'Quali Analysis'
-                    race_info = source_file_name[i+15:-4]
-                elif source_file_name[i:i+13] == 'Quali Buildup':
-                    race_session = 'Quali Buildup'
-                    race_info = source_file_name[i+14:-4]
-                elif source_file_name[i-5:i+5] == 'Post Quali':
-                    race_session = 'Quali Analysis'
-                    race_info = source_file_name[i+6:-4]
-                elif source_file_name[i-4:i+5] == 'Pre Quali':
-                    race_session = 'Quali Buildup'
-                    race_info = source_file_name[i+6:-4]
-                else:
-                    race_session = 'Qualifying'
-                    race_info = source_file_name[i+6:-4]
+    # remove USA from race name
+    if 'USA' in source_file_name:
+        race_name_index_start = source_file_name.index('USA') + len('USA') + 1
 
-            # print(source_file_name[i-7:i-1])
-            if source_file_name[i:i+5].lower() == 'race ':
-                if len(race_name) > len(source_file_name[race_name_index_start:i-1]):
-                    race_name = source_file_name[race_name_index_start:i-1]
-                if source_file_name[i:i+13] == 'Race Analysis':
-                    race_session = 'Race Analysis'
-                    race_info = source_file_name[i+14:-4]
-                elif source_file_name[i:i+12] == 'Race Buildup':
-                    race_session = 'Race Buildup'
-                    race_info = source_file_name[i+13:-4]
-                elif source_file_name[i:i+13] == 'Race Build-Up':
-                    race_session = 'Race Buildup'
-                    race_info = source_file_name[i+14:-4]
-                elif source_file_name[i-5:i+4] == 'Post Race':
-                    race_session = 'Race Analysis'
-                    race_info = source_file_name[i+5:-4]
-                elif source_file_name[i-4:i+4] == 'Pre Race':
-                    race_session = 'Race Buildup'
-                    race_info = source_file_name[i+5:-4]
-                elif not source_file_name[i-7:i+4] == 'Sprint Race':
-                    race_session = 'Race'
-                    race_info = source_file_name[i+5:-4]
-
-            # print(source_file_name[i:i+6])
-            if source_file_name[i:i+7].lower() == 'sprint ':
-                race_name = source_file_name[race_name_index_start:i-1]
-                if source_file_name[i:i+10] == 'Sprint Sho':
-                    race_session = 'Sprint Shootout'
-                    race_info = source_file_name[i+16:-4]
-                else:
-                    race_session = 'Sprint'
-                    race_info = source_file_name[i+7:-4]
-
-    if teds is True:
-        if len(teds_race_name) < len(race_name):
-            race_name = teds_race_name
-        if race_session[0:5] == 'Quali':
-            race_session = 'Quali Notebook'
-        if race_session[0:6] == 'Sprint':
-            race_session = 'Sprint Notebook'
-        if race_session[0:4] == 'Race':
-            race_session = 'Race Notebook'
+    # sort race sessions
+    for key, value in session_map:
+        if key in source_file_name.lower():
+            if len(race_session) <= len(key):
+                race_session = value
+                race_name = source_file_name[race_name_index_start:source_file_name.lower().index(key) - 1]
+                race_info = source_file_name[source_file_name.lower().index(key) + len(key) + 1:-4]
 
     return (race_series, race_season, race_round, race_name, race_session,
             race_info)
@@ -411,10 +349,19 @@ def build_out_files(source_file_names, sprint_weekends):
             destination_folder = str(destination_path + "/" + race_series +
                                      "/" + race_season + "-" + race_round +
                                      " - " + race_name + " GP")
-
             # print(destination_folder + "/" + final_file_name)
-            os.makedirs(destination_folder, exist_ok=True)
-            final_file_path = str(destination_folder + '/' + final_file_name)
+
+            # reduce duplicate race directories due to differences in race names
+            race_round_path = str(destination_path + "/" + race_series +
+                                      "/" + race_season + "-" + race_round)
+            race_round_path_found = glob.glob(race_round_path + '*')
+            if race_round_path_found:
+                # print('Found existing race directory: ' + str(race_round_path_found[0]))
+                destination_folder = str(race_round_path_found[0])
+                final_file_path = str(race_round_path_found[0]) + '/' + final_file_name
+            else:
+                os.makedirs(destination_folder, exist_ok=True)
+                final_file_path = str(destination_folder + '/' + final_file_name)
             # print(final_file_path)
 
             # only build a background image once for each directory
