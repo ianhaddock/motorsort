@@ -17,13 +17,16 @@ from configparser import ConfigParser
 file_types = ('.mkv', '.mp4')
 
 file_prefix = ('Formula1', 'Formula.1', 'WEC')
+
 series_prefix = [('Formula1', 'Formula 1'),
                  ('Formula 1', 'Formula 1'),
                  ('WEC', 'WEC')]
+
 fonts = ['font_regular',
          'font_bold',
          'font_wide',
          'font_black']
+
 sprint_weekends = []
 
 sprint_order = ['Free Practice 1',
@@ -170,9 +173,7 @@ def parse_file_name(source_file_name):
     """parse source file names for keywords to build folder structures and
     file names"""
 
-    race_session = ''
-    race_name = ''
-    race_info = ''
+    race_session, race_name, race_info = '', '', ''
 
     # remove subfolders from path before sorting by filename
     while '/' in source_file_name:
@@ -183,7 +184,7 @@ def parse_file_name(source_file_name):
         if prefix in source_file_name:
             race_series = name
 
-    # get round number
+    # get Round number
     if 'Round' in source_file_name:
         i = source_file_name.index('Round')
         race_round = source_file_name[i+5:i+8].strip()
@@ -207,8 +208,6 @@ def parse_file_name(source_file_name):
                 race_session = value
                 race_name = source_file_name[race_name_index_start:source_file_name.lower().index(key) - 1].strip()
                 race_info = source_file_name[source_file_name.lower().index(key) + len(key) + 1:-4].strip()
-
-    # print(source_file_name)
 
     return (race_series, race_season, race_round, race_name, race_session,
             race_info)
