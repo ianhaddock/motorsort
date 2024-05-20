@@ -151,21 +151,23 @@ def list_files(source_path):
 def find_sprint_weekends(source_file_names, sprint_weekends):
     """ search for sprint weekends before parsing names """
     for source_file_name in source_file_names:
-        for i, c in enumerate(source_file_name):
-            if c == '2':
-                if source_file_name[i:i+4].isnumeric():
-                    race_season = source_file_name[i:i+4]
-                # print(source_file_name[i:i+4])
-            if c == 'R':
-                # print(source_file_name[i:i+5])
-                if source_file_name[i:i+5] == 'Round':
-                    race_round = source_file_name[i+5:i+7]
-                    # print(source_file_name[i+5:i+7])
-            if c == 'S':
-                # print(source_file_name[i:i+6])
-                if source_file_name[i:i+6] == 'Sprint':
-                    if (race_season, race_round) not in sprint_weekends:
-                        sprint_weekends.append((race_season, race_round))
+        race_season, race_round = '', ''
+
+        if 'Sprint' in source_file_name:
+
+            if '20' in source_file_name:
+                i = source_file_name.index('20')
+                year = source_file_name[i:i+4]
+                if year.isnumeric():
+                    race_season = year
+
+            if 'Round' in source_file_name:
+                i = source_file_name.index('Round')
+                race_round = source_file_name[i+5:i+8].strip('.')
+
+            if (race_season, race_round) not in sprint_weekends:
+                sprint_weekends.append((race_season, race_round))
+
     return sprint_weekends
 
 
@@ -356,7 +358,7 @@ def build_out_files(source_file_names, sprint_weekends):
 
             # reduce duplicate race directories due to differences in race names
             race_round_path = str(destination_path + "/" + race_series +
-                                      "/" + race_season + "-" + race_round)
+                                  "/" + race_season + "-" + race_round)
             race_round_path_found = glob.glob(race_round_path + '*')
             if race_round_path_found:
                 # print('Found existing race directory: ' + str(race_round_path_found[0]))
