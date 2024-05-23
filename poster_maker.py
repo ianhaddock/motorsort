@@ -45,7 +45,7 @@ def create_background_image(font_name, image_path, destination_folder, race_seas
 def create_poster_image(font_name, track_path, image_path, destination_folder, race_season, race_round, race_name):
     """ generates images with imagemagick"""
 
-    point_size_base = 80
+    point_size_base = 95
 
     race_poster_destination = str(destination_folder + "/show.png")
     track_map_image = str(track_path + "/" + race_name + ".png")
@@ -62,7 +62,7 @@ def create_poster_image(font_name, track_path, image_path, destination_folder, r
         poster_image = str(image_path + "/poster.jpg")
 
     # adjust title size for longer race_name
-    point_size = str(point_size_base-len(race_name)*2)
+    point_size = str(point_size_base-len(race_name)*3)
 
     # start building up the imagemagic command
     generate_race_poster_cmd = ["magick", poster_image,
@@ -81,10 +81,10 @@ def create_poster_image(font_name, track_path, image_path, destination_folder, r
     generate_race_poster_cmd.extend(["-gravity", "Center",
                                      "-font", font_name['font_bold'],
                                      "-pointsize", point_size,
-                                     "-fill", "red2",
-                                     "-stroke", "red4",
+                                     "-fill", "white",
+                                     "-stroke", "black",
                                      "-strokewidth", "4",
-                                     "-annotate", "+0-310", race_name,
+                                     "-annotate", "+0-310", race_name.upper(),
                                      "-font", font_name['font_black'],
                                      "-fill", "red4",
                                      "-stroke", "white",
@@ -94,10 +94,10 @@ def create_poster_image(font_name, track_path, image_path, destination_folder, r
                                      "-annotate", "+20+20", race_season,
                                      "-gravity", "SouthEast",
                                      "-font", font_name['font_regular'],
-                                     "-pointsize", "120",
+                                     "-pointsize", "90",
                                      "-fill", "none",
                                      "-stroke", "white",
-                                     "-strokewidth", "8",
+                                     "-strokewidth", "4",
                                      "-annotate", "+10+10", race_round,
                                      race_poster_destination])
 
