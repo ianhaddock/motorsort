@@ -45,7 +45,7 @@ def create_background_image(font_name, image_path, destination_folder, race_seas
 def create_poster_image(font_name, track_path, image_path, destination_folder, race_season, race_round, race_name):
     """ generates images with imagemagick"""
 
-    point_size_base = 90
+    point_size_base = 98
 
     race_poster_destination = str(destination_folder + "/show.png")
     track_map_image = str(track_path + "/" + race_name + ".png")
