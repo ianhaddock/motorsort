@@ -10,6 +10,7 @@ import os
 import glob
 from shutil import which
 import urllib.request
+from datetime import datetime
 from configparser import ConfigParser
 from poster_maker import create_poster_image, create_background_image
 
@@ -294,10 +295,10 @@ if __name__ == "__main__":
     image_path = get_config('image_path')
     track_path = get_config('track_path')
 
-    # config, build sprint weekends list from string
+    # config, build sprint weekends list for current year from config string
     weekends = get_config('sprint_weekends').split(',')
     for weekend in weekends:
-        sprint_weekends.append(('2024', weekend))
+        sprint_weekends.append((datetime.now().year, weekend))
 
     # sanity checks
     if not os.path.isdir(str(source_path)):
