@@ -72,10 +72,10 @@ def create_poster_image(font_name, track_path, image_path, destination_folder, r
 
     # if brightness is greater than value, use a darker text color
     if brightness > 50:
-        fill_color = "darkred"
+        fill_color = "gray36"
         stroke_color = "white"
     else:
-        fill_color = "red3"
+        fill_color = "gray90"
         stroke_color = "black"
 
     # adjust title size for longer race_name
