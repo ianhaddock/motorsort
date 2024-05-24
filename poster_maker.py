@@ -45,7 +45,7 @@ def create_background_image(font_name, image_path, destination_folder, race_seas
 def create_poster_image(font_name, track_path, image_path, destination_folder, race_season, race_round, race_name):
     """ generates images with imagemagick"""
 
-    point_size_base = 98
+    point_size_base = 120
 
     race_poster_destination = str(destination_folder + "/show.png")
     track_map_image = str(track_path + "/" + race_name + ".png")
@@ -61,8 +61,25 @@ def create_poster_image(font_name, track_path, image_path, destination_folder, r
     if not os.path.isfile(poster_image):
         poster_image = str(image_path + "/poster.jpg")
 
+    # get average brightness of poster image
+    pb = ["convert", poster_image, "-colorspace", "gray",
+          "-resize", "1x1", "-format", "'%[pixel:p{0,0}]'", "info:"]
+    poster_brightness = subprocess.run(pb, capture_output=True, text=True)
+
+    # convert result 'grey(xx.xxx)' to int
+    poster_brightness_result = poster_brightness.stdout
+    brightness = int(poster_brightness_result[6:8])
+
+    # if brightness is greater than value, use a darker text color
+    if brightness > 50:
+        fill_color = "darkred"
+        stroke_color = "white"
+    else:
+        fill_color = "red3"
+        stroke_color = "black"
+
     # adjust title size for longer race_name
-    point_size = str(point_size_base-len(race_name)*3)
+    point_size = str(point_size_base-len(race_name)*5)
 
     # start building up the imagemagic command
     generate_race_poster_cmd = ["magick", poster_image,
@@ -70,7 +87,7 @@ def create_poster_image(font_name, track_path, image_path, destination_folder, r
 
     # if a map is available, add it to the command
     if os.path.isfile(track_map_image):
-        generate_race_poster_cmd.extend(["-blur", "0x2",
+        generate_race_poster_cmd.extend(["-blur", "0x4",
                                          track_map_image,
                                          "-compose", "Src_Over",
                                          "-gravity", "Center",
@@ -79,10 +96,10 @@ def create_poster_image(font_name, track_path, image_path, destination_folder, r
 
     # add the rest of the imagemagic command
     generate_race_poster_cmd.extend(["-gravity", "Center",
-                                     "-font", font_name['font_bold'],
+                                     "-font", font_name['font_black'],
                                      "-pointsize", point_size,
-                                     "-fill", "white",
-                                     "-stroke", "black",
+                                     "-fill", fill_color,
+                                     "-stroke", stroke_color,
                                      "-strokewidth", "4",
                                      "-annotate", "+0-310", race_name.upper(),
                                      "-font", font_name['font_black'],
