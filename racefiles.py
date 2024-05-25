@@ -133,76 +133,6 @@ def parse_file_name(source_file_name):
             race_info)
 
 
-def build_out_files(source_file_names, sprint_weekends):
-    """ check if this is a media file, parse filename, sort by keywords into
-    folders, link files to destination directory"""
-
-    images_linked = []
-    backgrounds_linked = []
-
-    try:
-        os.makedirs(destination_path, exist_ok=True)
-    except OSError as err:
-        print("Can't create " + destination_path + ": " + err)
-        raise SystemExit()
-
-    for source_file_name in source_file_names:
-        # print()
-        # print(source_file_name)
-        if source_file_name[-4:] in file_types:
-
-            filetype = source_file_name[-3:]
-
-            race_series, race_season, race_round, race_name, race_session, \
-                race_info = parse_file_name(source_file_name.replace('.', ' '))
-
-            if (race_season, race_round) in sprint_weekends:
-                weekend_order = str(sprint_order.index(race_session)+1).zfill(2)
-            else:
-                weekend_order = str(regular_order.index(race_session)+1).zfill(2)
-
-            final_file_name = str(race_name + " GP - S" + race_round + "E" +
-                                  weekend_order + " - " + race_session +
-                                  " [" + race_info + "]." + filetype)
-
-            destination_folder = str(destination_path + "/" + race_series +
-                                     "/" + race_season + "-" + race_round +
-                                     " - " + race_name + " GP")
-            # print(destination_folder + "/" + final_file_name)
-
-            # reduce duplicate race directories due to differences in race names
-            race_round_path = str(destination_path + "/" + race_series +
-                                  "/" + race_season + "-" + race_round)
-            race_round_path_found = glob.glob(race_round_path + '*')
-            if race_round_path_found:
-                # print('Found existing race directory: ' + str(race_round_path_found[0]))
-                destination_folder = str(race_round_path_found[0])
-                final_file_path = str(race_round_path_found[0]) + '/' + final_file_name
-            else:
-                os.makedirs(destination_folder, exist_ok=True)
-                final_file_path = str(destination_folder + '/' + final_file_name)
-            # print(final_file_path)
-
-            # only build a background image once for each directory
-            if destination_folder not in backgrounds_linked:
-                create_background_image(font_list, image_path, destination_folder,
-                                        race_season, race_round, race_name)
-                backgrounds_linked.append(destination_folder)
-
-            # only build a poster once for each directory
-            if destination_folder not in images_linked:
-                create_poster_image(font_list, track_path, image_path, destination_folder,
-                                    race_season, race_round, race_name)
-                images_linked.append(destination_folder)
-
-            try:
-                os.link(source_file_name, final_file_path)
-            except FileExistsError:
-                pass  # print("Skipping: " + final_file_name)
-            else:
-                print("Linked: " + os.path.basename(final_file_name))
-
-
 if __name__ == "__main__":
     """ main """
 
@@ -249,4 +179,68 @@ if __name__ == "__main__":
     print("Found " + str(len(sprint_weekends)) + " sprint weekends.")
 
     print("Creating files.")
-    build_out_files(source_file_names, sprint_weekends)
+
+    images_linked = []
+    backgrounds_linked = []
+
+    try:
+        os.makedirs(destination_path, exist_ok=True)
+    except OSError as err:
+        print("Can't create " + destination_path + ": " + err)
+        raise SystemExit()
+
+    for source_file_name in source_file_names:
+        # print()
+        # print(source_file_name)
+
+        filetype = source_file_name[-3:]
+
+        race_series, race_season, race_round, race_name, race_session, \
+            race_info = parse_file_name(source_file_name.replace('.', ' '))
+
+        if (race_season, race_round) in sprint_weekends:
+            weekend_order = str(sprint_order.index(race_session)+1).zfill(2)
+        else:
+            weekend_order = str(regular_order.index(race_session)+1).zfill(2)
+
+        final_file_name = str(race_name + " GP - S" + race_round + "E" +
+                              weekend_order + " - " + race_session +
+                              " [" + race_info + "]." + filetype)
+
+        destination_folder = str(destination_path + "/" + race_series +
+                                 "/" + race_season + "-" + race_round +
+                                 " - " + race_name + " GP")
+        # print(destination_folder + "/" + final_file_name)
+
+        # reduce duplicate race directories due to differences in race names
+        race_round_path = str(destination_path + "/" + race_series +
+                              "/" + race_season + "-" + race_round)
+        race_round_path_found = glob.glob(race_round_path + '*')
+        if race_round_path_found:
+            # print('Found existing race directory: ' + str(race_round_path_found[0]))
+            destination_folder = str(race_round_path_found[0])
+            final_file_path = str(race_round_path_found[0]) + '/' + final_file_name
+        else:
+            os.makedirs(destination_folder, exist_ok=True)
+            final_file_path = str(destination_folder + '/' + final_file_name)
+        # print(final_file_path)
+
+        # only build a background image once for each directory
+        if destination_folder not in backgrounds_linked:
+            create_background_image(font_list, image_path, destination_folder,
+                                    race_season, race_round, race_name)
+            backgrounds_linked.append(destination_folder)
+
+        # only build a poster once for each directory
+        if destination_folder not in images_linked:
+            create_poster_image(font_list, track_path, image_path, destination_folder,
+                                race_season, race_round, race_name)
+            images_linked.append(destination_folder)
+
+        try:
+            os.link(source_file_name, final_file_path)
+        except FileExistsError:
+            pass  # print("Skipping: " + final_file_name)
+        else:
+            print("Linked: " + os.path.basename(final_file_name))
+
