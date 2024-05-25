@@ -198,19 +198,31 @@ if __name__ == "__main__":
         race_series, race_season, race_round, race_name, race_session, \
             race_info = parse_file_name(source_file_name.replace('.', ' '))
 
-        if (race_season, race_round) in sprint_weekends:
-            weekend_order = str(sprint_order.index(race_session)+1).zfill(2)
+        if race_series == "Formula 1":
+            if (race_season, race_round) in sprint_weekends:
+                weekend_order = str(sprint_order.index(race_session)+1).zfill(2)
+            else:
+                weekend_order = str(regular_order.index(race_session)+1).zfill(2)
+
+            final_file_name = str(race_name + " GP - S" + race_round + "E" +
+                                  weekend_order + " - " + race_session +
+                                  " [" + race_info + "]." + filetype)
+
+            destination_folder = str(destination_path + "/" + race_series +
+                                     "/" + race_season + "-" + race_round +
+                                     " - " + race_name + " GP")
+            # print(destination_folder + "/" + final_file_name)
         else:
-            weekend_order = str(regular_order.index(race_session)+1).zfill(2)
+            weekend_order = str(sportscar_order.index(race_session)+1).zfill(2)
 
-        final_file_name = str(race_name + " GP - S" + race_round + "E" +
-                              weekend_order + " - " + race_session +
-                              " [" + race_info + "]." + filetype)
+            final_file_name = str(race_name + " - S" + race_round + "E" +
+                                  weekend_order + " - " + race_session +
+                                  " [" + race_info + "]." + filetype)
 
-        destination_folder = str(destination_path + "/" + race_series +
-                                 "/" + race_season + "-" + race_round +
-                                 " - " + race_name + " GP")
-        # print(destination_folder + "/" + final_file_name)
+            destination_folder = str(destination_path + "/" + race_series +
+                                     "/" + race_season + "-" + race_round +
+                                     " - " + race_name)
+            # print(destination_folder + "/" + final_file_name)
 
         # reduce duplicate race directories due to differences in race names
         race_round_path = str(destination_path + "/" + race_series +
