@@ -16,16 +16,6 @@ from configparser import ConfigParser
 from poster_maker import create_poster_image, create_background_image
 
 
-# def get_config(item, config_file='config.ini'):
-#     """get settings in config file"""
-#     config = ConfigParser()
-#     config.read(config_file)
-# 
-#     print(config.get('config', 'wide' ))
-# 
-#     return config.get('config', str(item))
-
-
 def get_fonts(path):
     """ download fonts if missing"""
 
@@ -54,11 +44,12 @@ def get_fonts(path):
 
 
 def list_files(source_path):
+    """ return path & name of files matching extensions and prefix lists"""
+
     file_list = []
     for root, dirs, files in os.walk(source_path):
         for file in files:
-            if file.endswith(file_types) and \
-               file.startswith(file_prefix):
+            if file.endswith(file_types) and file.startswith(file_prefix):
                 file_list.append(os.path.join(root, file))
 
     return sorted(file_list)
@@ -215,39 +206,30 @@ if __name__ == "__main__":
     file_types = tuple(config.get('config', 'file_types').split(','))
     weekends = config.get('config', 'sprint_weekends').split(',')
 
-
     # read json files
     with open('series_prefix.json') as file:
         series_prefix = json.load(file)
-#        print(series_prefix)
     with open('weekend_order.json') as file:
         weekend_order = json.load(file)
-#        print(weekend_order)
         sprint_order = weekend_order['sprint_order']
         regular_order = weekend_order['regular_order']
         sportscar_order = weekend_order['sportscar_order']
     with open('session_map.json') as file:
         session_map = json.load(file)
-#        print(session_map)
-#        for key in session_map.keys():
-#            print("key: " + key + ", value: " + session_map[key])
     with open('fonts.json') as file:
         font_list = json.load(file)
-#    print(font_list)
-
 
     # sanity checks
     if not os.path.isdir(str(source_path)):
         print("Can't find source path: " + source_path)
         raise SystemExit()
-
     if not which('magick'):
         print("imagemagick not found")
         raise SystemExit()
 
     # test
-    for key, value in config.items('config'):
-        print("Key: " + key + " Value: " + value)
+    # for key, value in config.items('config'):
+    #     print("Key: " + key + " Value: " + value)
 
     # build sprint weekends list for current year from config string
     sprint_weekends = []
