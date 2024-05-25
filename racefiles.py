@@ -8,133 +8,49 @@
 
 import os
 import glob
+import json
 from shutil import which
 import urllib.request
 from datetime import datetime
 from configparser import ConfigParser
 from poster_maker import create_poster_image, create_background_image
 
-file_types = ('.mkv', '.mp4')
 
-file_prefix = ('Formula1', 'Formula.1', 'WEC')
-
-series_prefix = [('Formula1', 'Formula 1'),
-                 ('Formula 1', 'Formula 1'),
-                 ('WEC', 'WEC')]
-
-fonts = ['font_regular',
-         'font_bold',
-         'font_wide',
-         'font_black']
-
-sprint_weekends = []
-
-sprint_order = ['Free Practice 1',
-                'Quali Buildup',
-                'Qualifying',
-                'Quali Analysis',
-                'Quali Notebook',
-                'Free Practice 2',
-                'Sprint Shootout',
-                'Sprint',
-                'Sprint Analysis',
-                'Sprint Notebook',
-                'Free Practice 3',
-                'Race Buildup',
-                'Race',
-                'Race Analysis',
-                'Race Notebook',
-                'Onboard Channel']
-
-regular_order = ['Free Practice 1',
-                 'Free Practice 2',
-                 'Free Practice 3',
-                 'Quali Buildup',
-                 'Qualifying',
-                 'Quali Analysis',
-                 'Quali Notebook',
-                 'Race Buildup',
-                 'Race',
-                 'Race Analysis',
-                 'Race Notebook',
-                 'Onboard Channel']
-
-session_map = [('fp1', 'Free Practice 1'),
-               ('fp2', 'Free Practice 2'),
-               ('fp3', 'Free Practice 3'),
-               ('qualifying', 'Qualifying'),
-               ('pre quali', 'Quali Buildup'),
-               ('pre qualifying', 'Quali Buildup'),
-               ('qualifying buildup', 'Quali Buildup'),
-               ('qualifying build-up', 'Quali Buildup'),
-               ('quali', 'Qualifying'),
-               ('post quali', 'Quali Analysis'),
-               ('post qualifying', 'Quali Analysis'),
-               ('quali analysis', 'Quali Analysis'),
-               ('quali buildup', 'Quali Buildup'),
-               ('qualifying analysis', 'Quali Analysis'),
-               ('sprint', 'Sprint'),
-               ('sprint shootout', 'Sprint Shootout'),
-               ('sprint quali', 'Sprint Shootout'),
-               ('sprint race', 'Sprint'),
-               ('pre race', 'Race Buildup'),
-               ('race buildup', 'Race Buildup'),
-               ('race build-up', 'Race Buildup'),
-               ('race', 'Race'),
-               ('post race', 'Race Analysis'),
-               ('race analysis', 'Race Analysis'),
-               ('race notebook', 'Race Notebook'),
-               ('quali notebook', 'Quali Notebook'),
-               ('teds notebook', 'Race Notebook'),
-               ('teds quali notebook', 'Quali Notebook'),
-               ('qualifying notebook', 'Quali Notebook'),
-               ('teds qualifying notebook', 'Quali Notebook'),
-               ('qualifying teds notebook', 'Quali Notebook'),
-               ('teds race notebook', 'Race Notebook'),
-               ('teds sprint notebook', 'Sprint Notebook'),
-               ('race teds notebook', 'Race Notebook'),
-               ('onboard channel', 'Onboard Channel'),
-               ('race onboard channel', 'Onboard Channel'),
-               ('onboard', 'Onboard Channel')]
+# def get_config(item, config_file='config.ini'):
+#     """get settings in config file"""
+#     config = ConfigParser()
+#     config.read(config_file)
+# 
+#     print(config.get('config', 'wide' ))
+# 
+#     return config.get('config', str(item))
 
 
-def get_config(item, config_file='config.ini'):
-    """get settings in config file"""
-    config = ConfigParser()
-    config.read(config_file)
-
-    return config.get('config', str(item))
-
-
-def get_fonts(fonts, path):
+def get_fonts(path):
     """ download fonts if missing"""
 
     downloaded = False
-    fonts_list = []
-    font_name = {}
-
-    for font in fonts:
-        fonts_list.append((get_config(font).split(',')))
-        font_name[font] = fonts_list[-1][0]
 
     os.makedirs(path, exist_ok=True)
-    for name, url_path in fonts_list:
-        font = os.path.basename(url_path)
-        if not os.path.isfile(str(font_path + "/" + font)):
+
+    for key in font_list.keys():
+        font_url = font_list[key][1]
+        font = os.path.basename(font_list[key][1])
+        if not os.path.isfile(str(path + "/" + font)):
             try:
-                urllib.request.urlretrieve(url_path, str(path + "/" + font))
+                urllib.request.urlretrieve(font_url, str(path + "/" + font))
             except OSError as err:
                 print("Can't download F1 Font: " + str(err))
                 raise SystemExit()
             else:
                 downloaded = True
-                print("Downloaded " + name)
+                print("Downloaded " + font_list[key][0])
 
     if downloaded:
         print("Please install downloaded fonts to proceed.")
         raise SystemExit()
 
-    return font_name
+    return
 
 
 def list_files(source_path):
@@ -181,10 +97,9 @@ def parse_file_name(source_file_name):
     while '/' in source_file_name:
         source_file_name = source_file_name[source_file_name.index('/') + 1:]
 
-    # cleanup race series naming
-    for prefix, name in series_prefix:
-        if prefix in source_file_name:
-            race_series = name
+    for key in series_prefix.keys():
+        if key in source_file_name:
+            race_series = series_prefix[key]
 
     # get Round number
     if 'Round' in source_file_name:
@@ -204,10 +119,10 @@ def parse_file_name(source_file_name):
         race_name_index_start = source_file_name.index('USA') + len('USA') + 1
 
     # sort race sessions
-    for key, value in session_map:
+    for key in session_map.keys():
         if key in source_file_name.lower():
             if len(race_session) <= len(key):
-                race_session = value
+                race_session = session_map[key]
                 race_name = source_file_name[race_name_index_start:source_file_name.lower().index(key) - 1].strip()
                 race_info = source_file_name[source_file_name.lower().index(key) + len(key) + 1:-4].strip()
 
@@ -267,13 +182,13 @@ def build_out_files(source_file_names, sprint_weekends):
 
             # only build a background image once for each directory
             if destination_folder not in backgrounds_linked:
-                create_background_image(font_name, image_path, destination_folder,
+                create_background_image(font_list, image_path, destination_folder,
                                         race_season, race_round, race_name)
                 backgrounds_linked.append(destination_folder)
 
             # only build a poster once for each directory
             if destination_folder not in images_linked:
-                create_poster_image(font_name, track_path, image_path, destination_folder,
+                create_poster_image(font_list, track_path, image_path, destination_folder,
                                     race_season, race_round, race_name)
                 images_linked.append(destination_folder)
 
@@ -288,17 +203,38 @@ def build_out_files(source_file_names, sprint_weekends):
 if __name__ == "__main__":
     """ main """
 
-    # config, paths
-    source_path = get_config('source_path')
-    destination_path = get_config('destination_path')
-    font_path = get_config('font_path')
-    image_path = get_config('image_path')
-    track_path = get_config('track_path')
+    # read config.ini file
+    config = ConfigParser()
+    config.read('config.ini')
+    source_path = config.get('config', 'source_path')
+    destination_path = config.get('config', 'destination_path')
+    font_download_path = config.get('config', 'font_path')
+    image_path = config.get('config', 'image_path')
+    track_path = config.get('config', 'track_path')
+    file_prefix = tuple(config.get('config', 'file_prefix').split(','))
+    file_types = tuple(config.get('config', 'file_types').split(','))
+    weekends = config.get('config', 'sprint_weekends').split(',')
 
-    # config, build sprint weekends list for current year from config string
-    weekends = get_config('sprint_weekends').split(',')
-    for weekend in weekends:
-        sprint_weekends.append((datetime.now().year, weekend))
+
+    # read json files
+    with open('series_prefix.json') as file:
+        series_prefix = json.load(file)
+#        print(series_prefix)
+    with open('weekend_order.json') as file:
+        weekend_order = json.load(file)
+#        print(weekend_order)
+        sprint_order = weekend_order['sprint_order']
+        regular_order = weekend_order['regular_order']
+        sportscar_order = weekend_order['sportscar_order']
+    with open('session_map.json') as file:
+        session_map = json.load(file)
+#        print(session_map)
+#        for key in session_map.keys():
+#            print("key: " + key + ", value: " + session_map[key])
+    with open('fonts.json') as file:
+        font_list = json.load(file)
+#    print(font_list)
+
 
     # sanity checks
     if not os.path.isdir(str(source_path)):
@@ -309,7 +245,16 @@ if __name__ == "__main__":
         print("imagemagick not found")
         raise SystemExit()
 
-    font_name = get_fonts(fonts, font_path)
+    # test
+    for key, value in config.items('config'):
+        print("Key: " + key + " Value: " + value)
+
+    # build sprint weekends list for current year from config string
+    sprint_weekends = []
+    for weekend in weekends:
+        sprint_weekends.append((datetime.now().year, weekend))
+
+    get_fonts(font_download_path)
 
     source_file_names = list_files(source_path)
     print("Found " + str(len(source_file_names)) + " items to process.")

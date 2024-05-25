@@ -1,0 +1,6 @@
+{
+"regular": ["Formula1-Display-Regular", "https://www.formula1.com/etc/designs/fom-website/fonts/F1Regular/Formula1-Regular.ttf"],
+"bold": ["Formula1-Display-Bold-Bold", "https://www.formula1.com/etc/designs/fom-website/fonts/F1Bold/Formula1-Bold.ttf"],
+"wide": ["Formula1-Display-Wide", "https://www.formula1.com/etc/designs/fom-website/fonts/F1Wide/Formula1-Wide.ttf"],
+"black": ["Formula1-Display-Black", "https://www.formula1.com/etc/designs/fom-website/fonts/F1Black/Formula1-Black.ttf"]
+}
