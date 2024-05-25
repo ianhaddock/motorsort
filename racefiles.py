@@ -55,8 +55,15 @@ def list_files(source_path):
     return sorted(file_list)
 
 
-def find_sprint_weekends(source_file_names, sprint_weekends):
+def find_sprint_weekends(source_file_names, weekends):
     """ search for sprint weekends before parsing names """
+
+    sprint_weekends = []
+    # add sprint weekends from list in config.ini
+    for weekend in weekends:
+        sprint_weekends.append((datetime.now().year, weekend))
+
+    # search files for other sprint weekends
     for source_file_name in source_file_names:
         race_season, race_round = '', ''
 
@@ -231,19 +238,13 @@ if __name__ == "__main__":
     # for key, value in config.items('config'):
     #     print("Key: " + key + " Value: " + value)
 
-    # build sprint weekends list for current year from config string
-    sprint_weekends = []
-    for weekend in weekends:
-        sprint_weekends.append((datetime.now().year, weekend))
-
     get_fonts(font_download_path)
 
     source_file_names = list_files(source_path)
     print("Found " + str(len(source_file_names)) + " items to process.")
 
-    sprint_weekends = find_sprint_weekends(source_file_names, sprint_weekends)
+    sprint_weekends = find_sprint_weekends(source_file_names, weekends)
     print("Found " + str(len(sprint_weekends)) + " sprint weekends.")
 
     print("Creating files.")
     build_out_files(source_file_names, sprint_weekends)
-
