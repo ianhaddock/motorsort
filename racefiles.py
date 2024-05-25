@@ -16,12 +16,12 @@ from configparser import ConfigParser
 from poster_maker import create_poster_image, create_background_image
 
 
-def get_fonts(path):
+def download_missing_fonts(path):
     """ download fonts if missing"""
 
-    downloaded = False
-
     os.makedirs(path, exist_ok=True)
+
+    downloaded = False
 
     for key in font_list.keys():
         font_url = font_list[key][1]
@@ -43,10 +43,15 @@ def get_fonts(path):
     return
 
 
-def list_files(source_path):
+def get_file_list(source_path, file_prefix, file_types):
     """ return path & name of files matching extensions and prefix lists"""
 
     file_list = []
+
+    if not os.path.isdir(str(source_path)):
+        print("Can't find source path: " + source_path)
+        raise SystemExit()
+
     for root, dirs, files in os.walk(source_path):
         for file in files:
             if file.endswith(file_types) and file.startswith(file_prefix):
@@ -201,14 +206,19 @@ def build_out_files(source_file_names, sprint_weekends):
 if __name__ == "__main__":
     """ main """
 
+    # dependency check
+    if not which('magick'):
+        print("imagemagick not found")
+        raise SystemExit()
+
     # read config.ini file
     config = ConfigParser()
     config.read('config.ini')
-    source_path = config.get('config', 'source_path')
     destination_path = config.get('config', 'destination_path')
-    font_download_path = config.get('config', 'font_path')
     image_path = config.get('config', 'image_path')
     track_path = config.get('config', 'track_path')
+    font_path = config.get('config', 'font_path')
+    source_path = config.get('config', 'source_path')
     file_prefix = tuple(config.get('config', 'file_prefix').split(','))
     file_types = tuple(config.get('config', 'file_types').split(','))
     weekends = config.get('config', 'sprint_weekends').split(',')
@@ -226,21 +236,13 @@ if __name__ == "__main__":
     with open('fonts.json') as file:
         font_list = json.load(file)
 
-    # sanity checks
-    if not os.path.isdir(str(source_path)):
-        print("Can't find source path: " + source_path)
-        raise SystemExit()
-    if not which('magick'):
-        print("imagemagick not found")
-        raise SystemExit()
-
     # test
     # for key, value in config.items('config'):
     #     print("Key: " + key + " Value: " + value)
 
-    get_fonts(font_download_path)
+    download_missing_fonts(font_path)
 
-    source_file_names = list_files(source_path)
+    source_file_names = get_file_list(source_path, file_prefix, file_types)
     print("Found " + str(len(source_file_names)) + " items to process.")
 
     sprint_weekends = find_sprint_weekends(source_file_names, weekends)
