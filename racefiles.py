@@ -95,6 +95,7 @@ def parse_file_name(source_file_name):
     file names"""
 
     race_session, race_name, race_info = '', '', ''
+    race_round = '00'
 
     # remove subfolders from path before sorting by filename
     while '/' in source_file_name:
@@ -126,7 +127,13 @@ def parse_file_name(source_file_name):
         if key in source_file_name.lower():
             if len(race_session) <= len(key):
                 race_session = session_map[key]
-                race_name = source_file_name[race_name_index_start:source_file_name.lower().index(key) - 1].strip()
+                # if no Round was found, use the race series as the race name
+                try:
+                    race_name_index_start
+                except NameError:
+                    race_name = race_series
+                else:
+                    race_name = source_file_name[race_name_index_start:source_file_name.lower().index(key) - 1].strip()
                 race_info = source_file_name[source_file_name.lower().index(key) + len(key) + 1:-4].strip()
 
     return (race_series, race_season, race_round, race_name, race_session,
