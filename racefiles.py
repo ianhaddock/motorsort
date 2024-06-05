@@ -201,34 +201,28 @@ if __name__ == "__main__":
             race_info = parse_file_name(source_file_name.replace('.', ' '))
 
         if race_series == "Formula 1":
+            gp_suffix = " GP"
             if (race_season, race_round) in sprint_weekends:
                 weekend_order = str(sprint_order.index(race_session)+1).zfill(2)
             else:
                 weekend_order = str(regular_order.index(race_session)+1).zfill(2)
-
-            final_file_name = str(race_name + " GP - S" + race_round + "E" +
-                                  weekend_order + " - " + race_session +
-                                  " [" + race_info + "]." + filetype)
-
-            destination_folder = str(destination_path + "/" + race_series +
-                                     "/" + race_season + "-" + race_round +
-                                     " - " + race_name + " GP")
-            # print(destination_folder + "/" + final_file_name)
         else:
+            gp_suffix = ""
             weekend_order = str(sportscar_order.index(race_session)+1).zfill(2)
 
-            final_file_name = str(race_name + " - S" + race_round + "E" +
-                                  weekend_order + " - " + race_session +
-                                  " [" + race_info + "]." + filetype)
+        final_file_name = str(race_name + gp_suffix + " - S" + race_round + "E" +
+                              weekend_order + " - " + race_session +
+                              " [" + race_info + "]." + filetype)
 
-            destination_folder = str(destination_path + "/" + race_series +
-                                     "/" + race_season + "-" + race_round +
-                                     " - " + race_name)
-            # print(destination_folder + "/" + final_file_name)
+        destination_folder = str(destination_path + "/" + race_series +
+                                 "/" + race_season + "-" + race_round +
+                                 " - " + race_name + gp_suffix)
+        # print(destination_folder + "/" + final_file_name)
 
-        # use an existing race_season + race_round directory even if race_name differs
         race_round_path = str(destination_path + "/" + race_series +
                               "/" + race_season + "-" + race_round)
+
+        # use an existing race_season + race_round directory even if race_name differs
         race_round_path_found = glob.glob(race_round_path + '*')
         if race_round_path_found:
             # print('Found existing race directory: ' + str(race_round_path_found[0]))
@@ -239,7 +233,6 @@ if __name__ == "__main__":
                 os.makedirs(destination_folder, exist_ok=True)
             except OSError as err:
                 raise SystemExit("ERROR: Can't create path: " + destination_folder + "\n" + str(err))
-
             final_file_path = str(destination_folder + '/' + final_file_name)
         # print(final_file_path)
 
@@ -258,8 +251,7 @@ if __name__ == "__main__":
         try:
             os.link(source_file_name, final_file_path)
         except FileExistsError:
-            # print("Already exists: " + final_file_name)
+            # print("Exists: " + final_file_name)
             pass
         else:
             print("Linked: " + os.path.basename(final_file_name))
-
