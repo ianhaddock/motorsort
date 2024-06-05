@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # racefiles.py
 #
-# Automatically organize racing videos into seasons and create custom poster
+# Organize racing videos into seasons and create custom poster
 # images. For use with a personal media server.
 # 17 Dec 2023
 
@@ -19,7 +19,10 @@ from poster_maker import create_poster_image, create_background_image
 def download_missing_fonts(path):
     """ download fonts if missing"""
 
-    os.makedirs(path, exist_ok=True)
+    try:
+        os.makedirs(path, exist_ok=True)
+    except OSError as err:
+        raise SystemExit("ERROR: Can't create path: " + path + "\n" + str(err))
 
     downloaded = False
 
@@ -171,16 +174,9 @@ if __name__ == "__main__":
     with open('fonts.json') as file:
         font_list = json.load(file)
 
-    # check for imagemagick dependency
+    # checks
     if not which('magick'):
-        print("imagemagick not found")
-        raise SystemExit()
-
-    # check for target directory write access
-    try:
-        os.makedirs(destination_path, exist_ok=True)
-    except OSError as err:
-        raise SystemExit("ERROR: Can't create path: " + destination_path + "\n" + str(err))
+        raise SystemExit("ERROR: Can't find imagemagick")
 
     # get fonts
     download_missing_fonts(font_path)
@@ -239,7 +235,11 @@ if __name__ == "__main__":
             destination_folder = str(race_round_path_found[0])
             final_file_path = str(race_round_path_found[0]) + '/' + final_file_name
         else:
-            os.makedirs(destination_folder, exist_ok=True)
+            try:
+                os.makedirs(destination_folder, exist_ok=True)
+            except OSError as err:
+                raise SystemExit("ERROR: Can't create path: " + destination_folder + "\n" + str(err))
+
             final_file_path = str(destination_folder + '/' + final_file_name)
         # print(final_file_path)
 
