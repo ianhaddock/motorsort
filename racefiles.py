@@ -99,6 +99,8 @@ def parse_file_name(source_file_name):
 
     race_session, race_name, race_info = '', '', ''
     race_round = '00'
+    
+    filetype = source_file_name[-3:]
 
     # remove subfolders from path before sorting by filename
     while '/' in source_file_name:
@@ -139,8 +141,33 @@ def parse_file_name(source_file_name):
                 else:
                     race_name = source_file_name[race_name_index_start:source_file_name.lower().index(key) - 1].strip()
 
-    return (race_series, race_season, race_round, race_name, race_session,
-            race_info)
+    # set filename GP suffix
+    if race_series == "Formula 1":
+        gp_suffix = " GP"
+    else:
+        gp_suffix = ""
+
+    # set weekend event order
+    if race_series == "Formula 1":
+        if (race_season, race_round) in sprint_weekends:
+            weekend_order = str(sprint_order.index(race_session)+1).zfill(2)
+        else:
+            weekend_order = str(regular_order.index(race_session)+1).zfill(2)
+    else:
+        weekend_order = str(sportscar_order.index(race_session)+1).zfill(2)
+
+    final_file_name = str(race_name + gp_suffix + " - S" + race_round + "E" +
+                          weekend_order + " - " + race_session +
+                          " [" + race_info + "]." + filetype)
+
+    destination_folder = str(destination_path + "/" + race_series +
+                             "/" + race_season + "-" + race_round +
+                             " - " + race_name + gp_suffix)
+
+    race_round_path = str(destination_path + "/" + race_series +
+                          "/" + race_season + "-" + race_round)
+
+    return (final_file_name, destination_folder, race_round_path, race_series, race_round, race_name)
 
 
 if __name__ == "__main__":
@@ -195,32 +222,8 @@ if __name__ == "__main__":
         # print()
         # print(source_file_name)
 
-        filetype = source_file_name[-3:]
-
-        race_series, race_season, race_round, race_name, race_session, \
-            race_info = parse_file_name(source_file_name.replace('.', ' '))
-
-        if race_series == "Formula 1":
-            gp_suffix = " GP"
-            if (race_season, race_round) in sprint_weekends:
-                weekend_order = str(sprint_order.index(race_session)+1).zfill(2)
-            else:
-                weekend_order = str(regular_order.index(race_session)+1).zfill(2)
-        else:
-            gp_suffix = ""
-            weekend_order = str(sportscar_order.index(race_session)+1).zfill(2)
-
-        final_file_name = str(race_name + gp_suffix + " - S" + race_round + "E" +
-                              weekend_order + " - " + race_session +
-                              " [" + race_info + "]." + filetype)
-
-        destination_folder = str(destination_path + "/" + race_series +
-                                 "/" + race_season + "-" + race_round +
-                                 " - " + race_name + gp_suffix)
-        # print(destination_folder + "/" + final_file_name)
-
-        race_round_path = str(destination_path + "/" + race_series +
-                              "/" + race_season + "-" + race_round)
+        final_file_name, destination_folder, race_round_path, race_season, race_round, race_name, \
+            = parse_file_name(source_file_name.replace('.', ' '))
 
         # use an existing race_season + race_round directory even if race_name differs
         race_round_path_found = glob.glob(race_round_path + '*')
