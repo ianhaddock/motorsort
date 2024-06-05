@@ -99,7 +99,7 @@ def parse_file_name(source_file_name):
 
     race_session, race_name, race_info = '', '', ''
     race_round = '00'
-    
+
     filetype = source_file_name[-3:]
 
     # remove subfolders from path before sorting by filename
@@ -141,20 +141,19 @@ def parse_file_name(source_file_name):
                 else:
                     race_name = source_file_name[race_name_index_start:source_file_name.lower().index(key) - 1].strip()
 
-    # set filename GP suffix
+    # set weekend event order
+    if race_series == "Formula 1" and (race_season, race_round) in sprint_weekends:
+        weekend_order = str(sprint_order.index(race_session)+1).zfill(2)
+    elif race_series == "Formula 1":
+        weekend_order = str(regular_order.index(race_session)+1).zfill(2)
+    else:
+        weekend_order = str(sportscar_order.index(race_session)+1).zfill(2)
+
+    # set gp suffix
     if race_series == "Formula 1":
         gp_suffix = " GP"
     else:
         gp_suffix = ""
-
-    # set weekend event order
-    if race_series == "Formula 1":
-        if (race_season, race_round) in sprint_weekends:
-            weekend_order = str(sprint_order.index(race_session)+1).zfill(2)
-        else:
-            weekend_order = str(regular_order.index(race_session)+1).zfill(2)
-    else:
-        weekend_order = str(sportscar_order.index(race_session)+1).zfill(2)
 
     final_file_name = str(race_name + gp_suffix + " - S" + race_round + "E" +
                           weekend_order + " - " + race_session +
@@ -167,7 +166,9 @@ def parse_file_name(source_file_name):
     race_round_path = str(destination_path + "/" + race_series +
                           "/" + race_season + "-" + race_round)
 
-    return (final_file_name, destination_folder, race_round_path, race_series, race_round, race_name)
+    race_round_path_found = glob.glob(race_round_path + '*')
+
+    return (final_file_name, destination_folder, race_round_path_found, race_series, race_round, race_name)
 
 
 if __name__ == "__main__":
@@ -222,15 +223,14 @@ if __name__ == "__main__":
         # print()
         # print(source_file_name)
 
-        final_file_name, destination_folder, race_round_path, race_season, race_round, race_name, \
+        final_file_name, destination_folder, race_round_path_found, race_season, race_round, race_name, \
             = parse_file_name(source_file_name.replace('.', ' '))
 
         # use an existing race_season + race_round directory even if race_name differs
-        race_round_path_found = glob.glob(race_round_path + '*')
         if race_round_path_found:
             # print('Found existing race directory: ' + str(race_round_path_found[0]))
             destination_folder = str(race_round_path_found[0])
-            final_file_path = str(race_round_path_found[0]) + '/' + final_file_name
+            final_file_path = destination_folder + '/' + final_file_name
         else:
             try:
                 os.makedirs(destination_folder, exist_ok=True)
@@ -239,13 +239,13 @@ if __name__ == "__main__":
             final_file_path = str(destination_folder + '/' + final_file_name)
         # print(final_file_path)
 
-        # only build a background image once for each directory
+        # only build background once for each directory
         if destination_folder not in backgrounds_linked:
             create_background_image(font_list, image_path, destination_folder,
                                     race_season, race_round, race_name)
             backgrounds_linked.append(destination_folder)
 
-        # only build a poster once for each directory
+        # only build poster once for each directory
         if destination_folder not in images_linked:
             create_poster_image(font_list, track_path, image_path, destination_folder,
                                 race_season, race_round, race_name)
