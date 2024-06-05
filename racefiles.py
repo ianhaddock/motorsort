@@ -127,14 +127,14 @@ def parse_file_name(source_file_name):
         if key in source_file_name.lower():
             if len(race_session) <= len(key):
                 race_session = session_map[key]
-                # if no Round was found, use the race series as the race name
+                race_info = source_file_name[source_file_name.lower().index(key) + len(key) + 1:-4].strip()
+                # if no race Round was found, use the series name as the race name
                 try:
                     race_name_index_start
                 except NameError:
                     race_name = race_series
                 else:
                     race_name = source_file_name[race_name_index_start:source_file_name.lower().index(key) - 1].strip()
-                race_info = source_file_name[source_file_name.lower().index(key) + len(key) + 1:-4].strip()
 
     return (race_series, race_season, race_round, race_name, race_session,
             race_info)
@@ -143,10 +143,8 @@ def parse_file_name(source_file_name):
 if __name__ == "__main__":
     """ main """
 
-    # dependency check
-    if not which('magick'):
-        print("imagemagick not found")
-        raise SystemExit()
+    images_linked = []
+    backgrounds_linked = []
 
     # read config.ini file
     config = ConfigParser()
@@ -173,29 +171,30 @@ if __name__ == "__main__":
     with open('fonts.json') as file:
         font_list = json.load(file)
 
-    # test
-    # for key, value in config.items('config'):
-    #     print("Key: " + key + " Value: " + value)
+    # check for imagemagick dependency
+    if not which('magick'):
+        print("imagemagick not found")
+        raise SystemExit()
 
-    download_missing_fonts(font_path)
-
-    source_file_names = get_file_list(source_path, file_prefix, file_types)
-    print("Found " + str(len(source_file_names)) + " items to process.")
-
-    sprint_weekends = find_sprint_weekends(source_file_names, weekends)
-    print("Found " + str(len(sprint_weekends)) + " sprint weekends.")
-
-    print("Creating files.")
-
-    images_linked = []
-    backgrounds_linked = []
-
+    # check for target directory write access
     try:
         os.makedirs(destination_path, exist_ok=True)
     except OSError as err:
-        print("Can't create " + destination_path + ": " + err)
-        raise SystemExit()
+        raise SystemExit("ERROR: Can't create path: " + destination_path + "\n" + str(err))
 
+    # get fonts
+    download_missing_fonts(font_path)
+
+    # sort source directory for files that fit criteria
+    source_file_names = get_file_list(source_path, file_prefix, file_types)
+    print("Found " + str(len(source_file_names)) + " items to process.")
+
+    # search found files for events that match F1 sprint weekend order
+    sprint_weekends = find_sprint_weekends(source_file_names, weekends)
+    print("Found " + str(len(sprint_weekends)) + " sprint weekends.")
+
+    # start buliding
+    print("Creating files.")
     for source_file_name in source_file_names:
         # print()
         # print(source_file_name)
@@ -231,7 +230,7 @@ if __name__ == "__main__":
                                      " - " + race_name)
             # print(destination_folder + "/" + final_file_name)
 
-        # reduce duplicate race directories due to differences in race names
+        # use an existing race_season + race_round directory even if race_name differs
         race_round_path = str(destination_path + "/" + race_series +
                               "/" + race_season + "-" + race_round)
         race_round_path_found = glob.glob(race_round_path + '*')
@@ -259,7 +258,8 @@ if __name__ == "__main__":
         try:
             os.link(source_file_name, final_file_path)
         except FileExistsError:
-            pass  # print("Skipping: " + final_file_name)
+            # print("Already exists: " + final_file_name)
+            pass
         else:
             print("Linked: " + os.path.basename(final_file_name))
 
