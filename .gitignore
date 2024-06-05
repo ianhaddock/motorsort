@@ -1,6 +1,16 @@
+# .gitignore
+
+# MacOS
 .DS_Store
 
+# Project
 sourcefiles/*
 mediafiles/*
 reference/*
 fonts/*
+
+# python
+__pycache__/*
+bin/*
+lib/*
+pyvenv.cfg
