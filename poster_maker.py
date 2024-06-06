@@ -5,19 +5,19 @@ import os
 import subprocess
 
 
-def create_background_image(font_name, image_path, destination_folder, race_season, race_round, race_name):
+def create_background_image(race, font_name, image_path):
     """ generates images with imagemagick"""
 
-    background_destination = str(destination_folder + "/background.jpg")
+    background_destination = str(race.get_destination_folder() + "/background.jpg")
 
     # if image already exists, dont recreate
     if os.path.isfile(background_destination):
         return
 
     # prefer race name to race year to default
-    background_image = str(image_path + "/" + race_name + "-background.jpg")
+    background_image = str(image_path + "/" + race.get_race_name() + "-background.jpg")
     if not os.path.isfile(background_image):
-        background_image = str(image_path + "/" + race_season + "-background.jpg")
+        background_image = str(image_path + "/" + race.get_race_season() + "-background.jpg")
     if not os.path.isfile(background_image):
         background_image = str(image_path + "/background.jpg")
 
@@ -29,7 +29,7 @@ def create_background_image(font_name, image_path, destination_folder, race_seas
                                "-fill", "none",
                                "-stroke", "white",
                                "-strokewidth", "14",
-                               "-annotate", "+160+160", race_round,
+                               "-annotate", "+160+160", race.get_race_round(),
                                background_destination]
 
     try:
@@ -37,27 +37,27 @@ def create_background_image(font_name, image_path, destination_folder, race_seas
     except FileExistsError as err:
         print(err)
     else:
-        print("Background: " + os.path.basename(destination_folder))
+        print("Background: " + os.path.basename(race.get_destination_folder()))
 
     return
 
 
-def create_poster_image(font_name, track_path, image_path, destination_folder, race_season, race_round, race_name):
+def create_poster_image(race, font_name, track_path, image_path):
     """ generates images with imagemagick"""
 
     point_size_base = 120
 
-    race_poster_destination = str(destination_folder + "/show.png")
-    track_map_image = str(track_path + "/" + race_name + ".png")
+    race_poster_destination = str(race.get_destination_folder() + "/show.png")
+    track_map_image = str(track_path + "/" + race.get_race_name() + ".png")
 
     # if image already exists, dont recreate
     if os.path.isfile(race_poster_destination):
         return
 
     # prefer race name to race year to default
-    poster_image = str(image_path + "/" + race_name + "-poster.jpg")
+    poster_image = str(image_path + "/" + race.get_race_name() + "-poster.jpg")
     if not os.path.isfile(poster_image):
-        poster_image = str(image_path + "/" + race_season + "-poster.jpg")
+        poster_image = str(image_path + "/" + race.get_race_season() + "-poster.jpg")
     if not os.path.isfile(poster_image):
         poster_image = str(image_path + "/poster.jpg")
 
@@ -79,7 +79,7 @@ def create_poster_image(font_name, track_path, image_path, destination_folder, r
         stroke_color = "black"
 
     # adjust title size for longer race_name
-    point_size = str(point_size_base-len(race_name)*5)
+    point_size = str(point_size_base-len(race.get_race_name())*5)
 
     # start building up the imagemagic command
     generate_race_poster_cmd = ["magick", poster_image,
@@ -101,21 +101,21 @@ def create_poster_image(font_name, track_path, image_path, destination_folder, r
                                      "-fill", fill_color,
                                      "-stroke", stroke_color,
                                      "-strokewidth", "4",
-                                     "-annotate", "+0-310", race_name.upper(),
+                                     "-annotate", "+0-310", race.get_race_name().upper(),
                                      "-font", font_name['black'][0],
                                      "-fill", "red4",
                                      "-stroke", "white",
                                      "-strokewidth", "2",
                                      "-pointsize", "65",
                                      "-gravity", "SouthWest",
-                                     "-annotate", "+20+20", race_season,
+                                     "-annotate", "+20+20", race.get_race_season(),
                                      "-gravity", "SouthEast",
                                      "-font", font_name['regular'][0],
                                      "-pointsize", "90",
                                      "-fill", "none",
                                      "-stroke", "white",
                                      "-strokewidth", "4",
-                                     "-annotate", "+10+10", race_round,
+                                     "-annotate", "+10+10", race.get_race_round(),
                                      race_poster_destination])
 
     try:
@@ -123,7 +123,7 @@ def create_poster_image(font_name, track_path, image_path, destination_folder, r
     except FileExistsError as err:
         print(err)
     else:
-        print("Poster: " + os.path.basename(destination_folder))
+        print("Poster: " + os.path.basename(race.get_destination_folder()))
 
     return
 

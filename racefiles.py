@@ -354,14 +354,12 @@ if __name__ == "__main__":
 
         # only build background once for each directory
         if destination_folder not in backgrounds_linked:
-            create_background_image(font_list, image_path, destination_folder,
-                                    race.get_race_season(), race.get_race_round(), race.get_race_name())
+            create_background_image(race, font_list, image_path)
             backgrounds_linked.append(destination_folder)
 
         # only build poster once for each directory
         if destination_folder not in images_linked:
-            create_poster_image(font_list, track_path, image_path, destination_folder,
-                                race.get_race_season(), race.get_race_round(), race.get_race_name())
+            create_poster_image(race, font_list, track_path, image_path)
             images_linked.append(destination_folder)
 
         try:
