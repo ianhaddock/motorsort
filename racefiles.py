@@ -38,22 +38,13 @@ class weekend(object):
         """ """
         self.series_prefix = series_prefix
 
-    def get_series_prefix(self):
-        return self.series_prefix
-
     def set_race_session(self, race_session):
         """ """
         self.race_session = race_session
 
-    def get_race_session(self):
-        return self.race_session
-
     def set_gp_suffix(self, gp_suffix):
         """ """
         self.gp_suffix = gp_suffix
-
-    def get_gp_suffix(self):
-        return self.gp_suffix
 
     def set_race_name(self, race_name):
         """ """
@@ -66,9 +57,6 @@ class weekend(object):
         """ """
         self.race_info = race_info
 
-    def get_race_info(self):
-        return self.race_info
-
     def set_race_round(self, race_round):
         """ """
         self.race_round = race_round
@@ -80,15 +68,9 @@ class weekend(object):
         """ """
         self.filetype = filetype
 
-    def get_filetype(self):
-        return self.filetype
-
     def set_weekend_order(self, weekend_order):
         """ """
         self.weekend_order = weekend_order
-
-    def get_weekend_order(self):
-        return self.weekend_order
 
     def set_final_file_name(self, final_file_name):
         """ """
@@ -127,9 +109,6 @@ class weekend(object):
     def set_race_series(self, race_series):
         """ """
         self.race_series = race_series
-
-    def get_race_series(self):
-        return self.race_series
 
     def set_race_season(self, race_season):
         """ """
@@ -256,14 +235,14 @@ def parse_file_name(race, source_file_name):
         if key in source_file_name.lower():
             if len(race_session) <= len(key):
                 race_session = session_map[key]
-                race_info = source_file_name[source_file_name.lower().index(key) + len(key) + 1:-4].strip()
+                race.set_race_info(source_file_name[source_file_name.lower().index(key) + len(key) + 1:-4].strip())
                 # if no race Round was found, use the series name as the race name
                 try:
                     race_name_index_start
                 except NameError:
-                    race_name = race_series
+                    race.set_race_name(race_series)
                 else:
-                    race_name = source_file_name[race_name_index_start:source_file_name.lower().index(key) - 1].strip()
+                    race.set_race_name(source_file_name[race_name_index_start:source_file_name.lower().index(key) - 1].strip())
 
     # set weekend event order
     if race_series == "Formula 1" and (race_season, race_round) in sprint_weekends:
@@ -281,9 +260,7 @@ def parse_file_name(race, source_file_name):
 
     race.set_race_series(race_series)
     race.set_race_round(race_round)
-    race.set_race_name(race_name)
     race.set_race_session(race_session)
-    race.set_race_info(race_info)
 
     return
 
@@ -348,10 +325,8 @@ if __name__ == "__main__":
             os.makedirs(race.get_destination_folder(), exist_ok=True)
         except OSError as err:
             raise SystemExit("ERROR: Can't create path: " + race.get_destination_folder() + "\n" + str(err))
-        destination_folder = race.get_destination_folder()
-        final_file_path = str(destination_folder + '/' + race.get_final_file_name())
-        # print(final_file_path)
 
+        destination_folder = race.get_destination_folder()
         # only build background once for each directory
         if destination_folder not in backgrounds_linked:
             create_background_image(race, font_list, image_path)
@@ -363,9 +338,9 @@ if __name__ == "__main__":
             images_linked.append(destination_folder)
 
         try:
-            os.link(source_file_name, final_file_path)
+            os.link(source_file_name, str(race.get_destination_folder() + '/' + race.get_final_file_name()))
         except FileExistsError:
-            # print("Exists: " + race.get_final_file_name())
+            # print("Exists: " + race.get_destination_folder() + '/' + race.get_final_file_name())
             pass
         else:
             print("Linked: " + os.path.basename(race.get_final_file_name()))
