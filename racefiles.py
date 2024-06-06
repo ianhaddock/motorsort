@@ -185,8 +185,7 @@ def parse_file_name(race, source_file_name):
     race.set_filetype(source_file_name[-3:])
 
     # remove subfolders from path before sorting by filename
-    while '/' in source_file_name:
-        source_file_name = source_file_name[source_file_name.index('/') + 1:]
+    source_file_name = source_file_name[source_file_name.rindex('/') + 1:]
 
     for key in series_prefix.keys():
         if key in source_file_name:
