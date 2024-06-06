@@ -16,6 +16,129 @@ from configparser import ConfigParser
 from poster_maker import create_poster_image, create_background_image
 
 
+class weekend(object):
+    """race weekend"""
+
+    def __init__(self):
+        self.series_prefix = ""
+        self.race_session = ""
+        self.race_name = ""
+        self.race_info = ""
+        self.race_round = "00"
+        self.filetype = ""
+        self.final_file_name = ""
+        self.destination_folder = ""
+        self.race_round_path_found = []
+        self.race_round_path = ""
+        self.race_series = ""
+        self.race_season = ""
+        self.weekend_order = ""
+
+    def set_series_prefix(self, series_prefix):
+        """ """
+        self.series_prefix = series_prefix
+
+    def get_series_prefix(self):
+        return self.series_prefix
+
+    def set_race_session(self, race_session):
+        """ """
+        self.race_session = race_session
+
+    def get_race_session(self):
+        return self.race_session
+
+    def set_gp_suffix(self, gp_suffix):
+        """ """
+        self.gp_suffix = gp_suffix
+
+    def get_gp_suffix(self):
+        return self.gp_suffix
+
+    def set_race_name(self, race_name):
+        """ """
+        self.race_name = race_name
+
+    def get_race_name(self):
+        return self.race_name
+
+    def set_race_info(self, race_info):
+        """ """
+        self.race_info = race_info
+
+    def get_race_info(self):
+        return self.race_info
+
+    def set_race_round(self, race_round):
+        """ """
+        self.race_round = race_round
+
+    def get_race_round(self):
+        return self.race_round
+
+    def set_filetype(self, filetype):
+        """ """
+        self.filetype = filetype
+
+    def get_filetype(self):
+        return self.filetype
+
+    def set_weekend_order(self, weekend_order):
+        """ """
+        self.weekend_order = weekend_order
+
+    def get_weekend_order(self):
+        return self.weekend_order
+
+    def set_final_file_name(self, final_file_name):
+        """ """
+        self.final_file_name = final_file_name
+
+    def get_final_file_name(self):
+        return str(self.race_name + self.gp_suffix + " - S" + self.race_round + "E" +
+                   self.weekend_order + " - " + self.race_session +
+                   " [" + self.race_info + "]." + self.filetype)
+
+    def set_destination_folder(self, destination_folder):
+        """ """
+        self.destination_folder = destination_folder
+
+    def get_destination_folder(self):
+        """ use an existing race_season + race_round directory even if race_name differs"""
+
+        self.race_round_path = str(destination_path + "/" + self.race_series +
+                                   "/" + self.race_season + "-" + self.race_round)
+
+        self.dest_folder = str(destination_path + "/" + self.race_series +
+                               "/" + self.race_season + "-" + self.race_round +
+                               " - " + self.race_name + self.gp_suffix)
+
+        self.race_round_path_found = glob.glob(self.race_round_path + '*')
+
+        if self.race_round_path_found:
+            self.destination_folder = str(self.race_round_path_found[0])
+            # print('Found existing race directory: ' + self.destination_folder)
+        else:
+            self.destination_folder = self.dest_folder
+            # print('Creating destination directory.')
+
+        return self.destination_folder
+
+    def set_race_series(self, race_series):
+        """ """
+        self.race_series = race_series
+
+    def get_race_series(self):
+        return self.race_series
+
+    def set_race_season(self, race_season):
+        """ """
+        self.race_season = race_season
+
+    def get_race_season(self):
+        return self.race_season
+
+
 def download_missing_fonts(path):
     """ download fonts if missing"""
 
@@ -93,14 +216,11 @@ def find_sprint_weekends(source_file_names, weekends):
     return sprint_weekends
 
 
-def parse_file_name(source_file_name):
+def parse_file_name(race, source_file_name):
     """parse source file names for keywords to build folder structures and
     file names"""
 
-    race_session, race_name, race_info = '', '', ''
-    race_round = '00'
-
-    filetype = source_file_name[-3:]
+    race.set_filetype(source_file_name[-3:])
 
     # remove subfolders from path before sorting by filename
     while '/' in source_file_name:
@@ -115,6 +235,8 @@ def parse_file_name(source_file_name):
         i = source_file_name.index('Round')
         race_round = source_file_name[i+5:i+8].strip()
         race_name_index_start = source_file_name.index('Round') + len('Round00') + 1
+    else:
+        race_round = "00"
 
     # get race year
     if '20' in source_file_name:
@@ -122,12 +244,14 @@ def parse_file_name(source_file_name):
         year = source_file_name[i:i+4]
         if year.isnumeric():
             race_season = year
+            race.set_race_season(year)
 
     # remove USA from race name
     if 'USA' in source_file_name:
         race_name_index_start = source_file_name.index('USA') + len('USA') + 1
 
     # sort race sessions
+    race_session = ""
     for key in session_map.keys():
         if key in source_file_name.lower():
             if len(race_session) <= len(key):
@@ -143,32 +267,25 @@ def parse_file_name(source_file_name):
 
     # set weekend event order
     if race_series == "Formula 1" and (race_season, race_round) in sprint_weekends:
-        weekend_order = str(sprint_order.index(race_session)+1).zfill(2)
+        race.set_weekend_order(str(sprint_order.index(race_session)+1).zfill(2))
     elif race_series == "Formula 1":
-        weekend_order = str(regular_order.index(race_session)+1).zfill(2)
+        race.set_weekend_order(str(regular_order.index(race_session)+1).zfill(2))
     else:
-        weekend_order = str(sportscar_order.index(race_session)+1).zfill(2)
+        race.set_weekend_order(str(sportscar_order.index(race_session)+1).zfill(2))
 
     # set gp suffix
     if race_series == "Formula 1":
-        gp_suffix = " GP"
+        race.set_gp_suffix(" GP")
     else:
-        gp_suffix = ""
+        race.set_gp_suffix("")
 
-    final_file_name = str(race_name + gp_suffix + " - S" + race_round + "E" +
-                          weekend_order + " - " + race_session +
-                          " [" + race_info + "]." + filetype)
+    race.set_race_series(race_series)
+    race.set_race_round(race_round)
+    race.set_race_name(race_name)
+    race.set_race_session(race_session)
+    race.set_race_info(race_info)
 
-    destination_folder = str(destination_path + "/" + race_series +
-                             "/" + race_season + "-" + race_round +
-                             " - " + race_name + gp_suffix)
-
-    race_round_path = str(destination_path + "/" + race_series +
-                          "/" + race_season + "-" + race_round)
-
-    race_round_path_found = glob.glob(race_round_path + '*')
-
-    return (final_file_name, destination_folder, race_round_path_found, race_series, race_round, race_name)
+    return
 
 
 if __name__ == "__main__":
@@ -193,10 +310,10 @@ if __name__ == "__main__":
     with open('series_prefix.json') as file:
         series_prefix = json.load(file)
     with open('weekend_order.json') as file:
-        weekend_order = json.load(file)
-        sprint_order = weekend_order['sprint_order']
-        regular_order = weekend_order['regular_order']
-        sportscar_order = weekend_order['sportscar_order']
+        the_weekend_order = json.load(file)
+        sprint_order = the_weekend_order['sprint_order']
+        regular_order = the_weekend_order['regular_order']
+        sportscar_order = the_weekend_order['sportscar_order']
     with open('session_map.json') as file:
         session_map = json.load(file)
     with open('fonts.json') as file:
@@ -223,38 +340,34 @@ if __name__ == "__main__":
         # print()
         # print(source_file_name)
 
-        final_file_name, destination_folder, race_round_path_found, race_season, race_round, race_name, \
-            = parse_file_name(source_file_name.replace('.', ' '))
+        race = weekend()
 
-        # use an existing race_season + race_round directory even if race_name differs
-        if race_round_path_found:
-            # print('Found existing race directory: ' + str(race_round_path_found[0]))
-            destination_folder = str(race_round_path_found[0])
-            final_file_path = destination_folder + '/' + final_file_name
-        else:
-            try:
-                os.makedirs(destination_folder, exist_ok=True)
-            except OSError as err:
-                raise SystemExit("ERROR: Can't create path: " + destination_folder + "\n" + str(err))
-            final_file_path = str(destination_folder + '/' + final_file_name)
+        parse_file_name(race, source_file_name.replace('.', ' '))
+
+        try:
+            os.makedirs(race.get_destination_folder(), exist_ok=True)
+        except OSError as err:
+            raise SystemExit("ERROR: Can't create path: " + race.get_destination_folder() + "\n" + str(err))
+        destination_folder = race.get_destination_folder()
+        final_file_path = str(destination_folder + '/' + race.get_final_file_name())
         # print(final_file_path)
 
         # only build background once for each directory
         if destination_folder not in backgrounds_linked:
             create_background_image(font_list, image_path, destination_folder,
-                                    race_season, race_round, race_name)
+                                    race.get_race_season(), race.get_race_round(), race.get_race_name())
             backgrounds_linked.append(destination_folder)
 
         # only build poster once for each directory
         if destination_folder not in images_linked:
             create_poster_image(font_list, track_path, image_path, destination_folder,
-                                race_season, race_round, race_name)
+                                race.get_race_season(), race.get_race_round(), race.get_race_name())
             images_linked.append(destination_folder)
 
         try:
             os.link(source_file_name, final_file_path)
         except FileExistsError:
-            # print("Exists: " + final_file_name)
+            # print("Exists: " + race.get_final_file_name())
             pass
         else:
-            print("Linked: " + os.path.basename(final_file_name))
+            print("Linked: " + os.path.basename(race.get_final_file_name()))
