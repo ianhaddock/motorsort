@@ -20,7 +20,6 @@ class weekend(object):
     """race weekend"""
 
     def __init__(self):
-        self.series_prefix = ""
         self.race_session = ""
         self.race_name = ""
         self.race_info = ""
@@ -33,10 +32,6 @@ class weekend(object):
         self.race_series = ""
         self.race_season = ""
         self.weekend_order = ""
-
-    def set_series_prefix(self, series_prefix):
-        """ """
-        self.series_prefix = series_prefix
 
     def set_race_session(self, race_session):
         """ """
@@ -72,18 +67,21 @@ class weekend(object):
         """ """
         self.weekend_order = weekend_order
 
-    def set_final_file_name(self, final_file_name):
+    def set_race_series(self, race_series):
         """ """
-        self.final_file_name = final_file_name
+        self.race_series = race_series
+
+    def set_race_season(self, race_season):
+        """ """
+        self.race_season = race_season
+
+    def get_race_season(self):
+        return self.race_season
 
     def get_final_file_name(self):
         return str(self.race_name + self.gp_suffix + " - S" + self.race_round + "E" +
                    self.weekend_order + " - " + self.race_session +
                    " [" + self.race_info + "]." + self.filetype)
-
-    def set_destination_folder(self, destination_folder):
-        """ """
-        self.destination_folder = destination_folder
 
     def get_destination_folder(self):
         """ use an existing race_season + race_round directory even if race_name differs"""
@@ -105,17 +103,6 @@ class weekend(object):
             # print('Creating destination directory.')
 
         return self.destination_folder
-
-    def set_race_series(self, race_series):
-        """ """
-        self.race_series = race_series
-
-    def set_race_season(self, race_season):
-        """ """
-        self.race_season = race_season
-
-    def get_race_season(self):
-        return self.race_season
 
 
 def download_missing_fonts(path):
