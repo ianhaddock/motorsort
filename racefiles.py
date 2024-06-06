@@ -27,7 +27,6 @@ class weekend(object):
         self.filetype = ""
         self.final_file_name = ""
         self.destination_folder = ""
-        self.race_round_path_found = []
         self.race_round_path = ""
         self.race_series = ""
         self.race_season = ""
@@ -88,18 +87,15 @@ class weekend(object):
 
         self.race_round_path = str(destination_path + "/" + self.race_series +
                                    "/" + self.race_season + "-" + self.race_round)
-
-        self.dest_folder = str(destination_path + "/" + self.race_series +
-                               "/" + self.race_season + "-" + self.race_round +
-                               " - " + self.race_name + self.gp_suffix)
-
         self.race_round_path_found = glob.glob(self.race_round_path + '*')
 
         if self.race_round_path_found:
             self.destination_folder = str(self.race_round_path_found[0])
             # print('Found existing race directory: ' + self.destination_folder)
         else:
-            self.destination_folder = self.dest_folder
+            self.destination_folder = str(destination_path + "/" + self.race_series +
+                                          "/" + self.race_season + "-" + self.race_round +
+                                          " - " + self.race_name + self.gp_suffix)
             # print('Creating destination directory.')
 
         return self.destination_folder
