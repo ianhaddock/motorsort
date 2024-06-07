@@ -6,7 +6,7 @@ import subprocess
 
 
 def create_background_image(race, font_name, image_path):
-    """ generates images with imagemagick"""
+    """ generates images with imageconvert"""
 
     background_destination = str(race.get_destination_folder() + "/background.jpg")
 
@@ -21,8 +21,8 @@ def create_background_image(race, font_name, image_path):
     if not os.path.isfile(background_image):
         background_image = str(image_path + "/background.jpg")
 
-    generate_background_cmd = ["magick", background_image,
-                               "-resize", "1920x1080\!",
+    generate_background_cmd = ["convert", background_image,
+                               "-resize", "1920x1080!",
                                "-gravity", "NorthEast",
                                "-font", font_name['regular'][0],
                                "-pointsize", "280",
@@ -43,7 +43,7 @@ def create_background_image(race, font_name, image_path):
 
 
 def create_poster_image(race, font_name, track_path, image_path):
-    """ generates images with imagemagick"""
+    """ generates images with imageconvert"""
 
     point_size_base = 120
 
@@ -82,8 +82,8 @@ def create_poster_image(race, font_name, track_path, image_path):
     point_size = str(point_size_base-len(race.get_race_name())*5)
 
     # start building up the imagemagic command
-    generate_race_poster_cmd = ["magick", poster_image,
-                                "-resize", "600x900\!"]
+    generate_race_poster_cmd = ["convert", poster_image,
+                                "-resize", "600x900!"]
 
     # if a map is available, add it to the command
     if os.path.isfile(track_map_image):

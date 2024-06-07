@@ -9,6 +9,10 @@ mediafiles/*
 reference/*
 fonts/*
 
+# container
+media/*
+!media/source_files/
+
 # python
 __pycache__/*
 bin/*

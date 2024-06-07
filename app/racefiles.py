@@ -125,8 +125,9 @@ def download_missing_fonts(path):
                 print("Downloaded " + font_list[key][0])
 
     if downloaded:
-        print("Please install downloaded fonts to proceed.")
-        raise SystemExit()
+        #print("Please install downloaded fonts to proceed.")
+        print("Fonts installed.")
+        #raise SystemExit()
 
     return
 
@@ -255,7 +256,7 @@ if __name__ == "__main__":
 
     # read config.ini file
     config = ConfigParser()
-    config.read('config.ini')
+    config.read('/config/config.ini')
     destination_path = config.get('config', 'destination_path')
     image_path = config.get('config', 'image_path')
     track_path = config.get('config', 'track_path')
@@ -266,21 +267,21 @@ if __name__ == "__main__":
     weekends = config.get('config', 'sprint_weekends').split(',')
 
     # read json files
-    with open('series_prefix.json') as file:
+    with open('/config/series_prefix.json') as file:
         series_prefix = json.load(file)
-    with open('weekend_order.json') as file:
+    with open('/config/weekend_order.json') as file:
         the_weekend_order = json.load(file)
         sprint_order = the_weekend_order['sprint_order']
         regular_order = the_weekend_order['regular_order']
         sportscar_order = the_weekend_order['sportscar_order']
-    with open('session_map.json') as file:
+    with open('/config/session_map.json') as file:
         session_map = json.load(file)
-    with open('fonts.json') as file:
+    with open('/config/fonts.json') as file:
         font_list = json.load(file)
 
     # checks
-    if not which('magick'):
-        raise SystemExit("ERROR: Can't find imagemagick")
+    if not which('convert'):
+        raise SystemExit("ERROR: Can't find imageconvert")
 
     # get fonts
     download_missing_fonts(font_path)
