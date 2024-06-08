@@ -322,20 +322,26 @@ if __name__ == "__main__":
             create_poster_image(race, font_list, track_path, image_path)
             images_linked.append(destination_folder)
 
-        if copy_files:
-            try:
-                copy2(source_file_name, str(race.get_destination_folder() + '/' + race.get_final_file_name()))
-            except OSError as err:
-                raise SystemExit("ERROR: Can't copy file: " + "\n" + str(err))
-            else:
-                print("Copied: " + os.path.basename(race.get_final_file_name()))
+        # skip if destination file exists, link file unless copy_files is set
+        # true. check first as shutil.copy2 will overwrite an existing file
+        #
+        destination_full_path = str(race.get_destination_folder() + '/' + race.get_final_file_name())
+
+        if os.path.exists(destination_full_path):
+            # print("File Exists: " + destination_full_path)
+            pass
         else:
-            try:
-                os.link(source_file_name, str(race.get_destination_folder() + '/' + race.get_final_file_name()))
-            except FileExistsError:
-                # print("Exists: " + race.get_destination_folder() + '/' + race.get_final_file_name())
-                pass
-            except OSError as err:
-                raise SystemExit("ERROR: Can't link file: " + "\n" + str(err))
+            if copy_files:
+                try:
+                    copy2(source_file_name, destination_full_path)
+                except OSError as err:
+                    raise SystemExit("ERROR: Can't copy file: " + "\n" + str(err))
+                else:
+                    print("Copied: " + os.path.basename(race.get_final_file_name()))
             else:
-                print("Linked: " + os.path.basename(race.get_final_file_name()))
+                try:
+                    os.link(source_file_name, destination_full_path)
+                except OSError as err:
+                    raise SystemExit("ERROR: Can't link file: " + "\n" + str(err))
+                else:
+                    print("Linked: " + os.path.basename(race.get_final_file_name()))
