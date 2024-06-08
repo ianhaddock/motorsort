@@ -9,7 +9,7 @@
 import os
 import glob
 import json
-from shutil import which
+from shutil import which, copy2
 import urllib.request
 from datetime import datetime
 from configparser import ConfigParser
@@ -254,14 +254,16 @@ if __name__ == "__main__":
     images_linked = []
     backgrounds_linked = []
 
+    font_path = '/usr/local/share/fonts/Formula1'
+    image_path = '/config/images'
+    track_path = '/config/tracks'
+
     # read config.ini file
     config = ConfigParser()
     config.read('/config/config.ini')
     destination_path = config.get('config', 'destination_path')
-    image_path = config.get('config', 'image_path')
-    track_path = config.get('config', 'track_path')
-    font_path = config.get('config', 'font_path')
     source_path = config.get('config', 'source_path')
+    copy_files = config.getboolean('config', 'copy_files')
     file_prefix = tuple(config.get('config', 'file_prefix').split(','))
     file_types = tuple(config.get('config', 'file_types').split(','))
     weekends = config.get('config', 'sprint_weekends').split(',')
@@ -320,12 +322,20 @@ if __name__ == "__main__":
             create_poster_image(race, font_list, track_path, image_path)
             images_linked.append(destination_folder)
 
-        try:
-            os.link(source_file_name, str(race.get_destination_folder() + '/' + race.get_final_file_name()))
-        except FileExistsError:
-            # print("Exists: " + race.get_destination_folder() + '/' + race.get_final_file_name())
-            pass
-        except OSError as err:
-            raise SystemExit("ERROR: Can't link path: " + "\n" + str(err))
+        if copy_files:
+            try:
+                copy2(source_file_name, str(race.get_destination_folder() + '/' + race.get_final_file_name()))
+            except OSError as err:
+                raise SystemExit("ERROR: Can't copy file: " + "\n" + str(err))
+            else:
+                print("Copied: " + os.path.basename(race.get_final_file_name()))
         else:
-            print("Linked: " + os.path.basename(race.get_final_file_name()))
+            try:
+                os.link(source_file_name, str(race.get_destination_folder() + '/' + race.get_final_file_name()))
+            except FileExistsError:
+                # print("Exists: " + race.get_destination_folder() + '/' + race.get_final_file_name())
+                pass
+            except OSError as err:
+                raise SystemExit("ERROR: Can't link file: " + "\n" + str(err))
+            else:
+                print("Linked: " + os.path.basename(race.get_final_file_name()))
