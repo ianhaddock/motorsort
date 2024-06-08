@@ -325,5 +325,7 @@ if __name__ == "__main__":
         except FileExistsError:
             # print("Exists: " + race.get_destination_folder() + '/' + race.get_final_file_name())
             pass
+        except OSError as err:
+            raise SystemExit("ERROR: Can't link path: " + "\n" + str(err))
         else:
             print("Linked: " + os.path.basename(race.get_final_file_name()))
