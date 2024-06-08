@@ -1,6 +1,9 @@
 services:
   app:
     build: .
+    environment:
+      - SLEEP_SECONDS=300
     volumes:
       - ./config:/config
       - ./media:/media
+      - ./fonts:/usr/local/share/fonts
