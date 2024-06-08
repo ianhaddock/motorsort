@@ -2,7 +2,9 @@
 
 FROM docker.io/library/python:3.12-slim-bullseye
 
-RUN apt-get update && apt-get install imagemagick -y
+RUN apt-get update
+
+RUN apt-get install imagemagick -y
 
 RUN apt-get install bc -y
 
