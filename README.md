@@ -1,95 +1,122 @@
-# Racelinks
-Automatically organize racing videos into seasons and create custom poster images. For use with a personal media server.
+# Motorsort 
+Organize racing videos into seasons and create custom poster images. For use with a personal media server.
 
 <p align="center">
   <img width="60%" height="auto" src="readme.jpg">
 </p>
 
+
 ### Uses:
 * Python
 * ImageMagick
+* Docker
+
 
 ### What it does:
-* Searches a source directory for .mkv or .m4v files
-* Parses filenames by keyword to sort by series, weekend, and session. 
-* Detects sprint and regular weekends and orders them correctly. 
+* Searches a source directory for files with extensions in the whitelist (see config).
+* Parses filename by keywords to sort by series, year, race weekend, and weekend session. 
+* Detects sprint and regular weekends and orders event sessions correctly. 
 * Creates poster images with race name, event number, track map, and race year.
 * Creates background images with event number.
 * Links files to target directory, saving space and leaving source files unaltered.
 
-### Setup:
-* Install ImageMagick
-* Run the script once to automatically download the needed font files.
-* Copy the subdirectory created in fonts/ to your system fonts dirctory (often in /usr/share/fonts/). 
-* Edit the config.ini to set your source and destination directories.
-* Make sure your user has correct permissions on source (read) and target (read write) directories.
-* Run the script.
+
+### Usage:
+For this example, if your media was located at `/mnt/my_files/downloads/complete/` and you wanted the sorted files at `/mnt/my_files/motorsort/` you would:
+
+```
+docker run \
+    -d \
+    --name motorsort \
+    -e MEDIA_SOURCE_PATH=/mnt/media/downloads/complete \
+    -e MEDIA_DESTINATION_PATH=/mnt/media/motorsort \
+    -v /mnt/my_files:/mnt/media \
+    docker.io/ianhaddock/motorsort
+```
+
+### Parameters:
+* `-v <your_media_path>:/mnt/media` This mounts your media on the container at `/mnt/media`.
+* `-e MEDIA_SOURCE_PATH` This is the path mounted at /mnt/media the container will search for source files.
+* `-e MEDIA_DESTINATION_PATH` This is the path mounted at /mnt/media the container will output files.
+NOTE:  Both `MEDIA_SOURCE_PATH` and `MEDIA_DESTINATION_PATH` must be on the mount point.
+
+
+### Optional Parameters:
+* `-e SLEEP_SECONDS` Motorsort will check for new files every 5 minutes by default unless changed here. Set to zero if you want the container to run once and quit.
+* `-e COPY_FILES' Set to True if you want Motorsort to copy files instead of hardlinking them (this will take longer and consume more drive space).
+
 
 ### Usage:
 ```
-$ ./racefiles.py
-Found 182 items to process.
-Found 16 sprint weekends.
+$ docker logs motorsort
+Mon Jun 10 18:20:55 UTC 2024: Starting
+Found 166 items to process.
+Found 17 sprint weekends.
 Creating files.
 Background: 2022-00 - Example GP
 Poster: 2022-00 - Example GP
-Linked: Example GP - S00E01 - Free Practice 1 [SimSportHD 1080p].mkv
-Linked: Example GP - S00E06 - Free Practice 2 [SimSportHD 1080p].mkv
-...
+Linked: Example GP - S00E01 - Free Practice 1 [FastChannelHD 1080p].mkv
+Linked: Example GP - S00E06 - Free Practice 2 [FastChannelHD 1080p].mkv
+Mon Jun 10 18:20:55 UTC 2024: Sleeping 300 seconds
 ```
 
+### Example output:
 Source files:
 ```
-sourcefiles/
-├── Formula1.2022.Round00.Example.FP1.SimSportHD.1080p.mkv
-├── Formula1.2022.Round00.Example.FP2.SimSportHD.1080p.mkv
-├── Formula1.2022.Round00.Example.FP3.SimSportHD.1080p.mkv
-├── Formula1.2022.Round00.Example.Onboard.Channel.SimSportHD.1080p.mkv
-├── Formula1.2022.Round00.Example.Quali.Analysis.SimSportHD.1080p.mkv
-├── Formula1.2022.Round00.Example.Qualifying.Buildup.SimSportHD.1080p.mkv
-├── Formula1.2022.Round00.Example.Qualifying.SimSportHD.1080p.mkv
-├── Formula1.2022.Round00.Example.Qualifying.Teds.Notebook.SimSportHD.1080p.mkv
-├── Formula1.2022.Round00.Example.Race.Analysis.SimSportHD.1080p.mkv
-├── Formula1.2022.Round00.Example.Race.Buildup.SimSportHD.1080p.mkv
-├── Formula1.2022.Round00.Example.Race.SimSportHD.1080p.mkv
-├── Formula1.2022.Round00.Example.Sprint.Shootout.SimSportHD.1080p.mkv
-├── Formula1.2022.Round00.Example.Sprint.SimSportHD.1080p.mkv
-├── Formula1.2022.Round00.Example.Teds.Race.Notebook.SimSportHD.1080p.mkv
-├── Formula1.2022.Round00.Example.Teds.Sprint.Notebook.SimSportHD.1080p.mkv
+media/source_files/complete/
+├── Formula1.2022.Round00.Example.FP1.FastChannelHD.1080p.50fps.X264.Multi-AOA11.mkv
+├── Formula1.2022.Round00.Example.FP2.FastChannelHD.1080p.50fps.X264.Multi-AOA11.mkv
+├── Formula1.2022.Round00.Example.FP3.FastChannelHD.1080p.50fps.X264.Multi-AOA11.mkv
+├── Formula1.2022.Round00.Example.Onboard.Channel.FastChannelHD.1080p.50fps.X264.Multi-AOA11.mkv
+├── Formula1.2022.Round00.Example.Quali.Analysis.FastChannelHD.1080p.50fps.X264.Multi-AOA11.mkv
+├── Formula1.2022.Round00.Example.Qualifying.Buildup.FastChannelHD.1080p.50fps.X264.Multi-AOA11.mkv
+├── Formula1.2022.Round00.Example.Qualifying.FastChannelHD.1080p.50fps.X264.Multi-AOA11.mkv
+├── Formula1.2022.Round00.Example.Qualifying.Teds.Notebook.FastChannelHD.1080p.50fps.X264.Multi-AOA11.mkv
+├── Formula1.2022.Round00.Example.Race.Analysis.FastChannelHD.1080p.50fps.X264.Multi-AOA11.mkv
+├── Formula1.2022.Round00.Example.Race.Buildup.FastChannelHD.1080p.50fps.X264.Multi-AOA11.mkv
+├── Formula1.2022.Round00.Example.Race.FastChannelHD.1080p.50fps.X264.Multi-AOA11.mkv
+├── Formula1.2022.Round00.Example.Sprint.FastChannelHD.1080p.50fps.X264.Multi-AOA11.mkv
+├── Formula1.2022.Round00.Example.Sprint.Shootout.FastChannelHD.1080p.50fps.X264.Multi-AOA11.mkv
+├── Formula1.2022.Round00.Example.Teds.Race.Notebook.FastChannelHD.1080p.50fps.X264.Multi-AOA11.mkv
+└── Formula1.2022.Round00.Example.Teds.Sprint.Notebook.FastChannelHD.1080p.50fps.X264.Multi-AOA11.mkv
 ```
 
 Resulting structure:
 ```
-mediafiles/Formula 1/2022-00 - Example GP/
-├── Example GP - S00E01 - Free Practice 1 [SimSportHD 1080p].mkv
-├── Example GP - S00E02 - Quali Buildup [SimSportHD 1080p].mkv
-├── Example GP - S00E03 - Qualifying [SimSportHD 1080p].mkv
-├── Example GP - S00E04 - Quali Analysis [SimSportHD 1080p].mkv
-├── Example GP - S00E05 - Quali Notebook [Teds Notebook SimSportHD 1080p].mkv
-├── Example GP - S00E06 - Free Practice 2 [SimSportHD 1080p].mkv
-├── Example GP - S00E07 - Sprint Shootout [SimSportHD 1080p].mkv
-├── Example GP - S00E08 - Sprint [SimSportHD 1080p].mkv
-├── Example GP - S00E10 - Sprint Notebook [Notebook SimSportHD 1080p].mkv
-├── Example GP - S00E11 - Free Practice 3 [SimSportHD 1080p].mkv
-├── Example GP - S00E12 - Race Buildup [SimSportHD 1080p].mkv
-├── Example GP - S00E13 - Race [SimSportHD 1080p].mkv
-├── Example GP - S00E14 - Race Analysis [SimSportHD 1080p].mkv
-├── Example GP - S00E15 - Race Notebook [Notebook SimSportHD 1080p].mkv
-├── Example GP - S00E16 - Onboard Channel [SimSportHD 1080p].mkv
-├── background.jpg
-└── show.png
+media/motorsort/Formula 1/
+└── 2022-00 - Example GP
+    ├── Example GP - S00E01 - Free Practice 1 [FastChannelHD 1080p 50fps X264 Multi-AOA11].mkv
+    ├── Example GP - S00E02 - Quali Buildup [FastChannelHD 1080p 50fps X264 Multi-AOA11].mkv
+    ├── Example GP - S00E03 - Qualifying [FastChannelHD 1080p 50fps X264 Multi-AOA11].mkv
+    ├── Example GP - S00E04 - Quali Analysis [FastChannelHD 1080p 50fps X264 Multi-AOA11].mkv
+    ├── Example GP - S00E05 - Quali Notebook [FastChannelHD 1080p 50fps X264 Multi-AOA11].mkv
+    ├── Example GP - S00E06 - Free Practice 2 [FastChannelHD 1080p 50fps X264 Multi-AOA11].mkv
+    ├── Example GP - S00E07 - Sprint Shootout [FastChannelHD 1080p 50fps X264 Multi-AOA11].mkv
+    ├── Example GP - S00E08 - Sprint [FastChannelHD 1080p 50fps X264 Multi-AOA11].mkv
+    ├── Example GP - S00E10 - Sprint Notebook [FastChannelHD 1080p 50fps X264 Multi-AOA11].mkv
+    ├── Example GP - S00E11 - Free Practice 3 [FastChannelHD 1080p 50fps X264 Multi-AOA11].mkv
+    ├── Example GP - S00E12 - Race Buildup [FastChannelHD 1080p 50fps X264 Multi-AOA11].mkv
+    ├── Example GP - S00E13 - Race [FastChannelHD 1080p 50fps X264 Multi-AOA11].mkv
+    ├── Example GP - S00E14 - Race Analysis [FastChannelHD 1080p 50fps X264 Multi-AOA11].mkv
+    ├── Example GP - S00E15 - Race Notebook [FastChannelHD 1080p 50fps X264 Multi-AOA11].mkv
+    ├── Example GP - S00E16 - Onboard Channel [FastChannelHD 1080p 50fps X264 Multi-AOA11].mkv
+    ├── background.jpg
+    └── show.png
 ```
 
 ### Custom Images:
-* Replacement poster art should be 600x900 .jpg files and will be reformatted to fit 600x900 otherwise.
-* Replacement background art should be 1920x1080 .jpg files and will be reformatted to fit 1920x1080 otherwise.
+All images can be changed to fit your style. For the best results:
+* Poster art should be 600x900 .jpg files and will be reformatted (squished) to fit 600x900 otherwise.
+* Background art should be 1920x1080 .jpg files and will be reformatted to fit 1920x1080 otherwise.
 * Poster art is selected in order of track name, season, or default. e.g. COTA-poster.jpg, 2022-poster.jpg, poster.jpg.
 * Background art is selected in order of track name, season, or default. E.g. COTA-background.jpg, 2022-background.jpg, background.jpg
+
 
 ### Notes:
 * Track SVGs from [Wikimedia][021]
 * Posters and Backgrounds created in [Assetto Corsa][022] using [Race Sim Studios][023] cars with skins found online.
 * [Plex Media Server][025] users should select 'TV Shows' as the library type, install the [Absolute Series Scanner][024], and select the 'Personal Media Shows' Agent when creating a library. This will keep Plex from incorrectly sorting files and applying medatata from other sources.
+
 
 ### Support:
 If you found this useful or would like to support projects like this you can buy me a coffee:
