@@ -14,6 +14,10 @@ WORKDIR /racefiles
 
 COPY ./app /racefiles
 
+COPY ./config /config
+
+COPY ./media /mnt/media
+
 RUN chmod +x ./start_racefiles.sh
 
 CMD ["./start_racefiles.sh"]
