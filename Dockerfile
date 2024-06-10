@@ -16,7 +16,7 @@ COPY ./app /motorsort
 
 COPY ./config /config
 
-COPY ./media /mnt/media
+COPY ./media/source_files /mnt/media/source_files
 
 RUN chmod +x ./start_motorsort.sh
 

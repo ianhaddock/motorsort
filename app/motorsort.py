@@ -258,12 +258,14 @@ if __name__ == "__main__":
     image_path = '/config/images'
     track_path = '/config/tracks'
 
+    # import enviroment variables
+    source_path = os.environ.get('MEDIA_SOURCE_PATH', '/mnt/media/source_files/complete')
+    destination_path = os.environ.get('MEDIA_DESTINATION_PATH', '/mnt/media')
+    copy_files = (os.environ.get('COPY_FILES', 'False') == 'True')
+
     # read config.ini file
     config = ConfigParser()
     config.read('/config/config.ini')
-    destination_path = config.get('config', 'destination_path')
-    source_path = config.get('config', 'source_path')
-    copy_files = config.getboolean('config', 'copy_files')
     file_prefix = tuple(config.get('config', 'file_prefix').split(','))
     file_types = tuple(config.get('config', 'file_types').split(','))
     weekends = config.get('config', 'sprint_weekends').split(',')
