@@ -13,16 +13,14 @@ Organize racing videos into seasons and create custom poster images. For use wit
 
 
 ### What it does:
-* Searches a source directory for files with extensions in the whitelist (see config).
-* Parses filename by keywords to sort by series, year, race weekend, and weekend session. 
-* Detects sprint and regular weekends and orders event sessions correctly. 
-* Creates poster images with race name, event number, track map, and race year.
-* Creates background images with event number.
+* Parses source filenames by keyword to sort series, year, race weekend, and event session for both sprint weekends and regular weekends.
+* Creates customizable poster images with race name, event number, track map, and race year.
+* Creates customizable background images with event number.
 * Links files to target directory, saving space and leaving source files unaltered.
 
 
 ### Usage:
-In this example, source media is located on the host computer at `/mnt/my_files/downloads/complete/` and sorted files will be created in `/mnt/my_files/motorsort/`:
+In this example source media is located on the host computer at `/mnt/my_files/downloads/complete/` and sorted files will be created in `/mnt/my_files/motorsort/`:
 
 ```
 docker run \
@@ -35,7 +33,7 @@ docker run \
 ```
 
 ### Parameters:
-* `-v <your_media_path>:/mnt/media` This mounts your media on the container at `/mnt/media`.
+* `-v <your_media_path>:/mnt/media` This mounts your media to the container at `/mnt/media`.
 * `-e MEDIA_SOURCE_PATH` This is the path mounted at /mnt/media the container will search for source files.
 * `-e MEDIA_DESTINATION_PATH` This is the path mounted at /mnt/media the container will output files.
 
@@ -43,7 +41,7 @@ NOTE:  Both `MEDIA_SOURCE_PATH` and `MEDIA_DESTINATION_PATH` must be on the moun
 
 
 ### Optional Parameters:
-* `-e SLEEP_SECONDS` Motorsort will check for new files every 5 minutes by default unless changed here. Set to `-e SLEEP_SECONDS=0' if you want the container to run once and quit.
+* `-e SLEEP_SECONDS` Motorsort will check for new files every 5 minutes by default unless changed here. Set to `-e SLEEP_SECONDS=0` if you want the container to run once and quit.
 * `-e COPY_FILES` Set this to `-e COPY_FILES=True` if you want Motorsort to copy files instead of hardlinking them (this will take longer and consume more drive space).
 
 
@@ -58,12 +56,13 @@ Background: 2022-00 - Example GP
 Poster: 2022-00 - Example GP
 Linked: Example GP - S00E01 - Free Practice 1 [FastChannelHD 1080p].mkv
 Linked: Example GP - S00E06 - Free Practice 2 [FastChannelHD 1080p].mkv
+...
 Mon Jun 10 18:20:55 UTC 2024: Sleeping 300 seconds
 ```
 
 ### Example Source Files:
 ```
-media/source_files/complete/
+/mnt/my_files/downloads/complete/
 ├── Formula1.2022.Round00.Example.FP1.FastChannelHD.1080p.50fps.X264.Multi-AOA11.mkv
 ├── Formula1.2022.Round00.Example.FP2.FastChannelHD.1080p.50fps.X264.Multi-AOA11.mkv
 ├── Formula1.2022.Round00.Example.FP3.FastChannelHD.1080p.50fps.X264.Multi-AOA11.mkv
@@ -83,7 +82,7 @@ media/source_files/complete/
 
 ### Example Resulting Structure:
 ```
-media/motorsort/Formula 1/
+/mnt/my_files/motorsort/Formula 1/
 └── 2022-00 - Example GP
     ├── Example GP - S00E01 - Free Practice 1 [FastChannelHD 1080p 50fps X264 Multi-AOA11].mkv
     ├── Example GP - S00E02 - Quali Buildup [FastChannelHD 1080p 50fps X264 Multi-AOA11].mkv
