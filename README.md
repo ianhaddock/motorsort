@@ -22,7 +22,7 @@ Organize racing videos into seasons and create custom poster images. For use wit
 
 
 ### Usage:
-For this example, if your media was located at `/mnt/my_files/downloads/complete/` and you wanted the sorted files at `/mnt/my_files/motorsort/` you would:
+In this example, source media is located on the host computer at `/mnt/my_files/downloads/complete/` and sorted files will be created in `/mnt/my_files/motorsort/`:
 
 ```
 docker run \
@@ -38,15 +38,16 @@ docker run \
 * `-v <your_media_path>:/mnt/media` This mounts your media on the container at `/mnt/media`.
 * `-e MEDIA_SOURCE_PATH` This is the path mounted at /mnt/media the container will search for source files.
 * `-e MEDIA_DESTINATION_PATH` This is the path mounted at /mnt/media the container will output files.
+
 NOTE:  Both `MEDIA_SOURCE_PATH` and `MEDIA_DESTINATION_PATH` must be on the mount point.
 
 
 ### Optional Parameters:
-* `-e SLEEP_SECONDS` Motorsort will check for new files every 5 minutes by default unless changed here. Set to zero if you want the container to run once and quit.
-* `-e COPY_FILES' Set to True if you want Motorsort to copy files instead of hardlinking them (this will take longer and consume more drive space).
+* `-e SLEEP_SECONDS` Motorsort will check for new files every 5 minutes by default unless changed here. Set to `-e SLEEP_SECONDS=0' if you want the container to run once and quit.
+* `-e COPY_FILES` Set this to `-e COPY_FILES=True` if you want Motorsort to copy files instead of hardlinking them (this will take longer and consume more drive space).
 
 
-### Usage:
+### Example Logs Output:
 ```
 $ docker logs motorsort
 Mon Jun 10 18:20:55 UTC 2024: Starting
@@ -60,8 +61,7 @@ Linked: Example GP - S00E06 - Free Practice 2 [FastChannelHD 1080p].mkv
 Mon Jun 10 18:20:55 UTC 2024: Sleeping 300 seconds
 ```
 
-### Example output:
-Source files:
+### Example Source Files:
 ```
 media/source_files/complete/
 ├── Formula1.2022.Round00.Example.FP1.FastChannelHD.1080p.50fps.X264.Multi-AOA11.mkv
@@ -81,7 +81,7 @@ media/source_files/complete/
 └── Formula1.2022.Round00.Example.Teds.Sprint.Notebook.FastChannelHD.1080p.50fps.X264.Multi-AOA11.mkv
 ```
 
-Resulting structure:
+### Example Resulting Structure:
 ```
 media/motorsort/Formula 1/
 └── 2022-00 - Example GP
