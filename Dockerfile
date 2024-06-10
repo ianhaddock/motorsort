@@ -10,14 +10,14 @@ RUN apt-get install bc -y
 
 RUN apt-get clean
 
-WORKDIR /racefiles
+WORKDIR /motorsort
 
-COPY ./app /racefiles
+COPY ./app /motorsort
 
 COPY ./config /config
 
 COPY ./media /mnt/media
 
-RUN chmod +x ./start_racefiles.sh
+RUN chmod +x ./start_motorsort.sh
 
-CMD ["./start_racefiles.sh"]
+CMD ["./start_motorsort.sh"]

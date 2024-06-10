@@ -21,7 +21,7 @@ fi
 #
 while true; do
     echo "$(date): Starting"
-    python racefiles.py
+    python motorsort.py
 
     if [ $sleep_seconds == 0 ]; then
         echo "$(date): Exiting."
