@@ -1,5 +1,5 @@
 # Motorsort 
-Organize racing videos into seasons and create custom poster images. For use with a personal media server.
+Organize motorsport videos and create custom poster images. For use with a personal media server.
 
 <p align="center">
   <img width="60%" height="auto" src="readme.jpg">
