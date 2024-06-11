@@ -1,5 +1,19 @@
 #!/bin/bash
 
+# create custom track and images directories
+#
+mkdir -p /custom/{tracks,images}
+
+# fill custom image and track directories if empty
+#
+if [ -z "$(ls -A /custom/tracks)" ]; then
+    cp /config/tracks/* /custom/tracks/
+fi
+
+if [ -z "$(ls -A /custom/images)" ]; then
+    cp /config/images/* /custom/images/
+fi
+
 # if env var set use that, otherwise use default
 #
 if [ ! $SLEEP_SECONDS ]; then

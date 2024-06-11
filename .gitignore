@@ -12,6 +12,7 @@ fonts/*
 # container
 media/*
 !media/source_files/
+custom/*
 
 # python
 __pycache__/*

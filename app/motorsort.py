@@ -255,8 +255,8 @@ if __name__ == "__main__":
     backgrounds_linked = []
 
     font_path = '/usr/local/share/fonts/Formula1'
-    image_path = '/config/images'
-    track_path = '/config/tracks'
+    image_path = '/custom/images'
+    track_path = '/custom/tracks'
 
     # import enviroment variables
     source_path = os.environ.get('MEDIA_SOURCE_PATH', '/mnt/media/source_files/complete')
