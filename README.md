@@ -2,7 +2,7 @@
 Organize motorsport videos and create custom poster images. For use with a personal media server.
 
 <p align="center">
-  <img width="60%" height="auto" src="readme.jpg">
+  <img width="80%" height="auto" src="readme.jpg">
 </p>
 
 
@@ -46,7 +46,7 @@ NOTE:  Both `MEDIA_SOURCE_PATH` and `MEDIA_DESTINATION_PATH` must be on the moun
 
 
 ### Custom Images:
-All images can be customized. To access them, create a local `custom` directory and add it as the `/custom` mountpoint on the container:
+All images can be customized. To access them, create a local directory and add it as the `/custom` mountpoint on the container:
 
 ```
 docker run \
@@ -55,7 +55,7 @@ docker run \
     -e MEDIA_SOURCE_PATH=/mnt/media/downloads/complete \
     -e MEDIA_DESTINATION_PATH=/mnt/media/motorsort \
     -v /mnt/my_files:/mnt/media \
-    -v ./custom:/custom \
+    -v /mnt/my_files/custom:/custom \
     docker.io/ianhaddock/motorsort
 ```
 
