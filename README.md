@@ -45,6 +45,32 @@ NOTE:  Both `MEDIA_SOURCE_PATH` and `MEDIA_DESTINATION_PATH` must be on the moun
 * `-e COPY_FILES` Set this to `-e COPY_FILES=True` if you want Motorsort to copy files instead of hardlinking them (this will take longer and consume more drive space).
 
 
+### Custom Images:
+All images can be changed as you prefer. To access them, create a local `custom` directory and add it as the `/custom` mountpoint on the container:
+
+```
+docker run \
+    -d \
+    --name motorsort \
+    -e MEDIA_SOURCE_PATH=/mnt/media/downloads/complete \
+    -e MEDIA_DESTINATION_PATH=/mnt/media/motorsort \
+    -v /mnt/my_files:/mnt/media \
+    -v ./custom:/custom \
+    docker.io/ianhaddock/motorsort
+```
+
+* When the container starts the custom folder will be populated with the default images and track files.
+* Any updates you make in this directory will be used on the next run instead of the default images. 
+* If you want to go back to the defaults: stop the container, erase the local custom folder contents, and start the container again. 
+* Poster and Background images are not overwritten on each run, remove existing show.png and background.jpg files to see your changes.
+
+For the best results:
+* Poster art should be 600x900 .jpg files and will be reformatted (squished) to fit 600x900 otherwise.
+* Background art should be 1920x1080 .jpg files and will be reformatted to fit 1920x1080 otherwise.
+* Poster art is selected in order of track name, season, or default. e.g. COTA-poster.jpg, 2022-poster.jpg, poster.jpg.
+* Background art is selected in order of track name, season, or default. E.g. COTA-background.jpg, 2022-background.jpg, background.jpg
+
+
 ### Example Logs Output:
 ```
 $ docker logs motorsort
@@ -102,31 +128,6 @@ Mon Jun 10 18:20:55 UTC 2024: Sleeping 300 seconds
     ├── background.jpg
     └── show.png
 ```
-
-### Custom Images:
-All images can be changed to fit your personal style. To access them, create a local `custom` directory and add it as the `/custom` mountpoint on the container:
-
-```
-docker run \
-    -d \
-    --name motorsort \
-    -e MEDIA_SOURCE_PATH=/mnt/media/downloads/complete \
-    -e MEDIA_DESTINATION_PATH=/mnt/media/motorsort \
-    -v /mnt/my_files:/mnt/media \
-    -v ./custom:/custom \
-    docker.io/ianhaddock/motorsort
-```
-
-* When the container starts the custom folder will be populated with the default images and track files.
-* Any updates you make in this directory will be used instead of the default images. 
-* If you make a mistake or want to go back to the defaul images: stop the container, erase the custom folder contents, and start the container again. 
-* Poster and Background images are not overwritten on each run, you mave have to remove existing show.png and background.jpg files to see your changes.
-
-For the best results:
-* Poster art should be 600x900 .jpg files and will be reformatted (squished) to fit 600x900 otherwise.
-* Background art should be 1920x1080 .jpg files and will be reformatted to fit 1920x1080 otherwise.
-* Poster art is selected in order of track name, season, or default. e.g. COTA-poster.jpg, 2022-poster.jpg, poster.jpg.
-* Background art is selected in order of track name, season, or default. E.g. COTA-background.jpg, 2022-background.jpg, background.jpg
 
 
 ### Notes:
