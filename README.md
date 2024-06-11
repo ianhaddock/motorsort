@@ -46,7 +46,7 @@ NOTE:  Both `MEDIA_SOURCE_PATH` and `MEDIA_DESTINATION_PATH` must be on the moun
 
 
 ### Custom Images:
-All images can be changed as you prefer. To access them, create a local `custom` directory and add it as the `/custom` mountpoint on the container:
+All images can be customized. To access them, create a local `custom` directory and add it as the `/custom` mountpoint on the container:
 
 ```
 docker run \
@@ -59,10 +59,10 @@ docker run \
     docker.io/ianhaddock/motorsort
 ```
 
-* When the container starts the custom folder will be populated with the default images and track files.
-* Any updates you make in this directory will be used on the next run instead of the default images. 
-* If you want to go back to the defaults: stop the container, erase the local custom folder contents, and start the container again. 
-* Poster and Background images are not overwritten on each run, remove existing show.png and background.jpg files to see your changes.
+* When the container starts the custom folder will be populated with image and track files.
+* Any updates made in this directory will be used on the next run.
+* To start over: stop the container, erase the local custom folder contents, and start the container again.
+* Images are not overwritten on each run, remove any existing show.png and background.jpg files to see your changes.
 
 For the best results:
 * Poster art should be 600x900 .jpg files and will be reformatted (squished) to fit 600x900 otherwise.
