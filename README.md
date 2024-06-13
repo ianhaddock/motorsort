@@ -1,4 +1,4 @@
-# Motorsort 
+# MotorSort
 Organize motorsport videos and create custom poster images. For use with a personal media server.
 
 <p align="center">
