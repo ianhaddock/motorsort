@@ -189,7 +189,7 @@ def parse_file_name(race, source_file_name):
     source_file_name = source_file_name[source_file_name.rindex('/') + 1:]
 
     for key in series_prefix.keys():
-        if key in source_file_name:
+        if source_file_name.startswith(key):
             race_series = series_prefix[key]
 
     # get Round number
@@ -211,6 +211,10 @@ def parse_file_name(race, source_file_name):
     # remove USA from race name
     if 'USA' in source_file_name:
         race_name_index_start = source_file_name.index('USA') + len('USA') + 1
+
+    # remove France from race name - test for Le Mans files
+    if 'France' in source_file_name:
+        race_name_index_start = source_file_name.index('France') + len('France') + 1
 
     # sort race sessions
     race_session = ""
