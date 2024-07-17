@@ -31,7 +31,7 @@ docker run \
     -e MEDIA_SOURCE_PATH=/mnt/media/downloads/complete \
     -e MEDIA_DESTINATION_PATH=/mnt/media/motorsort \
     -v /mnt/my_files:/mnt/media \
-    docker.io/ianhaddock/motorsort
+    ghcr.io/ianhaddock/motorsort:latest
 ```
 
 ### Parameters:
