@@ -1,3 +1,5 @@
+[![Docker Image CI](https://github.com/ianhaddock/motorsort/actions/workflows/docker-image-ci.yml/badge.svg)](https://github.com/ianhaddock/motorsort/actions/workflows/docker-image-ci.yml)
+
 # MotorSort
 Organize motorsport videos and create custom poster images. For use with a personal media server.
 
@@ -56,7 +58,7 @@ docker run \
     -e MEDIA_DESTINATION_PATH=/mnt/media/motorsort \
     -v /mnt/my_files:/mnt/media \
     -v /mnt/my_files/custom:/custom \
-    docker.io/ianhaddock/motorsort
+    ghcr.io/ianhaddock/motorsort:latest
 ```
 
 * When the container starts the custom folder will be populated with image and track files.
