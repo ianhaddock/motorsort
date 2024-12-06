@@ -47,6 +47,9 @@ def create_poster_image(race, font_name, track_path, image_path):
 
     point_size_base = 120
 
+    full_race_name = f"FORMULA 1\n{race.get_race_name().upper()}\nGRAND PRIX"
+    # full_race_season = f"{race.get_race_season()}-{race.get_race_round()}"
+
     race_poster_destination = str(race.get_destination_folder() + "/show.png")
     track_map_image = str(track_path + "/" + race.get_race_name() + ".png")
 
@@ -78,8 +81,9 @@ def create_poster_image(race, font_name, track_path, image_path):
         fill_color = "gray90"
         stroke_color = "black"
 
-    # adjust title size for longer race_name
-    point_size = str(point_size_base-len(race.get_race_name())*5)
+    # adjust race_name size if larger than the min of 10 - which is
+    # the 'grand prix' part of the title text.
+    point_size = str(point_size_base-(max(len(race.get_race_name()), 10)*5))
 
     # start building up the imagemagic command
     generate_race_poster_cmd = ["convert", poster_image,
@@ -101,7 +105,7 @@ def create_poster_image(race, font_name, track_path, image_path):
                                      "-fill", fill_color,
                                      "-stroke", stroke_color,
                                      "-strokewidth", "4",
-                                     "-annotate", "+0-310", race.get_race_name().upper(),
+                                     "-annotate", "+0-310", full_race_name,
                                      "-font", font_name['black'][0],
                                      "-fill", "red4",
                                      "-stroke", "white",
