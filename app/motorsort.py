@@ -117,7 +117,7 @@ def download_missing_fonts(path):
         if not os.path.isfile(str(path + "/" + font)):
             try:
                 urllib.request.urlretrieve(font_url, str(path + "/" + font))
-            except OSError as err:
+            except Exception as err:
                 print("Can't download F1 Font: " + str(err))
                 raise SystemExit()
             else:
