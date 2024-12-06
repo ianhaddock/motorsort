@@ -99,13 +99,13 @@ def create_poster_image(race, font_name, track_path, image_path):
                                          "-composite"])
 
     # add the rest of the imagemagic command
-    generate_race_poster_cmd.extend(["-gravity", "Center",
+    generate_race_poster_cmd.extend(["-gravity", "West",
                                      "-font", font_name['black'][0],
                                      "-pointsize", point_size,
                                      "-fill", fill_color,
                                      "-stroke", stroke_color,
                                      "-strokewidth", "4",
-                                     "-annotate", "+0-310", full_race_name,
+                                     "-annotate", "+20-310", full_race_name,
                                      "-font", font_name['black'][0],
                                      "-fill", "red4",
                                      "-stroke", "white",
