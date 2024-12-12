@@ -70,6 +70,10 @@ class weekend(object):
         """ """
         self.race_series = race_series
 
+    def get_race_series(self):
+        """ """
+        return self.race_series
+
     def set_race_season(self, race_season):
         """ """
         self.race_season = race_season
