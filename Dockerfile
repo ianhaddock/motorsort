@@ -12,6 +12,8 @@ RUN apt-get clean
 
 WORKDIR /motorsort
 
+COPY ./fonts /usr/local/share/fonts
+
 COPY ./app /motorsort
 
 COPY ./config /config

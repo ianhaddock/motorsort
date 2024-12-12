@@ -62,7 +62,7 @@ docker run \
 * When the container starts the custom folder will be populated with image and track files.
 * Any updates made in this directory will be used on the next run.
 * To start over: stop the container, erase the local custom folder contents, and start the container again.
-* Images are not overwritten on each run, remove any existing show.png and background.jpg files to see your changes.
+* Generated images on the destination path are not overwritten, remove existing show.png and background.jpg images to generate new versions with your changes.
 
 For the best results:
 * Poster art should be 600x900 .jpg files and will be reformatted (squished) to fit 600x900 otherwise.
@@ -133,6 +133,7 @@ Mon Jun 10 18:20:55 UTC 2024: Sleeping 300 seconds
 ### Notes:
 * Track SVGs from [Wikimedia][021]
 * Posters and Backgrounds created in [Assetto Corsa][022] using [Race Sim Studios][023] cars with skins found online.
+* Font files from [Smithographic][026] free font collection.
 * [Plex Media Server][025] users should select 'TV Shows' as the library type, install the [Absolute Series Scanner][024], and select the 'Personal Media Shows' Agent when creating a library. This will keep Plex from incorrectly sorting files and applying medatata from other sources.
 
 
@@ -148,3 +149,4 @@ If you found this useful or would like to support projects like this you can buy
 [023]:https://racesimstudio.com/
 [024]:https://github.com/ZeroQI/Absolute-Series-Scanner
 [025]:https://www.plex.tv/
+[026]:https://imjustcreative.com/category/free-font
