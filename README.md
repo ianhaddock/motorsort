@@ -1,22 +1,25 @@
 # MotorSort
-Organize motorsport videos and create custom poster images. For use with a personal media server.
 
 <p align="center">
   <img width="80%" height="auto" src="readme.jpg">
 </p>
+
+Are you a motorsport fan who uses [PLEX Personal Media Server][3] to host your historical content? Frustrated with empty poster images and how often PLEX will auto-parse file names incorrectly? Wish you didn't have to do all that manual work?
+
+MotorSort is a stateless, self contained Docker app that:
+
+* Sorts motorsport files by race series, weekend, and session (including sprint weekends).
+* Reformats file names to the PLEX compatible, [Absolute-Series-Scanner][2] convention.
+* Hardlinks source files into race series, race weekend directories to save drive space (with an option to copy if you prefer).
+* Generates dynamic poster images with event name, track map, and season event number.  
+
+MotorSort was created to automate my least favorite part of curating a Plex media library.
 
 
 ### Uses:
 * Python
 * ImageMagick
 * Docker
-
-
-### What it does:
-* Parses source filenames by keyword to sort series, year, race weekend, and event session for both sprint weekends and regular weekends.
-* Creates customizable poster images with race name, event number, track map, and race year.
-* Creates customizable background images with event number.
-* Links files to target directory, saving space and leaving source files unaltered.
 
 
 ### Usage:
