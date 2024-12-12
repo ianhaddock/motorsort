@@ -105,37 +105,6 @@ class weekend(object):
         return self.destination_folder
 
 
-def download_missing_fonts(path):
-    """ download fonts if missing"""
-
-    try:
-        os.makedirs(path, exist_ok=True)
-    except OSError as err:
-        raise SystemExit("ERROR: Can't create path: " + path + "\n" + str(err))
-
-    downloaded = False
-
-    for key in font_list.keys():
-        font_url = font_list[key][1]
-        font = os.path.basename(font_list[key][1])
-        if not os.path.isfile(str(path + "/" + font)):
-            try:
-                urllib.request.urlretrieve(font_url, str(path + "/" + font))
-            except Exception as err:
-                print("Can't download F1 Font: " + str(err))
-                raise SystemExit()
-            else:
-                downloaded = True
-                print("Downloaded " + font_list[key][0])
-
-    if downloaded:
-        #print("Please install downloaded fonts to proceed.")
-        print("Fonts installed.")
-        #raise SystemExit()
-
-    return
-
-
 def get_file_list(source_path, file_prefix, file_types):
     """ return path & name of files matching extensions and prefix lists"""
 
@@ -294,9 +263,6 @@ if __name__ == "__main__":
     # checks
     if not which('convert'):
         raise SystemExit("ERROR: Can't find imageconvert")
-
-    # get fonts
-    download_missing_fonts(font_path)
 
     # sort source directory for files that fit criteria
     source_file_names = get_file_list(source_path, file_prefix, file_types)
