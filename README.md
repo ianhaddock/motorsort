@@ -1,9 +1,5 @@
 # MotorSort
 
-<p align="center">
-  <img width="80%" height="auto" src="readme.jpg">
-</p>
-
 Are you a motorsport fan who uses [PLEX Personal Media Server][3] to host your historical content? Frustrated with empty poster images and how often PLEX will auto-parse file names incorrectly? Wish you didn't have to do all that manual work?
 
 MotorSort is a stateless, self contained Docker app that:
@@ -14,6 +10,10 @@ MotorSort is a stateless, self contained Docker app that:
 * Generates dynamic poster images with event name, track map, and season event number.  
 
 MotorSort was created to automate my least favorite part of curating a Plex media library.
+
+<p align="center">
+  <img width="80%" height="auto" src="readme.jpg">
+</p>
 
 
 ### Uses:
