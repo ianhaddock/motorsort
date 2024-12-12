@@ -47,7 +47,14 @@ def create_poster_image(race, font_name, track_path, image_path):
 
     point_size_base = 120
 
-    full_race_name = f"FORMULA 1\n{race.get_race_name().upper()}\nGRAND PRIX"
+    # format title depending on race series
+    if race.get_race_series() == "Formula 1":
+        full_race_name = f"{race.get_race_series().upper()}\n{race.get_race_name().upper()}\nGRAND PRIX"
+    elif race.get_race_series() == "World Endurance Championship":
+        full_race_name = f"World\nEndurance\nChampionship\n{race.get_race_name()}"
+    else:
+        full_race_name = f'{race.get_race_series()}'
+
     # full_race_season = f"{race.get_race_season()}-{race.get_race_round()}"
 
     race_poster_destination = str(race.get_destination_folder() + "/show.png")
@@ -81,9 +88,9 @@ def create_poster_image(race, font_name, track_path, image_path):
         fill_color = "gray90"
         stroke_color = "black"
 
-    # adjust race_name size if larger than the min of 10 - which is
-    # the 'grand prix' part of the title text.
-    point_size = str(point_size_base-(max(len(race.get_race_name()), 10)*5))
+    # adjust race_name size if larger than the min, which is
+    # the 'championship' part of the WEC title text.
+    point_size = str(point_size_base-(max(len(race.get_race_name()), 12)*5))
 
     # start building up the imagemagic command
     generate_race_poster_cmd = ["convert", poster_image,
