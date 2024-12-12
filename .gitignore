@@ -7,7 +7,7 @@
 sourcefiles/*
 mediafiles/*
 reference/*
-fonts/*
+#fonts/*
 
 # container
 media/*

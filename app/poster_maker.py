@@ -47,6 +47,16 @@ def create_poster_image(race, font_name, track_path, image_path):
 
     point_size_base = 120
 
+    # format title depending on race series
+    if race.get_race_series() == "Formula 1":
+        full_race_name = f"{race.get_race_series().upper()}\n{race.get_race_name().upper()}\nGRAND PRIX"
+    elif race.get_race_series() == "World Endurance Championship":
+        full_race_name = f"World\nEndurance\nChampionship\n{race.get_race_name()}"
+    else:
+        full_race_name = f'{race.get_race_series()}'
+
+    # full_race_season = f"{race.get_race_season()}-{race.get_race_round()}"
+
     race_poster_destination = str(race.get_destination_folder() + "/show.png")
     track_map_image = str(track_path + "/" + race.get_race_name() + ".png")
 
@@ -78,8 +88,9 @@ def create_poster_image(race, font_name, track_path, image_path):
         fill_color = "gray90"
         stroke_color = "black"
 
-    # adjust title size for longer race_name
-    point_size = str(point_size_base-len(race.get_race_name())*5)
+    # adjust race_name size if larger than the min, which is
+    # the 'championship' part of the WEC title text.
+    point_size = str(point_size_base-(max(len(race.get_race_name()), 12)*5))
 
     # start building up the imagemagic command
     generate_race_poster_cmd = ["convert", poster_image,
@@ -95,13 +106,13 @@ def create_poster_image(race, font_name, track_path, image_path):
                                          "-composite"])
 
     # add the rest of the imagemagic command
-    generate_race_poster_cmd.extend(["-gravity", "Center",
+    generate_race_poster_cmd.extend(["-gravity", "NorthWest",
                                      "-font", font_name['black'][0],
                                      "-pointsize", point_size,
                                      "-fill", fill_color,
                                      "-stroke", stroke_color,
                                      "-strokewidth", "4",
-                                     "-annotate", "+0-310", race.get_race_name().upper(),
+                                     "-annotate", "+20+40", full_race_name,
                                      "-font", font_name['black'][0],
                                      "-fill", "red4",
                                      "-stroke", "white",
