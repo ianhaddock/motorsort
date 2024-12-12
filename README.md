@@ -1,7 +1,17 @@
 [![Docker Image CI](https://github.com/ianhaddock/motorsort/actions/workflows/docker-image-ci.yml/badge.svg)](https://github.com/ianhaddock/motorsort/actions/workflows/docker-image-ci.yml)
 
 # MotorSort
-Organize motorsport videos and create custom poster images. For use with a personal media server.
+
+Are you a motorsport fan who uses [PLEX Personal Media Server][025] to host your historical content? Frustrated with empty poster images and how often PLEX will auto-parse file names incorrectly? Wish you didn't have to do all that manual work?
+
+MotorSort is a stateless, self contained Docker app that:
+
+* Sorts motorsport files by race series, weekend, and session (including sprint weekends).
+* Reformats file names to the PLEX compatible, [Absolute-Series-Scanner][024] convention.
+* Hardlinks source files into race series, race weekend directories to save drive space (with an option to copy if you prefer).
+* Generates dynamic poster images with event name, track map, and season event number.  
+
+MotorSort was created to automate my least favorite part of curating a Plex media library.
 
 <p align="center">
   <img width="80%" height="auto" src="readme.jpg">
@@ -12,13 +22,6 @@ Organize motorsport videos and create custom poster images. For use with a perso
 * Python
 * ImageMagick
 * Docker
-
-
-### What it does:
-* Parses source filenames by keyword to sort series, year, race weekend, and event session for both sprint weekends and regular weekends.
-* Creates customizable poster images with race name, event number, track map, and race year.
-* Creates customizable background images with event number.
-* Links files to target directory, saving space and leaving source files unaltered.
 
 
 ### Usage:
@@ -64,7 +67,7 @@ docker run \
 * When the container starts the custom folder will be populated with image and track files.
 * Any updates made in this directory will be used on the next run.
 * To start over: stop the container, erase the local custom folder contents, and start the container again.
-* Images are not overwritten on each run, remove any existing show.png and background.jpg files to see your changes.
+* Generated images on the destination path are not overwritten, remove existing show.png and background.jpg images to generate new versions with your changes.
 
 For the best results:
 * Poster art should be 600x900 .jpg files and will be reformatted (squished) to fit 600x900 otherwise.
@@ -135,6 +138,7 @@ Mon Jun 10 18:20:55 UTC 2024: Sleeping 300 seconds
 ### Notes:
 * Track SVGs from [Wikimedia][021]
 * Posters and Backgrounds created in [Assetto Corsa][022] using [Race Sim Studios][023] cars with skins found online.
+* Font files from [Smithographic][026] free font collection.
 * [Plex Media Server][025] users should select 'TV Shows' as the library type, install the [Absolute Series Scanner][024], and select the 'Personal Media Shows' Agent when creating a library. This will keep Plex from incorrectly sorting files and applying medatata from other sources.
 
 
@@ -150,3 +154,4 @@ If you found this useful or would like to support projects like this you can buy
 [023]:https://racesimstudio.com/
 [024]:https://github.com/ZeroQI/Absolute-Series-Scanner
 [025]:https://www.plex.tv/
+[026]:https://imjustcreative.com/category/free-font
