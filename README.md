@@ -132,13 +132,18 @@ Mon Jun 10 18:20:55 UTC 2024: Sleeping 300 seconds
     └── show.png
 ```
 
+### Plex Absolute Series Scanner settings:
+[Plex Media Server][025] users should install [Absolute Series Scanner][024]. This will keep Plex from incorrectly sorting files and applying medatata from online sources.
+
+When creating the library:
+* select 'TV Shows' as the library type
+* use the 'Personal Media Shows' Agent
 
 ### Notes:
-* Track SVGs from [Wikimedia][021]
-* Posters and Backgrounds created in [Assetto Corsa][022] using [Race Sim Studios][023] cars with skins found online.
-* Font files from [Smithographic][026] free font collection.
-* [Plex Media Server][025] users should select 'TV Shows' as the library type, install the [Absolute Series Scanner][024], and select the 'Personal Media Shows' Agent when creating a library. This will keep Plex from incorrectly sorting files and applying medatata from other sources.
-
+* Track SVGs are from [Wikimedia][021] commons
+* Posters and Backgrounds were created in [Assetto Corsa][022] using [Race Sim Studios][023] cars with [skins from various authors][030] found on [overtake.gg][031].
+* Formula 1 style font file set from [Smithographic][026] free font collection.
+* WEC style font files [Chavelite][027] and [AliciOne Demo][028] from [ffonts.net][029].
 
 ### Support:
 If you found this useful or would like to support projects like this you can buy me a coffee:
@@ -153,3 +158,8 @@ If you found this useful or would like to support projects like this you can buy
 [024]:https://github.com/ZeroQI/Absolute-Series-Scanner
 [025]:https://www.plex.tv/
 [026]:https://imjustcreative.com/category/free-font
+[027]:https://www.ffonts.net/Chavelite.font.download
+[028]:https://www.ffonts.net/AliciOne-Demo.font.download
+[029]:https://www.ffonts.net/
+[030]:https://www.overtake.gg/search/40174312/?q=Formula+1&t=resource&c[categories][0]=7&c[child_categories]=1&o=relevance
+[031]:https://www.overtake.gg/
