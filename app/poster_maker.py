@@ -45,15 +45,25 @@ def create_background_image(race, font_name, image_path):
 def create_poster_image(race, font_name, track_path, image_path):
     """ generates images with imageconvert"""
 
-    point_size_base = 120
-
     # format title depending on race series
     if race.get_race_series() == "Formula 1":
         full_race_name = f"{race.get_race_series().upper()}\n{race.get_race_name().upper()}\nGRAND PRIX\n{race.get_race_season()}"
+        race_name_font = font_name['black'][0]
+        race_name_interline_spacing = "+2"
+        race_name_annotate_offset = "+20+40"
+        point_size_base = 120
     elif race.get_race_series() == "World Endurance Championship":
-        full_race_name = f"World\nEndurance\nChampionship\n{race.get_race_name()}"
+        full_race_name = f"World\nEndurance\nChampionship\n{race.get_race_name()}\n{race.get_race_season()}"
+        race_name_font = font_name['titi-black'][0]
+        race_name_interline_spacing = "-45"
+        race_name_annotate_offset = "+20+10"
+        point_size_base = 130
     else:
         full_race_name = f'{race.get_race_series()}'
+        race_name_font = font_name['titi-black'][0]
+        race_name_interline_spacing = "-45"
+        race_name_annotate_offset = "+20+10"
+        point_size_base = 130
 
     race_poster_destination = str(race.get_destination_folder() + "/show.png")
     track_map_image = str(track_path + "/" + race.get_race_name() + ".png")
@@ -93,13 +103,13 @@ def create_poster_image(race, font_name, track_path, image_path):
 
     # add the rest of the imagemagic command
     generate_race_poster_cmd.extend(["-gravity", "NorthWest",
-                                     "-font", font_name['black'][0],
+                                     "-font", race_name_font,
                                      "-pointsize", point_size,
-                                     "-interline-spacing", "+2",
+                                     "-interline-spacing", race_name_interline_spacing,
                                      "-fill", fill_color,
                                      "-stroke", stroke_color,
                                      "-strokewidth", "1",
-                                     "-annotate", "+20+40", full_race_name,
+                                     "-annotate", race_name_annotate_offset, full_race_name,
                                      "-gravity", "SouthEast",
                                      "-font", font_name['titi-bold'][0],
                                      "-pointsize", "115",
