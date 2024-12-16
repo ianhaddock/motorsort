@@ -24,7 +24,7 @@ def create_background_image(race, font_name, image_path):
     generate_background_cmd = ["convert", background_image,
                                "-resize", "1920x1080!",
                                "-gravity", "NorthEast",
-                               "-font", font_name['regular'][0],
+                               "-font", font_name['titi-bold'][0],
                                "-pointsize", "280",
                                "-fill", "none",
                                "-stroke", "white",
@@ -49,7 +49,7 @@ def create_poster_image(race, font_name, track_path, image_path):
 
     # format title depending on race series
     if race.get_race_series() == "Formula 1":
-        full_race_name = f"{race.get_race_series().upper()}\n{race.get_race_name().upper()}\nGRAND PRIX"
+        full_race_name = f"{race.get_race_series().upper()}\n{race.get_race_name().upper()}\nGRAND PRIX\n{race.get_race_season()}"
     elif race.get_race_series() == "World Endurance Championship":
         full_race_name = f"World\nEndurance\nChampionship\n{race.get_race_name()}"
     else:
@@ -87,6 +87,7 @@ def create_poster_image(race, font_name, track_path, image_path):
                                          track_map_image,
                                          "-compose", "Src_Over",
                                          "-gravity", "Center",
+                                         "-geometry", "+0+80",
                                          "-background", "None",
                                          "-composite"])
 
@@ -94,24 +95,18 @@ def create_poster_image(race, font_name, track_path, image_path):
     generate_race_poster_cmd.extend(["-gravity", "NorthWest",
                                      "-font", font_name['black'][0],
                                      "-pointsize", point_size,
+                                     "-interline-spacing", "+2",
                                      "-fill", fill_color,
                                      "-stroke", stroke_color,
-                                     "-strokewidth", "4",
+                                     "-strokewidth", "1",
                                      "-annotate", "+20+40", full_race_name,
-                                     "-font", font_name['black'][0],
-                                     "-fill", "red4",
-                                     "-stroke", "white",
-                                     "-strokewidth", "2",
-                                     "-pointsize", "65",
-                                     "-gravity", "SouthWest",
-                                     "-annotate", "+20+20", race.get_race_season(),
                                      "-gravity", "SouthEast",
-                                     "-font", font_name['regular'][0],
-                                     "-pointsize", "90",
+                                     "-font", font_name['titi-bold'][0],
+                                     "-pointsize", "115",
                                      "-fill", "none",
                                      "-stroke", "white",
-                                     "-strokewidth", "4",
-                                     "-annotate", "+10+10", race.get_race_round(),
+                                     "-strokewidth", "2",
+                                     "-annotate", "+10-20", race.get_race_round(),
                                      race_poster_destination])
 
     try:
