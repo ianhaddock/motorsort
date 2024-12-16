@@ -55,8 +55,6 @@ def create_poster_image(race, font_name, track_path, image_path):
     else:
         full_race_name = f'{race.get_race_series()}'
 
-    # full_race_season = f"{race.get_race_season()}-{race.get_race_round()}"
-
     race_poster_destination = str(race.get_destination_folder() + "/show.png")
     track_map_image = str(track_path + "/" + race.get_race_name() + ".png")
 
@@ -71,22 +69,9 @@ def create_poster_image(race, font_name, track_path, image_path):
     if not os.path.isfile(poster_image):
         poster_image = str(image_path + "/poster.jpg")
 
-    # get average brightness of poster image
-    pb = ["convert", poster_image, "-colorspace", "gray",
-          "-resize", "1x1", "-format", "'%[pixel:p{0,0}]'", "info:"]
-    poster_brightness = subprocess.run(pb, capture_output=True, text=True)
-
-    # convert result 'grey(xx.xxx)' to int
-    poster_brightness_result = poster_brightness.stdout
-    brightness = int(poster_brightness_result[6:8])
-
-    # if brightness is greater than value, use a darker text color
-    if brightness > 50:
-        fill_color = "gray36"
-        stroke_color = "white"
-    else:
-        fill_color = "gray90"
-        stroke_color = "black"
+    # use simplified fill colors
+    fill_color = "white"
+    stroke_color = "black"
 
     # adjust race_name size if larger than the min, which is
     # the 'championship' part of the WEC title text.
