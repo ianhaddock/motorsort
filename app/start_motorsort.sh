@@ -2,7 +2,7 @@
 
 # create custom track and images directories
 #
-mkdir -p /custom/{tracks,images}
+mkdir -p /custom/{tracks,images,flags}
 
 # fill custom image and track directories if empty
 #
@@ -12,6 +12,10 @@ fi
 
 if [ -z "$(ls -A /custom/images)" ]; then
     cp /config/images/* /custom/images/
+fi
+
+if [ -z "$(ls -A /custom/flags)" ]; then
+    cp /config/flags/* /custom/flags/
 fi
 
 # if env var set use that, otherwise use default
@@ -31,13 +35,15 @@ if [ $tic_rate -lt 1 ]; then
 fi
 
 # if env var is zero, run then quit. Otherwise loop 
-# every $sleep_seconds forever
+# every $sleep_seconds forever unless an error is returned
 #
 while true; do
     echo "$(date): Starting"
     python motorsort.py
 
-    if [ $sleep_seconds == 0 ]; then
+    if [ $? != 0 ]; then
+       exit 1
+    elif [ $sleep_seconds == 0 ]; then
         echo "$(date): Exiting."
         exit 0
     fi

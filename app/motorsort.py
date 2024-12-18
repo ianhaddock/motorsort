@@ -234,6 +234,7 @@ if __name__ == "__main__":
     font_path = '/usr/local/share/fonts/Formula1'
     image_path = '/custom/images'
     track_path = '/custom/tracks'
+    flag_path = '/custom/flags'
 
     # import enviroment variables
     source_path = os.environ.get('MEDIA_SOURCE_PATH', '/mnt/media/source_files/complete')
@@ -295,7 +296,7 @@ if __name__ == "__main__":
 
         # only build poster once for each directory
         if destination_folder not in images_linked:
-            create_poster_image(race, font_list, track_path, image_path)
+            create_poster_image(race, font_list, track_path, flag_path, image_path)
             images_linked.append(destination_folder)
 
         # skip if destination file exists, link file unless copy_files is set
