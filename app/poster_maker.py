@@ -42,7 +42,7 @@ def create_background_image(race, font_name, image_path):
     return
 
 
-def create_poster_image(race, font_name, track_path, image_path):
+def create_poster_image(race, font_name, track_path, flag_path, image_path):
     """ generates images with imageconvert"""
 
     # format title depending on race series
@@ -67,6 +67,7 @@ def create_poster_image(race, font_name, track_path, image_path):
 
     race_poster_destination = str(race.get_destination_folder() + "/show.png")
     track_map_image = str(track_path + "/" + race.get_race_name() + ".png")
+    race_flag = str(flag_path + "/" + race.get_race_name().lower() + ".png")
 
     # if image already exists, dont recreate
     if os.path.isfile(race_poster_destination):
@@ -116,8 +117,17 @@ def create_poster_image(race, font_name, track_path, image_path):
                                      "-fill", "none",
                                      "-stroke", "white",
                                      "-strokewidth", "2",
-                                     "-annotate", "+10-20", race.get_race_round(),
-                                     race_poster_destination])
+                                     "-annotate", "+10-20", race.get_race_round()])
+
+    # add country flag if available
+    if os.path.isfile(race_flag):
+        generate_race_poster_cmd.extend([race_flag,
+                                         "-gravity", "SouthWest",
+                                         "-geometry", "+20+20",
+                                         "-compose", "Src_Over",
+                                         "-background", "None",
+                                         "-composite",
+                                         race_poster_destination])
 
     try:
         subprocess.call(generate_race_poster_cmd)
