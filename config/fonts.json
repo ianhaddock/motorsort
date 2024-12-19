@@ -1,6 +1,8 @@
 {
-"regular": ["Formula1-Display-Regular", "https://imjustcreative.com/wp-content/uploads/2021/10/Files-with-important-Message.zip"],
-"bold": ["Formula1-Display-Bold-Bold", "https://imjustcreative.com/wp-content/uploads/2021/10/Files-with-important-Message.zip"],
-"wide": ["Formula1-Display-Wide", "https://imjustcreative.com/wp-content/uploads/2021/10/Files-with-important-Message.zip"],
-"black": ["Formula1-Display-Black", "https://imjustcreative.com/wp-content/uploads/2021/10/Files-with-important-Message.zip"]
+"black": "Formula1-Display-Black",
+"motion": "Motion-Control-Neue-Lite-Bold",
+"alice": "AliciOne-Demo-Regular",
+"chav": "Chavelite-Regular",
+"titi-black": "Titillium-Web-Black",
+"titi-bold": "Titillium-Web-Bold"
 }
