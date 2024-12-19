@@ -143,7 +143,7 @@ When creating the library:
 
 ### Notes:
 * Track SVGs are from [Wikimedia][021] commons
-* Posters and Backgrounds were created in [Assetto Corsa][022] using [Race Sim Studios][023] cars with [skins from various authors][030] found on [overtake.gg][031].
+* Posters and Backgrounds were created in [Assetto Corsa][022] using [Race Sim Studios][023] cars with skins from various authors found on [overtake.gg][031].
 * Formula 1 style fonts [Motion Control Neue][032] from [ffonts.net][029], [Titillium Web][033] from [Google Fonts][034], and set from [Smithographic][026] free font collection.
 * WEC style font files [Chavelite][027] and [AliciOne Demo][028] from [ffonts.net][029].
 * flag icons from [lipis.dev][035].
@@ -164,7 +164,6 @@ If you found this useful or would like to support projects like this you can buy
 [027]:https://www.ffonts.net/Chavelite.font.download
 [028]:https://www.ffonts.net/AliciOne-Demo.font.download
 [029]:https://www.ffonts.net/
-[030]:https://www.overtake.gg/search/40174312/?q=Formula+1&t=resource&c[categories][0]=7&c[child_categories]=1&o=relevance
 [031]:https://www.overtake.gg/
 [032]:https://www.ffonts.net/Motion-Control-Neue-Lite-Bold.font.download
 [033]:https://fonts.google.com/specimen/Titillium+Web
