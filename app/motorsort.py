@@ -186,7 +186,7 @@ def parse_file_name(race, source_file_name):
         race_name_index_start = source_file_name.index('USA') + len('USA') + 1
 
     # remove France from race name - test for Le Mans files
-    if 'France' in source_file_name:
+    if race.get_race_series() == "World Endurance Championship" and 'France' in source_file_name:
         race_name_index_start = source_file_name.index('France') + len('France') + 1
 
     # sort race sessions
