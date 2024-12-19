@@ -9,7 +9,7 @@ MotorSort is a stateless, self contained Docker app that:
 * Sorts motorsport files by race series, weekend, and session (including sprint weekends).
 * Reformats file names to the PLEX compatible, [Absolute-Series-Scanner][024] convention.
 * Hardlinks source files into race series, race weekend directories to save drive space (with an option to copy if you prefer).
-* Generates dynamic poster images with event name, track map, and season event number.  
+* Generates dynamic poster images with event name, country flag, track map, and season event number.
 
 MotorSort was created to automate my least favorite part of curating a Plex media library.
 
@@ -64,7 +64,7 @@ docker run \
     ghcr.io/ianhaddock/motorsort:latest
 ```
 
-* When the container starts the custom folder will be populated with image and track files.
+* When the container starts the custom folder will be populated with image, flag, and track files.
 * Any updates made in this directory will be used on the next run.
 * To start over: stop the container, erase the local custom folder contents, and start the container again.
 * Generated images on the destination path are not overwritten, remove existing show.png and background.jpg images to generate new versions with your changes.
@@ -134,13 +134,19 @@ Mon Jun 10 18:20:55 UTC 2024: Sleeping 300 seconds
     └── show.png
 ```
 
+### Plex Absolute Series Scanner settings:
+[Plex Media Server][025] users should install [Absolute Series Scanner][024]. This will keep Plex from incorrectly sorting files and applying medatata from online sources.
+
+When creating the library:
+* select 'TV Shows' as the library type
+* use the 'Personal Media Shows' Agent
 
 ### Notes:
-* Track SVGs from [Wikimedia][021]
-* Posters and Backgrounds created in [Assetto Corsa][022] using [Race Sim Studios][023] cars with skins found online.
-* Font files from [Smithographic][026] free font collection.
-* [Plex Media Server][025] users should select 'TV Shows' as the library type, install the [Absolute Series Scanner][024], and select the 'Personal Media Shows' Agent when creating a library. This will keep Plex from incorrectly sorting files and applying medatata from other sources.
-
+* Track SVGs are from [Wikimedia][021] commons
+* Posters and Backgrounds were created in [Assetto Corsa][022] using [Race Sim Studios][023] cars with [skins from various authors][030] found on [overtake.gg][031].
+* Formula 1 style fonts [Motion Control Neue][032] from [ffonts.net][029], [Titillium Web][033] from [Google Fonts][034], and set from [Smithographic][026] free font collection.
+* WEC style font files [Chavelite][027] and [AliciOne Demo][028] from [ffonts.net][029].
+* flag icons from [lipis.dev][035].
 
 ### Support:
 If you found this useful or would like to support projects like this you can buy me a coffee:
@@ -155,3 +161,12 @@ If you found this useful or would like to support projects like this you can buy
 [024]:https://github.com/ZeroQI/Absolute-Series-Scanner
 [025]:https://www.plex.tv/
 [026]:https://imjustcreative.com/category/free-font
+[027]:https://www.ffonts.net/Chavelite.font.download
+[028]:https://www.ffonts.net/AliciOne-Demo.font.download
+[029]:https://www.ffonts.net/
+[030]:https://www.overtake.gg/search/40174312/?q=Formula+1&t=resource&c[categories][0]=7&c[child_categories]=1&o=relevance
+[031]:https://www.overtake.gg/
+[032]:https://www.ffonts.net/Motion-Control-Neue-Lite-Bold.font.download
+[033]:https://fonts.google.com/specimen/Titillium+Web
+[034]:https://fonts.google.com/
+[035]:https://flagicons.lipis.dev/

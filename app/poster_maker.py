@@ -24,7 +24,7 @@ def create_background_image(race, font_name, image_path):
     generate_background_cmd = ["convert", background_image,
                                "-resize", "1920x1080!",
                                "-gravity", "NorthEast",
-                               "-font", font_name['regular'][0],
+                               "-font", font_name['titi-bold'],
                                "-pointsize", "280",
                                "-fill", "none",
                                "-stroke", "white",
@@ -42,23 +42,32 @@ def create_background_image(race, font_name, image_path):
     return
 
 
-def create_poster_image(race, font_name, track_path, image_path):
+def create_poster_image(race, font_name, track_path, flag_path, image_path):
     """ generates images with imageconvert"""
-
-    point_size_base = 120
 
     # format title depending on race series
     if race.get_race_series() == "Formula 1":
-        full_race_name = f"{race.get_race_series().upper()}\n{race.get_race_name().upper()}\nGRAND PRIX"
+        full_race_name = f"{race.get_race_series().upper()}\n{race.get_race_name().upper()}\nGRAND PRIX\n{race.get_race_season()}"
+        race_name_font = font_name['black']
+        race_name_interline_spacing = "+2"
+        race_name_annotate_offset = "+20+40"
+        point_size_base = 120
     elif race.get_race_series() == "World Endurance Championship":
-        full_race_name = f"World\nEndurance\nChampionship\n{race.get_race_name()}"
+        full_race_name = f"World\nEndurance\nChampionship\n{race.get_race_name()}\n{race.get_race_season()}"
+        race_name_font = font_name['titi-black']
+        race_name_interline_spacing = "-45"
+        race_name_annotate_offset = "+20+10"
+        point_size_base = 130
     else:
         full_race_name = f'{race.get_race_series()}'
-
-    # full_race_season = f"{race.get_race_season()}-{race.get_race_round()}"
+        race_name_font = font_name['titi-black']
+        race_name_interline_spacing = "-45"
+        race_name_annotate_offset = "+20+10"
+        point_size_base = 130
 
     race_poster_destination = str(race.get_destination_folder() + "/show.png")
     track_map_image = str(track_path + "/" + race.get_race_name() + ".png")
+    race_flag = str(flag_path + "/" + race.get_race_name().lower() + ".png")
 
     # if image already exists, dont recreate
     if os.path.isfile(race_poster_destination):
@@ -71,22 +80,9 @@ def create_poster_image(race, font_name, track_path, image_path):
     if not os.path.isfile(poster_image):
         poster_image = str(image_path + "/poster.jpg")
 
-    # get average brightness of poster image
-    pb = ["convert", poster_image, "-colorspace", "gray",
-          "-resize", "1x1", "-format", "'%[pixel:p{0,0}]'", "info:"]
-    poster_brightness = subprocess.run(pb, capture_output=True, text=True)
-
-    # convert result 'grey(xx.xxx)' to int
-    poster_brightness_result = poster_brightness.stdout
-    brightness = int(poster_brightness_result[6:8])
-
-    # if brightness is greater than value, use a darker text color
-    if brightness > 50:
-        fill_color = "gray36"
-        stroke_color = "white"
-    else:
-        fill_color = "gray90"
-        stroke_color = "black"
+    # use simplified fill colors
+    fill_color = "white"
+    stroke_color = "black"
 
     # adjust race_name size if larger than the min, which is
     # the 'championship' part of the WEC title text.
@@ -96,43 +92,48 @@ def create_poster_image(race, font_name, track_path, image_path):
     generate_race_poster_cmd = ["convert", poster_image,
                                 "-resize", "600x900!"]
 
-    # if a map is available, add it to the command
+    # if a map is available
     if os.path.isfile(track_map_image):
         generate_race_poster_cmd.extend(["-blur", "0x4",
                                          track_map_image,
                                          "-compose", "Src_Over",
                                          "-gravity", "Center",
+                                         "-geometry", "+0+80",
+                                         "-background", "None",
+                                         "-composite"])
+
+    # add country flag if available
+    if os.path.isfile(race_flag):
+        generate_race_poster_cmd.extend([race_flag,
+                                         "-gravity", "SouthWest",
+                                         "-geometry", "+20+20",
+                                         "-compose", "Src_Over",
                                          "-background", "None",
                                          "-composite"])
 
     # add the rest of the imagemagic command
     generate_race_poster_cmd.extend(["-gravity", "NorthWest",
-                                     "-font", font_name['black'][0],
+                                     "-font", race_name_font,
                                      "-pointsize", point_size,
+                                     "-interline-spacing", race_name_interline_spacing,
                                      "-fill", fill_color,
                                      "-stroke", stroke_color,
-                                     "-strokewidth", "4",
-                                     "-annotate", "+20+40", full_race_name,
-                                     "-font", font_name['black'][0],
-                                     "-fill", "red4",
-                                     "-stroke", "white",
-                                     "-strokewidth", "2",
-                                     "-pointsize", "65",
-                                     "-gravity", "SouthWest",
-                                     "-annotate", "+20+20", race.get_race_season(),
+                                     "-strokewidth", "1",
+                                     "-annotate", race_name_annotate_offset, full_race_name,
                                      "-gravity", "SouthEast",
-                                     "-font", font_name['regular'][0],
-                                     "-pointsize", "90",
+                                     "-font", font_name['titi-bold'],
+                                     "-pointsize", "115",
                                      "-fill", "none",
                                      "-stroke", "white",
-                                     "-strokewidth", "4",
-                                     "-annotate", "+10+10", race.get_race_round(),
+                                     "-strokewidth", "2",
+                                     "-annotate", "+10-20", race.get_race_round(),
                                      race_poster_destination])
 
     try:
         subprocess.call(generate_race_poster_cmd)
-    except FileExistsError as err:
+    except Exception as err:
         print(err)
+        exit(1)
     else:
         print("Poster: " + os.path.basename(race.get_destination_folder()))
 
