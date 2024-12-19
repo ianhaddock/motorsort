@@ -7,7 +7,7 @@ MotorSort is a stateless, self contained Docker app that:
 * Sorts motorsport files by race series, weekend, and session (including sprint weekends).
 * Reformats file names to the PLEX compatible, [Absolute-Series-Scanner][024] convention.
 * Hardlinks source files into race series, race weekend directories to save drive space (with an option to copy if you prefer).
-* Generates dynamic poster images with event name, track map, and season event number.  
+* Generates dynamic poster images with event name, country flag, track map, and season event number.
 
 MotorSort was created to automate my least favorite part of curating a Plex media library.
 
@@ -62,7 +62,7 @@ docker run \
     docker.io/ianhaddock/motorsort
 ```
 
-* When the container starts the custom folder will be populated with image and track files.
+* When the container starts the custom folder will be populated with image, flag, and track files.
 * Any updates made in this directory will be used on the next run.
 * To start over: stop the container, erase the local custom folder contents, and start the container again.
 * Generated images on the destination path are not overwritten, remove existing show.png and background.jpg images to generate new versions with your changes.
@@ -142,8 +142,9 @@ When creating the library:
 ### Notes:
 * Track SVGs are from [Wikimedia][021] commons
 * Posters and Backgrounds were created in [Assetto Corsa][022] using [Race Sim Studios][023] cars with [skins from various authors][030] found on [overtake.gg][031].
-* Formula 1 style font file set from [Smithographic][026] free font collection.
+* Formula 1 style fonts [Motion Control Neue][032] from [ffonts.net][029], [Titillium Web][033] from [Google Fonts][034], and set from [Smithographic][026] free font collection.
 * WEC style font files [Chavelite][027] and [AliciOne Demo][028] from [ffonts.net][029].
+* flag icons from [lipis.dev][035].
 
 ### Support:
 If you found this useful or would like to support projects like this you can buy me a coffee:
@@ -163,3 +164,7 @@ If you found this useful or would like to support projects like this you can buy
 [029]:https://www.ffonts.net/
 [030]:https://www.overtake.gg/search/40174312/?q=Formula+1&t=resource&c[categories][0]=7&c[child_categories]=1&o=relevance
 [031]:https://www.overtake.gg/
+[032]:https://www.ffonts.net/Motion-Control-Neue-Lite-Bold.font.download
+[033]:https://fonts.google.com/specimen/Titillium+Web
+[034]:https://fonts.google.com/
+[035]:https://flagicons.lipis.dev/
