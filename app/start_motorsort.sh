@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -e
 
 # create custom track and images directories
 #
