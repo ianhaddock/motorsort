@@ -227,11 +227,6 @@ if __name__ == "__main__":
     images_linked = []
     backgrounds_linked = []
 
-    font_path = '/usr/local/share/fonts/Formula1'
-    image_path = '/custom/images'
-    track_path = '/custom/tracks'
-    flag_path = '/custom/flags'
-
     # import enviroment variables
     source_path = os.environ.get('MEDIA_SOURCE_PATH', '/mnt/media/source_files/complete')
     destination_path = os.environ.get('MEDIA_DESTINATION_PATH', '/mnt/media')
@@ -243,6 +238,10 @@ if __name__ == "__main__":
     file_prefix = tuple(config.get('config', 'file_prefix').split(','))
     file_types = tuple(config.get('config', 'file_types').split(','))
     weekends = config.get('config', 'sprint_weekends').split(',')
+    image_path = config.get('config', 'image_path')
+    track_path = config.get('config', 'track_path')
+    flag_path = config.get('config', 'flag_path')
+    font_path = config.get('config', 'font_path')
 
     # read json files
     with open('/config/series_prefix.json') as file:
