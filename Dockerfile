@@ -1,13 +1,5 @@
 ### Dockerfile
 
-# Container registry labels
-
-LABEL org.opencontainers.image.source=https://github.com/ianhaddock/motorsort
-
-LABEL org.opencontainers.image.description="Organize motorsport videos and create custom poster images."
-
-LABEL org.opencontainers.image.licenses=MIT
-
 # Base image
 
 FROM docker.io/library/python:3.12-slim-bullseye
@@ -35,6 +27,14 @@ COPY ./config /config
 # Demo content, overwritten when /mnt/media is set as a mount point
 
 COPY ./media/source_files /mnt/media/source_files
+
+# Container registry labels
+
+LABEL org.opencontainers.image.source="https://github.com/ianhaddock/motorsort"
+
+LABEL org.opencontainers.image.description="Organize motorsport videos and create custom poster images."
+
+LABEL org.opencontainers.image.licenses=MIT
 
 # start & stop motorsort
 
