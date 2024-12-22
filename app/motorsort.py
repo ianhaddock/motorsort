@@ -181,8 +181,12 @@ def parse_file_name(race, source_file_name):
             race_season = year
             race.set_race_season(year)
 
+    # remove USA from Formula 1 race name
+    if race_series == "Formula 1" and 'USA' in source_file_name:
+        race_name_index_start = source_file_name.index('USA') + len('USA') + 1
+
     # remove France from WEC race names - test for Le Mans files
-    if race.get_race_series() == "World Endurance Championship" and 'France' in source_file_name:
+    if race_series == "World Endurance Championship" and 'France' in source_file_name:
         race_name_index_start = source_file_name.index('France') + len('France') + 1
 
     # sort race sessions
