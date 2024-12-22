@@ -13,7 +13,7 @@ from shutil import which, copy2
 import urllib.request
 from datetime import datetime
 from configparser import ConfigParser
-from poster_maker import create_poster_image, create_background_image
+from app.poster_maker import create_poster_image, create_background_image
 
 
 class weekend(object):
@@ -82,24 +82,28 @@ class weekend(object):
         return self.race_season
 
     def get_final_file_name(self):
-        return str(self.race_name + self.gp_suffix + " - S" + self.race_round + "E" +
+        return str(self.race_name + " " + self.gp_suffix + " - S" + self.race_round + "E" +
                    self.weekend_order + " - " + self.race_session +
                    " [" + self.race_info + "]." + self.filetype)
 
-    def get_destination_folder(self):
+    def get_destination_folder(self, destination_path):
         """ use an existing race_season + race_round directory even if race_name differs"""
 
+        # this is a partial path search to see if the race already exists with 
+        # a slightly different name. The Imola/Italian GP problem.
         self.race_round_path = str(destination_path + "/" + self.race_series +
                                    "/" + self.race_season + "-" + self.race_round)
         self.race_round_path_found = glob.glob(self.race_round_path + '*')
 
+        # if a partial match is found use it, otherwise return the build up
+        # path name.
         if self.race_round_path_found:
             self.destination_folder = str(self.race_round_path_found[0])
             # print('Found existing race directory: ' + self.destination_folder)
         else:
             self.destination_folder = str(destination_path + "/" + self.race_series +
                                           "/" + self.race_season + "-" + self.race_round +
-                                          " - " + self.race_name + self.gp_suffix)
+                                          " - " + self.race_name + " " + self.gp_suffix)
             # print('Creating destination directory.')
 
         return self.destination_folder
@@ -214,7 +218,7 @@ def parse_file_name(race, source_file_name):
 
     # set gp suffix
     if race_series == "Formula 1":
-        race.set_gp_suffix(" GP")
+        race.set_gp_suffix("GP")
     else:
         race.set_gp_suffix("")
 
@@ -281,13 +285,13 @@ if __name__ == "__main__":
         race = weekend()
 
         parse_file_name(race, source_file_name.replace('.', ' '))
-
+        destination_folder = race.get_destination_folder(destination_path)
         try:
-            os.makedirs(race.get_destination_folder(), exist_ok=True)
+            os.makedirs(destination_folder, exist_ok=True)
         except OSError as err:
-            raise SystemExit("ERROR: Can't create path: " + race.get_destination_folder() + "\n" + str(err))
+            raise SystemExit("ERROR: Can't create path: " + destination_folder + "\n" + str(err))
 
-        destination_folder = race.get_destination_folder()
+
         # only build background once for each directory
         if destination_folder not in backgrounds_linked:
             create_background_image(race, font_list, image_path)
@@ -301,7 +305,7 @@ if __name__ == "__main__":
         # skip if destination file exists, link file unless copy_files is set
         # true. check first as shutil.copy2 will overwrite an existing file
         #
-        destination_full_path = str(race.get_destination_folder() + '/' +
+        destination_full_path = str(destination_folder + '/' +
                                     race.get_final_file_name())
 
         if os.path.exists(destination_full_path):
