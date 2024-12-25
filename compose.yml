@@ -1,0 +1,16 @@
+# Docker compose file
+
+services:
+  motorsort:
+    build: .
+    environment:
+      - SLEEP_SECONDS=4
+      - CONFIG_PATH=/config
+    volumes:
+      - ./config:/config
+      - ./media-testing:/mnt/media
+    develop:
+      watch:
+        - action: sync
+          path: ./app
+          target: /motorsort
