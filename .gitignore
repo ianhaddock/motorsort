@@ -15,7 +15,9 @@ media/*
 custom/*
 
 # python
-__pycache__/*
-bin/*
-lib/*
-pyvenv.cfg
+__pycache__*
+venv/*
+
+# pytest
+.coverage
+.pytest_cache
