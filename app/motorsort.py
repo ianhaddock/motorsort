@@ -10,10 +10,9 @@ import os
 import glob
 import json
 from shutil import which, copy2
-import urllib.request
 from datetime import datetime
 from configparser import ConfigParser
-from app.poster_maker import create_poster_image, create_background_image
+from poster_maker import create_poster_image, create_background_image
 
 
 class weekend(object):
@@ -36,9 +35,15 @@ class weekend(object):
         """ """
         self.race_session = race_session
 
+    def get_race_session(self):
+        return self.race_session
+
     def set_gp_suffix(self, gp_suffix):
         """ """
         self.gp_suffix = gp_suffix
+
+    def get_gp_suffix(self):
+        return self.gp_suffix
 
     def set_race_name(self, race_name):
         """ """
@@ -50,6 +55,9 @@ class weekend(object):
     def set_race_info(self, race_info):
         """ """
         self.race_info = race_info
+
+    def get_race_info(self):
+        return self.race_info
 
     def set_race_round(self, race_round):
         """ """
@@ -115,8 +123,7 @@ def get_file_list(source_path, file_prefix, file_types):
     file_list = []
 
     if not os.path.isdir(str(source_path)):
-        print("Can't find source path: " + source_path)
-        raise SystemExit()
+        raise SystemExit("ERROR, can't find source path: " + source_path)
 
     for root, dirs, files in os.walk(source_path):
         for file in files:
@@ -132,7 +139,7 @@ def find_sprint_weekends(source_file_names, weekends):
     sprint_weekends = []
     # add sprint weekends from list in config.ini
     for weekend in weekends:
-        sprint_weekends.append((datetime.now().year, weekend))
+        sprint_weekends.append((str(datetime.now().year), weekend))
 
     # search files for other sprint weekends
     for source_file_name in source_file_names:
@@ -156,9 +163,12 @@ def find_sprint_weekends(source_file_names, weekends):
     return sprint_weekends
 
 
-def parse_file_name(race, source_file_name):
+def parse_file_name(race, series_prefix, session_map, sprint_weekends, the_weekend_order, source_file_name):
     """parse source file names for keywords to build folder structures and
     file names"""
+
+    # sanitize filename
+    source_file_name = source_file_name.replace('.', ' ')
 
     race.set_filetype(source_file_name[-3:])
 
@@ -210,11 +220,11 @@ def parse_file_name(race, source_file_name):
 
     # set weekend event order
     if race_series == "Formula 1" and (race_season, race_round) in sprint_weekends:
-        race.set_weekend_order(str(sprint_order.index(race_session)+1).zfill(2))
+        race.set_weekend_order(str(the_weekend_order['sprint_order'].index(race_session)+1).zfill(2))
     elif race_series == "Formula 1":
-        race.set_weekend_order(str(regular_order.index(race_session)+1).zfill(2))
+        race.set_weekend_order(str(the_weekend_order['regular_order'].index(race_session)+1).zfill(2))
     else:
-        race.set_weekend_order(str(sportscar_order.index(race_session)+1).zfill(2))
+        race.set_weekend_order(str(the_weekend_order['sportscar_order'].index(race_session)+1).zfill(2))
 
     # set gp suffix
     if race_series == "Formula 1":
@@ -229,7 +239,7 @@ def parse_file_name(race, source_file_name):
     return
 
 
-if __name__ == "__main__":
+def main():
     """ main """
 
     images_linked = []
@@ -238,33 +248,32 @@ if __name__ == "__main__":
     # import enviroment variables
     source_path = os.environ.get('MEDIA_SOURCE_PATH', '/mnt/media/source_files/complete')
     destination_path = os.environ.get('MEDIA_DESTINATION_PATH', '/mnt/media')
-    copy_files = (os.environ.get('COPY_FILES', 'False') == 'True')
+    copy_files = (os.environ.get('COPY_FILES', 'False') == 'True')  # hacky way to turn str in to bool
+    config_path = os.environ.get('CONFIG_PATH', '/config')
 
     # read config.ini file
     config = ConfigParser()
-    config.read('/config/config.ini')
+    config.read(f'{config_path}/config.ini')
     file_prefix = tuple(config.get('config', 'file_prefix').split(','))
     file_types = tuple(config.get('config', 'file_types').split(','))
     weekends = config.get('config', 'sprint_weekends').split(',')
-    image_path = config.get('config', 'image_path')
-    track_path = config.get('config', 'track_path')
-    flag_path = config.get('config', 'flag_path')
-    font_path = config.get('config', 'font_path')
+
+    # content paths
+    image_path = f'{config_path}/images'
+    track_path = f'{config_path}/tracks'
+    flag_path = f'{config_path}/flags'
 
     # read json files
-    with open('/config/series_prefix.json') as file:
+    with open(f'{config_path}/series_prefix.json') as file:
         series_prefix = json.load(file)
-    with open('/config/weekend_order.json') as file:
+    with open(f'{config_path}/weekend_order.json') as file:
         the_weekend_order = json.load(file)
-        sprint_order = the_weekend_order['sprint_order']
-        regular_order = the_weekend_order['regular_order']
-        sportscar_order = the_weekend_order['sportscar_order']
-    with open('/config/session_map.json') as file:
+    with open(f'{config_path}/session_map.json') as file:
         session_map = json.load(file)
-    with open('/config/fonts.json') as file:
+    with open(f'{config_path}/fonts.json') as file:
         font_list = json.load(file)
 
-    # checks
+    # check
     if not which('convert'):
         raise SystemExit("ERROR: Can't find imageconvert")
 
@@ -284,7 +293,7 @@ if __name__ == "__main__":
 
         race = weekend()
 
-        parse_file_name(race, source_file_name.replace('.', ' '))
+        parse_file_name(race, series_prefix, session_map, sprint_weekends, the_weekend_order, source_file_name.replace('.', ' '))
         destination_folder = race.get_destination_folder(destination_path)
         try:
             os.makedirs(destination_folder, exist_ok=True)
@@ -294,12 +303,12 @@ if __name__ == "__main__":
 
         # only build background once for each directory
         if destination_folder not in backgrounds_linked:
-            create_background_image(race, font_list, image_path)
+            create_background_image(race, font_list, image_path, destination_path)
             backgrounds_linked.append(destination_folder)
 
         # only build poster once for each directory
         if destination_folder not in images_linked:
-            create_poster_image(race, font_list, track_path, flag_path, image_path)
+            create_poster_image(race, font_list, track_path, flag_path, image_path, destination_path)
             images_linked.append(destination_folder)
 
         # skip if destination file exists, link file unless copy_files is set
@@ -326,3 +335,9 @@ if __name__ == "__main__":
                     raise SystemExit("ERROR: Can't link file: " + "\n" + str(err))
                 else:
                     print("Linked: " + os.path.basename(destination_full_path))
+
+    return 0
+
+
+if __name__ == "__main__":
+    main()

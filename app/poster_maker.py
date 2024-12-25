@@ -5,14 +5,25 @@ import os
 import subprocess
 
 
-def create_background_image(race, font_name, image_path):
+if __name__ == "__main__":
+    print("Designed to be called by motorsort")
+
+
+def create_background_image(race, font_name, image_path, destination_path):
     """ generates images with imageconvert"""
 
-    background_destination = str(race.get_destination_folder() + "/background.jpg")
+    destination_folder = race.get_destination_folder(destination_path)
+    background_destination = str(race.get_destination_folder(destination_path) + "/background.jpg")
 
     # if image already exists, dont recreate
     if os.path.isfile(background_destination):
         return
+
+    # build path if not found
+    try:
+        os.makedirs(destination_folder, exist_ok=True)
+    except OSError as err:
+        raise SystemExit("ERROR, can't create path: " + str(err))
 
     # prefer race name to race year to default
     background_image = str(image_path + "/" + race.get_race_name() + "-background.jpg")
@@ -33,16 +44,16 @@ def create_background_image(race, font_name, image_path):
                                background_destination]
 
     try:
-        subprocess.call(generate_background_cmd)
-    except FileExistsError as err:
-        print(err)
+        subprocess.check_output(generate_background_cmd)
+    except subprocess.CalledProcessError as err:
+        raise SystemExit('ERROR Imagemagic exit code: ' + str(err.returncode))
     else:
-        print("Background: " + os.path.basename(race.get_destination_folder()))
+        print("Background: " + os.path.basename(race.get_destination_folder(destination_path)))
 
-    return
+    return 0
 
 
-def create_poster_image(race, font_name, track_path, flag_path, image_path):
+def create_poster_image(race, font_name, track_path, flag_path, image_path, destination_path):
     """ generates images with imageconvert"""
 
     # format title depending on race series
@@ -65,13 +76,20 @@ def create_poster_image(race, font_name, track_path, flag_path, image_path):
         race_name_annotate_offset = "+20+10"
         point_size_base = 130
 
-    race_poster_destination = str(race.get_destination_folder() + "/show.png")
+    destination_folder = race.get_destination_folder(destination_path)
+    race_poster_destination = str(race.get_destination_folder(destination_path) + "/show.png")
     track_map_image = str(track_path + "/" + race.get_race_name() + ".png")
     race_flag = str(flag_path + "/" + race.get_race_name().lower() + ".png")
 
     # if image already exists, dont recreate
     if os.path.isfile(race_poster_destination):
         return
+
+    # build path if not found
+    try:
+        os.makedirs(destination_folder, exist_ok=True)
+    except OSError as err:
+        raise SystemExit("ERROR, can't create path: " + str(err))
 
     # prefer race name to race year to default
     poster_image = str(image_path + "/" + race.get_race_name() + "-poster.jpg")
@@ -130,17 +148,10 @@ def create_poster_image(race, font_name, track_path, flag_path, image_path):
                                      race_poster_destination])
 
     try:
-        subprocess.call(generate_race_poster_cmd)
-    except Exception as err:
-        print(err)
-        exit(1)
+        subprocess.check_output(generate_race_poster_cmd)
+    except subprocess.CalledProcessError as err:
+        raise SystemExit('ERROR Imagemagic exit code: ' + str(err.returncode))
     else:
-        print("Poster: " + os.path.basename(race.get_destination_folder()))
+        print("Poster: " + os.path.basename(race.get_destination_folder(destination_path)))
 
-    return
-
-
-if __name__ == "__main__":
-    """ main """
-    print("Designed to be run by racefiles.py")
-
+    return 0
