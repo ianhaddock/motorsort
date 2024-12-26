@@ -23,10 +23,10 @@ MotorSort was created to automate my least favorite part of curating a Plex medi
 * Python
 * ImageMagick
 * Docker
+* Pytest
 
 
 ### Usage:
-In this example source media is located on the host computer at `/mnt/my_files/downloads/complete/` and sorted files will be created in `/mnt/my_files/motorsort/`:
 
 ```
 docker run \
@@ -38,12 +38,12 @@ docker run \
     ghcr.io/ianhaddock/motorsort:latest
 ```
 
-### Parameters:
+### Required Parameters:
 * `-v <your_media_path>:/mnt/media` This mounts your media to the container at `/mnt/media`.
 * `-e MEDIA_SOURCE_PATH` This is the path mounted at /mnt/media the container will search for source files.
 * `-e MEDIA_DESTINATION_PATH` This is the path mounted at /mnt/media the container will output files.
 
-NOTE:  Both `MEDIA_SOURCE_PATH` and `MEDIA_DESTINATION_PATH` must be on the mount point.
+Both source and destination need to be on the _same mount point_ (drive) to allow hardlinks. If you want to source from one drive (mountpoint) and output to another drive, use `COPY_FILES='True'` (see below).
 
 
 ### Optional Parameters:
@@ -143,12 +143,16 @@ When creating the library:
 * select 'TV Shows' as the library type
 * use the 'Personal Media Shows' Agent
 
-### Notes:
-* Track SVGs are from [Wikimedia][021] commons
-* Posters and Backgrounds were created in [Assetto Corsa][022] using [Race Sim Studios][023] cars with skins from various authors found on [overtake.gg][031].
-* Formula 1 style fonts [Motion Control Neue][032] from [ffonts.net][029], [Titillium Web][033] from [Google Fonts][034], and set from [Smithographic][026] free font collection.
-* WEC style font files [Chavelite][027] and [AliciOne Demo][028] from [ffonts.net][029].
-* flag icons from [lipis.dev][035].
+### Sources:
+* Track SVGs from [Wikimedia][021] commons.
+* flag images from [lipis.dev][035].
+* Poster and Background images created in [Assetto Corsa][022].
+* Car models from [Race Sim Studios][023], skins found on [overtake.gg][031].
+* [Motion Control Neue][032] font from [ffonts.net][029].
+* [Titillium Web][033] from [Google Fonts][034].
+* Racing font set from [Smithographic][026] free font collection.
+* [Chavelite][027] and [AliciOne Demo][028] from [ffonts.net][029].
+
 
 ### Support:
 If you found this useful or would like to support projects like this you can buy me a coffee:
