@@ -32,7 +32,7 @@ jobs:
         pip install flake8 pytest
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
     - name: load font files for testing
-      run: cp fonts /usr/local/share/fonts    
+      run: sudo cp -r fonts /usr/local/share/fonts    
     - name: Lint with flake8
       run: |
         # stop the build if there are Python syntax errors or undefined names

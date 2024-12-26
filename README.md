@@ -1,4 +1,4 @@
-[![Pytest](https://github.com/ianhaddock/motorsort/actions/workflows/pytest-tests.yml/badge.svg)](https://github.com/ianhaddock/motorsort/actions/workflows/pytest-tests.yml)
+[![Pytest](https://github.com/ianhaddock/motorsort/actions/workflows/pytest.yml/badge.svg)](https://github.com/ianhaddock/motorsort/actions/workflows/pytest.yml)
 [![Docker Image CI](https://github.com/ianhaddock/motorsort/actions/workflows/docker-image-ci.yml/badge.svg)](https://github.com/ianhaddock/motorsort/actions/workflows/docker-image-ci.yml)
 
 # MotorSort
