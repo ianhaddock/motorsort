@@ -1,3 +1,4 @@
+[![Pytest unit tests](https://github.com/ianhaddock/motorsort/actions/workflows/pytest-tests.yml/badge.svg)](https://github.com/ianhaddock/motorsort/actions/workflows/pytest-tests.yml)
 [![Docker Image CI](https://github.com/ianhaddock/motorsort/actions/workflows/docker-image-ci.yml/badge.svg)](https://github.com/ianhaddock/motorsort/actions/workflows/docker-image-ci.yml)
 
 # MotorSort
@@ -46,9 +47,10 @@ NOTE:  Both `MEDIA_SOURCE_PATH` and `MEDIA_DESTINATION_PATH` must be on the moun
 
 
 ### Optional Parameters:
-* `-e SLEEP_SECONDS` Motorsort will check for new files every 5 minutes by default unless changed here. Set to `-e SLEEP_SECONDS=0` if you want the container to run once and quit.
-* `-e COPY_FILES` Set to `-e COPY_FILES='True'` to copy files instead of hardlinking them. This will take longer and consume more drive space.
-* `-e CONFIG_PATH` Change config directory path.
+* `-e SLEEP_SECONDS=n` check for new files every _n_ seconds. Defaults to 300 seconds (5 minutes). 
+* `-e SLEEP_SECONDS=0` will set the container to run once and quit.
+* `-e COPY_FILES='True'` will copy files instead of hardlinking them.
+* `-e CONFIG_PATH='path/to/config'` to change config directory path.
 
 ### Custom Images:
 All images can be customized. To access them, create a local directory and add it as the `/custom` mountpoint on the container:
