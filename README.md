@@ -15,7 +15,7 @@ MotorSort curates your motorsports video libraries for viewing in [PLEX][025]. M
 * Customizable poster and background base images can be applied to individual events, full seasons, or even to one specific venue
 
 <p align="center">
-  <img width="80%" height="auto" src="readme.jpg">
+  <img width="80%" height="auto" src="readme.png">
 </p>
 
 ### Uses:
