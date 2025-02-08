@@ -245,18 +245,30 @@ def main():
     images_linked = []
     backgrounds_linked = []
 
-    # import enviroment variables
-    source_path = os.environ.get('MEDIA_SOURCE_PATH', '/mnt/media/source_files/complete')
-    destination_path = os.environ.get('MEDIA_DESTINATION_PATH', '/mnt/media')
-    copy_files = (os.environ.get('COPY_FILES', 'False') == 'True')  # hacky way to turn str in to bool
-    config_path = os.environ.get('CONFIG_PATH', '/config')
-
-    # read config.ini file
+    # get env var for config.ini if set
+    config_path = os.getenv('CONFIG_PATH', '/config')
     config = ConfigParser()
+
+    # config.read silenty fails allowing multiple paths at once so we test
+    # on the first item below.
     config.read(f'{config_path}/config.ini')
-    file_prefix = tuple(config.get('config', 'file_prefix').split(','))
+
+    try:
+        file_prefix = tuple(config.get('config', 'file_prefix').split(','))
+    except Exception as err:
+        print(f'ERROR: Unable to read config.ini file: {err}')
+        exit(1)
+
     file_types = tuple(config.get('config', 'file_types').split(','))
+    source_path = config.get('config', 'source_path')
+    destination_path = config.get('config', 'destination_path')
+    copy_files = config.get('config', 'copy_files')
     weekends = config.get('config', 'sprint_weekends').split(',')
+
+    # override config.ini if enviroment variable are set
+    source_path = os.getenv('MEDIA_SOURCE_PATH', source_path)
+    destination_path = os.getenv('MEDIA_DESTINATION_PATH', destination_path)
+    copy_files = (os.getenv('COPY_FILES', 'False') == 'True')  # hack turns str to bool
 
     # content paths
     image_path = f'{config_path}/images'
