@@ -121,11 +121,7 @@ Example Structure:
 
 
 ## Contributing
-I'm always interested in learning from and helping the community. If you have additions or suggestions feel free to drop a pull request.
-
-###  Docker compose
-
-A `compose.yml` file is included in the repo.
+I'm always interested in learning from and helping the community. If you have additions or suggestions feel free to drop a pull request. To get started a `compose.yml` file is included in the repo.
 
 Install [Docker and docker-compose][123].
 
