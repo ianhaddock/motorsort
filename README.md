@@ -78,7 +78,7 @@ PLEX users should install [Absolute Series Scanner][024]. This will keep PLEX fr
 
 
 ## Custom Images:
-All images can be customized by race, season, or venue! Create a local directory with your images (see formatting below) and add it to the container as `/custom`:
+All images can be customized by race, season, or venue. Create a local directory with your images (see formatting below) and add it to the container as `/custom`:
 
 ```
 docker run \
@@ -95,7 +95,7 @@ When the container starts with a custom folder available, it will be populated w
 
 Previously generated images on the destination path will not be overwritten. Remove any pre-existing show.png and background.jpg images to generate new versions that reflect your changes.
 
-To restore the default images stop the container, erase the local custom folder contents, and start the container again.
+To restore the default images, stop the container, erase the local custom folder contents, and start the container again.
 
 ### Image sizes
 * Poster art should be 600x900 .jpg files and will be reformatted (squished) to fit 600x900
@@ -121,9 +121,9 @@ Example Structure:
 
 
 ## Contributing
-I'm always interested in learning from and helping the community. If you have additions or suggestions feel free to drop a pull request. To get started:
+I'm always interested in learning from and helping the community. If you have additions or suggestions feel free to drop a pull request.
 
-### Using Docker compose
+###  Docker compose
 
 A `compose.yml` file is included in the repo.
 
