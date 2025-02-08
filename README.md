@@ -4,6 +4,10 @@
 # MotorSort
 MotorSort curates your motorsports video libraries for viewing in [PLEX][025]. MotorSort will auto-parse file names, generate event specific and _customizable_ poster and background images, and reformat filenames into a PLEX compatible folder hierarchy automatically.
 
+<p align="center">
+  <img width="80%" height="auto" src="readme.png">
+</p>
+
 ### Features
 * Stateless, self contained Docker image
 * Formats filenames using the PLEX compatible, [Absolute-Series-Scanner][024] convention
@@ -13,10 +17,6 @@ MotorSort curates your motorsports video libraries for viewing in [PLEX][025]. M
 * Generates poster images with race series, event name, year, country flag, track map, and event number
 * Generates background images with race event number
 * Customizable poster and background base images can be applied to individual events, full seasons, or even to one specific venue
-
-<p align="center">
-  <img width="80%" height="auto" src="readme.png">
-</p>
 
 ### Uses:
 * Python
