@@ -4,6 +4,8 @@
 # MotorSort
 MotorSort curates your motorsports video libraries for viewing in [PLEX][025]. MotorSort will auto-parse file names, generate event specific and _customizable_ poster and background images, and reformat filenames into a PLEX compatible folder hierarchy automatically.
 
+MotorSort removes the manual processing and tedium involved in keeping your motorsport libraies up to date.
+
 <p align="center">
   <img width="80%" height="auto" src="readme.png">
 </p>
@@ -38,6 +40,10 @@ docker run \
     ghcr.io/ianhaddock/motorsort:latest
 ```
 
+## Usage
+
+MotorSort checks for new content automatically, and once configured can be left to run unattended.
+
 ### Parameters
 * `-v <your_media_path>:/mnt/media` mounts your media volume to the container at `/mnt/media`
 * `-e MEDIA_SOURCE_PATH` is the source path within /mnt/media on the container
@@ -51,9 +57,8 @@ Both source and destination should be on the _same mount point_ (drive) to allow
 * `-e COPY_FILES='True'` copy files instead of using hardlinks
 * `-e CONFIG_PATH='path/to/config'` change config directory path
 
-
-## PLEX Integration
-MotorSort checks for new content automatically, and once configured can be left to run unattended. Each run will output brief diagnostic information into the container log:
+### Logging
+Each run will output summary diagnostic information into the container log:
 
 ```
 $ docker logs motorsort
@@ -121,7 +126,7 @@ Example Structure:
 
 
 ## Contributing
-I'm always interested in learning from and helping the community. If you have additions or suggestions feel free to drop a pull request. To get started a `compose.yml` file is included in the repo.
+I'm always interested in learning from and helping the community. If you have additions or suggestions feel free to fork the repo and open a pull request to the `main` branch. To get you started a `compose.yml` file is included in the repo.
 
 Install [Docker and docker-compose][123].
 
