@@ -90,7 +90,7 @@ class weekend(object):
         return self.race_season
 
     def get_final_file_name(self):
-         return str(self.race_name + self.gp_suffix + " - S" + self.race_round + "E" +
+        return str(self.race_name + self.gp_suffix + " - S" + self.race_round + "E" +
                    self.weekend_order + " - " + self.race_session +
                    " [" + self.race_info + "]." + self.filetype)
 

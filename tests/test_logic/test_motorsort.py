@@ -12,7 +12,7 @@ destination_path = "destination_top"
 
 race = weekend()
 race.set_race_name('race_name')
-race.set_gp_suffix('GP')
+race.set_gp_suffix('')
 race.set_race_round('01')
 race.set_weekend_order('02')
 race.set_race_session('Qualifying')
@@ -47,7 +47,7 @@ def test_get_final_name():
 
     assert race.get_race_info() == "Race Info"
     assert race.get_race_season() == "2024"
-    assert race.get_final_file_name() == 'race_name GP - S01E02 - Qualifying [Race Info].mov'
+    assert race.get_final_file_name() == 'race_name - S01E02 - Qualifying [Race Info].mov'
 
 
 def test_get_destination_folder_new_path(tmp_path):
@@ -55,16 +55,16 @@ def test_get_destination_folder_new_path(tmp_path):
     destination_path = f'{tmp_path}/motorsort'
     os.makedirs(destination_path)
 
-    assert race.get_destination_folder(destination_path) == f'{tmp_path}/motorsort/Race Series/2024-01 - race_name GP'
+    assert race.get_destination_folder(destination_path) == f'{tmp_path}/motorsort/Race Series/2024-01 - race_name '
 
 
 def test_get_destination_folder_partial_path_match(tmp_path):
 
-    existing_destination_path = f'{tmp_path}/motorsort/Race Series/2024-01 - other_race_name GP'
+    existing_destination_path = f'{tmp_path}/motorsort/Race Series/2024-01 - other_race_name'
     os.makedirs(existing_destination_path)
     requested_destination_path = f'{tmp_path}/motorsort'
 
-    assert race.get_destination_folder(requested_destination_path) == f'{tmp_path}/motorsort/Race Series/2024-01 - other_race_name GP'
+    assert race.get_destination_folder(requested_destination_path) == f'{tmp_path}/motorsort/Race Series/2024-01 - other_race_name'
 
 
 def test_parse_file_name_formula_1_regular_weekend():
@@ -73,7 +73,7 @@ def test_parse_file_name_formula_1_regular_weekend():
     file_name = 'test_media/Formula1.2022.Round04.Example.FP1.FastChannelHD.1080p.50fps.X264.Multi-AOA11 mkv'
     parse_file_name(race, series_prefix, session_map, sprint_weekends, the_weekend_order, file_name)
 
-    assert race.get_race_series() == 'Formula 1' and race.get_gp_suffix() == 'GP'
+    assert race.get_race_series() == 'Formula 1' and race.get_gp_suffix() == ' GP'
 
 
 def test_parse_file_name_formula_1_sprint_weekend():
@@ -86,12 +86,12 @@ def test_parse_file_name_formula_1_sprint_weekend():
 
 def test_parse_file_name_wec_and_no_suffix():
 
-    race.set_gp_suffix('GP')
+    race.set_gp_suffix(' GP')
     file_name = 'test_media/WEC.2022.Round04.Example.Race04.FastChannelHD.1080p.50fps.X264.Multi-AOA11.mkv'
     parse_file_name(race, series_prefix, session_map, sprint_weekends, the_weekend_order, file_name)
 
     assert race.get_race_series() == 'World Endurance Championship'
-    assert not race.get_gp_suffix() == 'GP'
+    assert not race.get_gp_suffix() == ' GP'
 
 
 def test_parse_file_name_no_round_name():
