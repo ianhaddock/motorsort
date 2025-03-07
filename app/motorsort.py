@@ -90,7 +90,7 @@ class weekend(object):
         return self.race_season
 
     def get_final_file_name(self):
-        return str(self.race_name + " " + self.gp_suffix + " - S" + self.race_round + "E" +
+         return str(self.race_name + self.gp_suffix + " - S" + self.race_round + "E" +
                    self.weekend_order + " - " + self.race_session +
                    " [" + self.race_info + "]." + self.filetype)
 
@@ -227,10 +227,9 @@ def parse_file_name(race, series_prefix, session_map, sprint_weekends, the_weeke
         race.set_weekend_order(str(the_weekend_order['sportscar_order'].index(race_session)+1).zfill(2))
 
     # set gp suffix
+    race.set_gp_suffix("")
     if race_series == "Formula 1":
-        race.set_gp_suffix("GP")
-    else:
-        race.set_gp_suffix("")
+        race.set_gp_suffix(" GP")
 
     race.set_race_series(race_series)
     race.set_race_round(race_round)
@@ -244,6 +243,7 @@ def main():
 
     images_linked = []
     backgrounds_linked = []
+
 
     # get env var for config.ini if set
     config_path = os.getenv('CONFIG_PATH', '/config')
