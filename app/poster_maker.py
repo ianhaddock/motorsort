@@ -9,11 +9,11 @@ if __name__ == "__main__":
     print("Designed to be called by motorsort")
 
 
-def create_background_image(race, font_name, image_path, destination_path):
+def create_background_image(race, font_name, image_path):
     """ generates images with imageconvert"""
 
-    destination_folder = race.get_destination_folder(destination_path)
-    background_destination = str(race.get_destination_folder(destination_path) + "/background.jpg")
+    destination_folder = race.get_destination_folder()
+    background_destination = str(race.get_destination_folder() + "/background.jpg")
 
     # if image already exists, dont recreate
     if os.path.isfile(background_destination):
@@ -48,12 +48,12 @@ def create_background_image(race, font_name, image_path, destination_path):
     except subprocess.CalledProcessError as err:
         raise SystemExit('ERROR Imagemagic exit code: ' + str(err.returncode))
     else:
-        print("Background: " + os.path.basename(race.get_destination_folder(destination_path)))
+        print("Background: " + os.path.basename(race.get_destination_folder()))
 
     return 0
 
 
-def create_poster_image(race, font_name, track_path, flag_path, image_path, destination_path):
+def create_poster_image(race, font_name, track_path, flag_path, image_path):
     """ generates images with imageconvert"""
 
     # format title depending on race series
@@ -76,8 +76,8 @@ def create_poster_image(race, font_name, track_path, flag_path, image_path, dest
         race_name_annotate_offset = "+20+10"
         point_size_base = 130
 
-    destination_folder = race.get_destination_folder(destination_path)
-    race_poster_destination = str(race.get_destination_folder(destination_path) + "/show.png")
+    destination_folder = race.get_destination_folder()
+    race_poster_destination = str(race.get_destination_folder() + "/show.png")
     track_map_image = str(track_path + "/" + race.get_race_name() + ".png")
     race_flag = str(flag_path + "/" + race.get_race_name().lower() + ".png")
 
@@ -152,6 +152,6 @@ def create_poster_image(race, font_name, track_path, flag_path, image_path, dest
     except subprocess.CalledProcessError as err:
         raise SystemExit('ERROR Imagemagic exit code: ' + str(err.returncode))
     else:
-        print("Poster: " + os.path.basename(race.get_destination_folder(destination_path)))
+        print("Poster: " + os.path.basename(race.get_destination_folder()))
 
     return 0
