@@ -20,7 +20,7 @@ MotorSort removes the manual processing and tedium involved in keeping your moto
 * Generates background images with race event number
 * Customizable poster and background base images can be applied to individual events, full seasons, or even to one specific venue
 
-### Uses:
+### Uses
 * Python
 * ImageMagick
 * Docker
@@ -82,7 +82,7 @@ Mon Jun 10 18:20:55 UTC 2024: Sleeping 300 seconds
 PLEX users should install [Absolute Series Scanner][024]. This will keep PLEX from applying medatata from online sources or replacing poster images.
 
 
-## Custom Images:
+## Custom Images
 All images can be customized by race, season, or venue. Create a local directory with your images (see formatting below) and add it to the container as `/custom`:
 
 ```
@@ -102,7 +102,7 @@ Previously generated images on the destination path will not be overwritten. Rem
 
 To restore the default images, stop the container, erase the local custom folder contents, and start the container again.
 
-### Image sizes
+### Image Sizes
 * Poster art should be 600x900 .jpg files and will be reformatted (squished) to fit 600x900
 * Background art should be 1920x1080 .jpg files and will be reformatted to fit 1920x1080
 * Poster art is selected in order of track name, season, or default. e.g. COTA-poster.jpg, 2022-poster.jpg, poster.jpg
@@ -180,14 +180,14 @@ motorsort-1  | ....
 use `cmd-c` to exit.
 
 
-### Running locally
+### Running Locally
 
 This option is not recommended. ImageMagick is such a great swiss army knife of a tool it can pose a [security concern][124]. You may also see various warning messages based on the OS you are running.
 
 If you still want to run locally you will need to change the full paths in `config/config.ini` and `app/start_motorsort.sh` to local paths your account has access to, set an env var for the config directory `export CONFIG_PATH=config`, and install `bc` and `ImageMagick` locally first.
 
 
-## Test coverage
+## Test Coverage
 
 Pytest tests are available.
 
@@ -207,7 +207,7 @@ Run the following to get an overview
 
 `pytest -vv -x --cov-report term-missing --cov=app tests`
 
-Currently test coverage is 94%:
+Current test coverage:
 
 ```
 ---------- coverage: platform darwin, python 3.10.1-final-0 ----------
