@@ -7,117 +7,15 @@
 
 
 import os
-import glob
 import json
 from shutil import which, copy2
 from datetime import datetime
 from configparser import ConfigParser
 from poster_maker import create_poster_image, create_background_image
+from weekend import Weekend
 
 
-class weekend(object):
-    """race weekend"""
-
-    def __init__(self):
-        self.race_session = ""
-        self.race_name = ""
-        self.race_info = ""
-        self.race_round = "00"
-        self.filetype = ""
-        self.final_file_name = ""
-        self.destination_folder = ""
-        self.race_round_path = ""
-        self.race_series = ""
-        self.race_season = ""
-        self.weekend_order = ""
-
-    def set_race_session(self, race_session):
-        """ """
-        self.race_session = race_session
-
-    def get_race_session(self):
-        return self.race_session
-
-    def set_gp_suffix(self, gp_suffix):
-        """ """
-        self.gp_suffix = gp_suffix
-
-    def get_gp_suffix(self):
-        return self.gp_suffix
-
-    def set_race_name(self, race_name):
-        """ """
-        self.race_name = race_name
-
-    def get_race_name(self):
-        return self.race_name
-
-    def set_race_info(self, race_info):
-        """ """
-        self.race_info = race_info
-
-    def get_race_info(self):
-        return self.race_info
-
-    def set_race_round(self, race_round):
-        """ """
-        self.race_round = race_round
-
-    def get_race_round(self):
-        return self.race_round
-
-    def set_filetype(self, filetype):
-        """ """
-        self.filetype = filetype
-
-    def set_weekend_order(self, weekend_order):
-        """ """
-        self.weekend_order = weekend_order
-
-    def set_race_series(self, race_series):
-        """ """
-        self.race_series = race_series
-
-    def get_race_series(self):
-        """ """
-        return self.race_series
-
-    def set_race_season(self, race_season):
-        """ """
-        self.race_season = race_season
-
-    def get_race_season(self):
-        return self.race_season
-
-    def get_final_file_name(self):
-        return str(self.race_name + self.gp_suffix + " - S" + self.race_round + "E" +
-                   self.weekend_order + " - " + self.race_session +
-                   " [" + self.race_info + "]." + self.filetype)
-
-    def get_destination_folder(self, destination_path):
-        """ use an existing race_season + race_round directory even if race_name differs"""
-
-        # this is a partial path search to see if the race already exists with 
-        # a slightly different name. The Imola/Italian GP problem.
-        self.race_round_path = str(destination_path + "/" + self.race_series +
-                                   "/" + self.race_season + "-" + self.race_round)
-        self.race_round_path_found = glob.glob(self.race_round_path + '*')
-
-        # if a partial match is found use it, otherwise return the build up
-        # path name.
-        if self.race_round_path_found:
-            self.destination_folder = str(self.race_round_path_found[0])
-            # print('Found existing race directory: ' + self.destination_folder)
-        else:
-            self.destination_folder = str(destination_path + "/" + self.race_series +
-                                          "/" + self.race_season + "-" + self.race_round +
-                                          " - " + self.race_name + " " + self.gp_suffix)
-            # print('Creating destination directory.')
-
-        return self.destination_folder
-
-
-def get_file_list(source_path, file_prefix, file_types):
+def get_file_list(source_path, file_prefix, file_types) -> list:
     """ return path & name of files matching extensions and prefix lists"""
 
     file_list = []
@@ -241,112 +139,78 @@ def parse_file_name(race, series_prefix, session_map, sprint_weekends, the_weeke
 def main():
     """ main """
 
-    images_linked = []
-    backgrounds_linked = []
+    if not which('convert'):
+        raise SystemExit("ERROR: Imagemagick convert not found in path.")
 
-
-    # get env var for config.ini if set
-    config_path = os.getenv('CONFIG_PATH', '/config')
     config = ConfigParser()
-
-    # config.read silenty fails allowing multiple paths at once so we test
-    # on the first item below.
-    config.read(f'{config_path}/config.ini')
-
+    config.read(f"{os.getenv('CONFIG_PATH', '/config')}/config.ini")
     try:
         file_prefix = tuple(config.get('config', 'file_prefix').split(','))
     except Exception as err:
         print(f'ERROR: Unable to read config.ini file: {err}')
         exit(1)
-
     file_types = tuple(config.get('config', 'file_types').split(','))
-    source_path = config.get('config', 'source_path')
-    destination_path = config.get('config', 'destination_path')
-    copy_files = config.get('config', 'copy_files')
     weekends = config.get('config', 'sprint_weekends').split(',')
+    source_path = os.getenv('MEDIA_SOURCE_PATH', config.get('config', 'source_path'))
+    destination_path = os.getenv('MEDIA_DESTINATION_PATH', config.get('config', 'destination_path'))
+    copy_files = (os.getenv('COPY_FILES', config.get('config', 'copy_files')) == 'True')  # str -> bool
 
-    # override config.ini if enviroment variable are set
-    source_path = os.getenv('MEDIA_SOURCE_PATH', source_path)
-    destination_path = os.getenv('MEDIA_DESTINATION_PATH', destination_path)
-    copy_files = (os.getenv('COPY_FILES', 'False') == 'True')  # hack turns str to bool
-
-    # content paths
-    image_path = f'{config_path}/images'
-    track_path = f'{config_path}/tracks'
-    flag_path = f'{config_path}/flags'
-
-    # read json files
-    with open(f'{config_path}/series_prefix.json') as file:
+    with open(f"{os.getenv('CONFIG_PATH', '/config')}/series_prefix.json") as file:
         series_prefix = json.load(file)
-    with open(f'{config_path}/weekend_order.json') as file:
+    with open(f"{os.getenv('CONFIG_PATH', '/config')}/weekend_order.json") as file:
         the_weekend_order = json.load(file)
-    with open(f'{config_path}/session_map.json') as file:
+    with open(f"{os.getenv('CONFIG_PATH', '/config')}/session_map.json") as file:
         session_map = json.load(file)
-    with open(f'{config_path}/fonts.json') as file:
+    with open(f"{os.getenv('CONFIG_PATH', '/config')}/fonts.json") as file:
         font_list = json.load(file)
 
-    # check
-    if not which('convert'):
-        raise SystemExit("ERROR: Can't find imageconvert")
-
-    # sort source directory for files that fit criteria
     source_file_names = get_file_list(source_path, file_prefix, file_types)
-    print("Found " + str(len(source_file_names)) + " items to process.")
-
-    # search found files for events that match F1 sprint weekend order
     sprint_weekends = find_sprint_weekends(source_file_names, weekends)
-    print("Found " + str(len(sprint_weekends)) + " sprint weekends.")
 
-    # start buliding
-    print("Creating files.")
     for source_file_name in source_file_names:
-        # print()
-        # print(source_file_name)
+        race = Weekend(destination_path)
 
-        race = weekend()
+        parse_file_name(race,
+                        series_prefix,
+                        session_map,
+                        sprint_weekends,
+                        the_weekend_order,
+                        source_file_name
+                        )
 
-        parse_file_name(race, series_prefix, session_map, sprint_weekends, the_weekend_order, source_file_name.replace('.', ' '))
-        destination_folder = race.get_destination_folder(destination_path)
         try:
-            os.makedirs(destination_folder, exist_ok=True)
+            os.makedirs(race.get_destination_folder(), exist_ok=True)
         except OSError as err:
-            raise SystemExit("ERROR: Can't create path: " + destination_folder + "\n" + str(err))
+            raise SystemExit("ERROR: Can't create path: " + str(err))
 
+        if race.get_destination_folder() not in race.get_directory_images_created():
+            create_poster_image(race,
+                                font_list,
+                                config.get('config', 'track_path'),
+                                config.get('config', 'flag_path'),
+                                config.get('config', 'image_path')
+                                )
+            create_background_image(race,
+                                    font_list,
+                                    config.get('config', 'image_path')
+                                    )
+            race.set_directory_images_created(race.get_destination_folder())
 
-        # only build background once for each directory
-        if destination_folder not in backgrounds_linked:
-            create_background_image(race, font_list, image_path, destination_path)
-            backgrounds_linked.append(destination_folder)
-
-        # only build poster once for each directory
-        if destination_folder not in images_linked:
-            create_poster_image(race, font_list, track_path, flag_path, image_path, destination_path)
-            images_linked.append(destination_folder)
-
-        # skip if destination file exists, link file unless copy_files is set
-        # true. check first as shutil.copy2 will overwrite an existing file
-        #
-        destination_full_path = str(destination_folder + '/' +
-                                    race.get_final_file_name())
-
-        if os.path.exists(destination_full_path):
-            # print("File Exists: " + destination_full_path)
-            pass
-        else:
+        if not os.path.exists(race.get_destination_full_path()):
             if copy_files:
                 try:
-                    copy2(source_file_name, destination_full_path)
+                    copy2(source_file_name, race.get_destination_full_path())
                 except OSError as err:
-                    raise SystemExit("ERROR: Can't copy file: " + "\n" + str(err))
+                    raise SystemExit("ERROR: Can't copy file: " + str(err))
                 else:
-                    print("Copied: " + os.path.basename(destination_full_path))
+                    print("Copied: " + race.get_final_file_name())
             else:
                 try:
-                    os.link(source_file_name, destination_full_path)
+                    os.link(source_file_name, race.get_destination_full_path())
                 except OSError as err:
-                    raise SystemExit("ERROR: Can't link file: " + "\n" + str(err))
+                    raise SystemExit("ERROR: Can't link file: " + str(err))
                 else:
-                    print("Linked: " + os.path.basename(destination_full_path))
+                    print("Linked: " + race.get_final_file_name())
 
     return 0
 
