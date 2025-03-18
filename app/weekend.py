@@ -76,6 +76,9 @@ class Weekend(object):
 
     def set_race_series(self, race_series):
         """ """
+        if race_series == "Formula 1":
+            self.gp_suffix = " GP"
+
         self.race_series = race_series
 
     def get_race_series(self):
@@ -90,9 +93,6 @@ class Weekend(object):
         return self.race_season
 
     def get_final_file_name(self):
-        if self.race_series == "Formula 1":
-            self.gp_suffix = " GP"
-
         return str(self.race_name + self.gp_suffix + " - S" + self.race_round + "E" +
                    self.weekend_order + " - " + self.race_session +
                    " [" + self.race_info + "]" + self.filetype)
