@@ -2,9 +2,7 @@
 # weekend.py
 #
 
-
 import glob
-
 
 class Weekend(object):
     """race weekend"""

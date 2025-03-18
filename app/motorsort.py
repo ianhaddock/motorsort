@@ -149,9 +149,9 @@ def main():
     file_types = tuple(config.get('config', 'file_types').split(','))
     weekends = config.get('config', 'sprint_weekends').split(',')
     source_path = os.getenv('MEDIA_SOURCE_PATH',
-                            config.get('config', 'source_path'))
+                            config.get('paths', 'source_path'))
     destination_path = os.getenv('MEDIA_DESTINATION_PATH',
-                                 config.get('config', 'destination_path'))
+                                 config.get('paths', 'destination_path'))
     copy_files = (os.getenv('COPY_FILES',
                             config.get('config', 'copy_files')
                             ) == 'True')  # str -> bool
@@ -187,13 +187,13 @@ def main():
         if race.get_destination_folder() not in race.get_directory_images_created():
             create_poster_image(race,
                                 font_list,
-                                config.get('config', 'track_path'),
-                                config.get('config', 'flag_path'),
-                                config.get('config', 'image_path')
+                                config.get('paths', 'track_path'),
+                                config.get('paths', 'flag_path'),
+                                config.get('paths', 'image_path')
                                 )
             create_background_image(race,
                                     font_list,
-                                    config.get('config', 'image_path')
+                                    config.get('paths', 'image_path')
                                     )
             race.set_directory_images_created(race.get_destination_folder())
 
