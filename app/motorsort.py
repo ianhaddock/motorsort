@@ -37,24 +37,22 @@ def find_sprint_weekends(source_file_names, weekends):
 
     sprint_weekends = []
     # add sprint weekends from list in config.ini
-    for weekend in weekends:
-        sprint_weekends.append((str(datetime.now().year), weekend))
+    for sprint_event in weekends:
+        sprint_weekends.append((str(datetime.now().year), sprint_event))
 
     # search files for other sprint weekends
     for source_file_name in source_file_names:
         race_season, race_round = '', ''
 
-        if 'Sprint' in source_file_name:
+        if 'sprint' in source_file_name.lower():
 
-            if '20' in source_file_name:
-                i = source_file_name.index('20')
-                year = source_file_name[i:i+4]
-                if year.isnumeric():
-                    race_season = year
+            race_year = re.search("(20|19)[0-9][0-9]", source_file_name)
+            if race_year:
+                race_season = race_year.group()
 
-            if 'Round' in source_file_name:
-                i = source_file_name.index('Round')
-                race_round = source_file_name[i+5:i+8].strip('.')
+            r_round = re.search("Round.?[0-9][0-9]", source_file_name)
+            if r_round:
+                race_round = r_round.group()[-2:]
 
             if (race_season, race_round) not in sprint_weekends:
                 sprint_weekends.append((race_season, race_round))
