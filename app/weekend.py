@@ -20,6 +20,7 @@ class Weekend(object):
         self.race_round_path = ""
         self.race_series = ""
         self.race_season = ""
+        self.gp_suffix = ""
         self.weekend_order = ""
         self.directory_images = []
         self.destination_path = destination_path
@@ -91,9 +92,12 @@ class Weekend(object):
         return self.race_season
 
     def get_final_file_name(self):
+        if self.race_series == "Formula 1":
+            self.gp_suffix = " GP"
+
         return str(self.race_name + self.gp_suffix + " - S" + self.race_round + "E" +
                    self.weekend_order + " - " + self.race_session +
-                   " [" + self.race_info + "]." + self.filetype)
+                   " [" + self.race_info + "]" + self.filetype)
 
     def get_destination_folder(self):
         """ use an existing race_season + race_round directory even if race_name differs"""

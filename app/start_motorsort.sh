@@ -18,6 +18,22 @@ if [ -z "$(ls -A /custom/flags)" ]; then
     cp /config/flags/* /custom/flags/
 fi
 
+if [ ! -z /custom/series_prefix.json ]; then
+    cp /config/series_prefix.json /custom/series_prefix.json
+fi
+
+if [ ! -z /custom/session_map.json ]; then
+    cp /config/session_map.json /custom/session_map.json
+fi
+
+if [ ! -z /custom/weekend_order.json ]; then
+    cp /config/weekend_order.json /custom/weekend_order.json
+fi
+
+if [ ! -z /custom/fonts.json ]; then
+    cp /config/fonts.json /custom/fonts.json
+fi
+
 # if env var set use that, otherwise use default
 #
 if [ ! $SLEEP_SECONDS ]; then
