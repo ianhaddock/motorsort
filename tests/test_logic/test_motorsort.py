@@ -5,7 +5,14 @@ import os
 import shutil
 import json
 from configparser import ConfigParser
-from motorsort import main, parse_file_name, get_file_list, find_sprint_weekends
+from motorsort import (
+        main,
+        parse_file_name,
+        get_file_list,
+        find_sprint_weekends,
+        build_images,
+        link_files
+        )
 from weekend import Weekend
 
 config = ConfigParser()
@@ -13,10 +20,11 @@ config.read('config/config.ini')
 file_prefix = tuple(config.get('config', 'file_prefix').split(','))
 file_types = tuple(config.get('config', 'file_types').split(','))
 weekends = config.get('config', 'sprint_weekends').split(',')
-image_path = config.get('paths', 'image_path')
-track_path = config.get('paths', 'track_path')
-flag_path = config.get('paths', 'flag_path')
-font_path = config.get('paths', 'font_path')
+
+image_path = 'config/images'
+track_path = 'config/tracks'
+flag_path = 'config/flags'
+font_path = 'fonts'
 
 with open('config/series_prefix.json') as file:
     series_prefix = json.load(file)
@@ -198,3 +206,32 @@ def test_find_sprint_weekends(tmp_path):
         ('2025', '23'),
         ('2022', '00')
         ]
+
+def test_build_images(tmp_path):
+
+    race = Weekend(f'{tmp_path}/motorsort')
+    race.set_race_series("Race Series")
+    race.set_race_name('race_name')
+    race.set_race_season("2024")
+    race.set_race_round('01')
+
+    build_images(race, font_list, track_path, flag_path, image_path)
+
+    assert os.path.exists(f"{tmp_path}/motorsort/Race Series/2024-01 - race_name/show.png")
+    assert os.path.exists(f"{tmp_path}/motorsort/Race Series/2024-01 - race_name/background.jpg")
+
+
+def test_link_files(tmp_path):
+
+    race = Weekend(f'{tmp_path}/motorsort')
+    copy_files = False
+    source_file_name = 'media/source_files/complete/Formula1.2022.Round00.Example.FP1.FastChannelHD.1080p.50fps.X264.Multi-AOA11.mkv'
+    sprint_weekends = [('2022', '05')]
+
+    parse_file_name(race, series_prefix, session_map, sprint_weekends, the_weekend_order, source_file_name)
+
+    os.makedirs(f'{tmp_path}/motorsort/Formula 1/2022-00 - Example GP')
+
+    link_files(race, source_file_name, copy_files)
+
+    assert os.path.exists(f'{tmp_path}/motorsort/Formula 1/2022-00 - Example GP/Example GP - S00E01 - Free Practice 1 [FastChannelHD 1080p 50fps X264 Multi-AOA11].mkv')

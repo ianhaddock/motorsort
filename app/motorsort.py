@@ -131,8 +131,45 @@ def parse_file_name(race,
     return
 
 
+def link_files(race, source_file_name: str, copy_files: bool):
+    """ """
+    if copy_files:
+        try:
+            copy2(source_file_name, race.get_destination_full_path())
+        except OSError as err:
+            raise SystemExit("ERROR: Can't copy file: " + str(err))
+        else:
+            print("Copied: " + race.get_final_file_name())
+    else:
+        try:
+            os.link(source_file_name, race.get_destination_full_path())
+        except OSError as err:
+            raise SystemExit("ERROR: Can't link file: " + str(err))
+        else:
+            print("Linked: " + race.get_final_file_name())
+
+
+def build_images(race, font_list, track_path, flag_path, image_path):
+    """ """
+    try:
+        os.makedirs(race.get_destination_folder(), exist_ok=True)
+    except OSError as err:
+        raise SystemExit("ERROR: Can't create path: " + str(err))
+
+    create_poster_image(race,
+                        font_list,
+                        track_path,
+                        flag_path,
+                        image_path
+                        )
+    create_background_image(race,
+                            font_list,
+                            image_path
+                            )
+
+
 def main():
-    """ main """
+    """Pull configurations, call functions to parse, build images, and link files."""
 
     if not which('convert'):
         raise SystemExit("ERROR: Imagemagick convert not found in path.")
@@ -140,19 +177,10 @@ def main():
     config = ConfigParser()
     config.read(f"{os.getenv('CONFIG_PATH', '/config')}/config.ini")
     try:
-        file_prefix = tuple(config.get('config', 'file_prefix').split(','))
+        source_path = os.getenv('MEDIA_SOURCE_PATH', config.get('paths', 'source_path'))
     except Exception as err:
         print(f'ERROR: Unable to read config.ini file: {err}')
         exit(1)
-    file_types = tuple(config.get('config', 'file_types').split(','))
-    weekends = config.get('config', 'sprint_weekends').split(',')
-    source_path = os.getenv('MEDIA_SOURCE_PATH',
-                            config.get('paths', 'source_path'))
-    destination_path = os.getenv('MEDIA_DESTINATION_PATH',
-                                 config.get('paths', 'destination_path'))
-    copy_files = (os.getenv('COPY_FILES',
-                            config.get('config', 'copy_files')
-                            ) == 'True')  # str -> bool
 
     with open(config.get('json', 'series_prefix')) as file:
         series_prefix = json.load(file)
@@ -163,12 +191,20 @@ def main():
     with open(config.get('json', 'fonts')) as file:
         font_list = json.load(file)
 
-    source_file_names = get_file_list(source_path, file_prefix, file_types)
-    sprint_weekends = find_sprint_weekends(source_file_names, weekends)
+    source_file_names = get_file_list(source_path,
+                                      tuple(config.get('config', 'file_prefix').split(',')),
+                                      tuple(config.get('config', 'file_types').split(','))
+                                      )
 
-    for source_file_name in get_file_list(source_path, file_prefix, file_types):
-        race = Weekend(destination_path)
+    sprint_weekends = find_sprint_weekends(source_file_names,
+                                           config.get('config', 'sprint_weekends').split(',')
+                                           )
 
+    for source_file_name in get_file_list(source_path,
+                                          tuple(config.get('config', 'file_prefix').split(',')),
+                                          tuple(config.get('config', 'file_types').split(','))
+                                          ):
+        race = Weekend(os.getenv('MEDIA_DESTINATION_PATH', config.get('paths', 'destination_path')))
         parse_file_name(race,
                         series_prefix,
                         session_map,
@@ -176,40 +212,18 @@ def main():
                         the_weekend_order,
                         source_file_name
                         )
-
-        try:
-            os.makedirs(race.get_destination_folder(), exist_ok=True)
-        except OSError as err:
-            raise SystemExit("ERROR: Can't create path: " + str(err))
-
-        if race.get_destination_folder() not in race.get_directory_images_created():
-            create_poster_image(race,
-                                font_list,
-                                config.get('paths', 'track_path'),
-                                config.get('paths', 'flag_path'),
-                                config.get('paths', 'image_path')
-                                )
-            create_background_image(race,
-                                    font_list,
-                                    config.get('paths', 'image_path')
-                                    )
-            race.set_directory_images_created(race.get_destination_folder())
-
+        if not os.path.exists(race.get_destination_folder()):
+            build_images(race,
+                         font_list,
+                         config.get('paths', 'track_path'),
+                         config.get('paths', 'flag_path'),
+                         config.get('paths', 'image_path')
+                         )
         if not os.path.exists(race.get_destination_full_path()):
-            if copy_files:
-                try:
-                    copy2(source_file_name, race.get_destination_full_path())
-                except OSError as err:
-                    raise SystemExit("ERROR: Can't copy file: " + str(err))
-                else:
-                    print("Copied: " + race.get_final_file_name())
-            else:
-                try:
-                    os.link(source_file_name, race.get_destination_full_path())
-                except OSError as err:
-                    raise SystemExit("ERROR: Can't link file: " + str(err))
-                else:
-                    print("Linked: " + race.get_final_file_name())
+            link_files(race,
+                       source_file_name,
+                       os.getenv('COPY_FILES', config.get('config', 'copy_files')) == 'True'  # str -> bool
+                       )
 
     return 0
 

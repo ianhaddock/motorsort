@@ -120,4 +120,4 @@ class Weekend(object):
         return self.destination_folder
 
     def get_destination_full_path(self):
-        return str(self.destination_folder + "/" + self.get_final_file_name())
+        return str(self.get_destination_folder() + "/" + self.get_final_file_name())
