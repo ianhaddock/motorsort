@@ -4,6 +4,7 @@
 
 import glob
 
+
 class Weekend(object):
     """race weekend"""
 
@@ -22,6 +23,14 @@ class Weekend(object):
         self.weekend_order = ""
         self.directory_images = []
         self.destination_path = destination_path
+
+    def set_race_info(self, race_info):
+        """ """
+        self.race_info = race_info
+
+    def get_race_info(self):
+        """ """
+        return self.race_info
 
     def set_directory_images_created(self, destination_folder):
         """ """
@@ -47,14 +56,14 @@ class Weekend(object):
 
     def set_race_name(self, race_name):
         """ """
-        self.race_name = race_name
+        self.race_name = race_name.replace('.', ' ').strip(' ')
 
     def get_race_name(self):
         return self.race_name
 
     def set_race_info(self, race_info):
         """ """
-        self.race_info = race_info
+        self.race_info = race_info.strip(' ')
 
     def get_race_info(self):
         return self.race_info
@@ -73,6 +82,10 @@ class Weekend(object):
     def set_weekend_order(self, weekend_order):
         """ """
         self.weekend_order = weekend_order
+
+    def get_weekend_order(self):
+        """ """
+        return self.weekend_order
 
     def set_race_series(self, race_series):
         """ """
@@ -95,7 +108,7 @@ class Weekend(object):
     def get_final_file_name(self):
         return str(self.race_name + self.gp_suffix + " - S" + self.race_round + "E" +
                    self.weekend_order + " - " + self.race_session +
-                   " [" + self.race_info + "]" + self.filetype)
+                   " [" + self.race_info.replace('.', ' ').strip(' ') + "]" + self.filetype)
 
     def get_destination_folder(self):
         """ use an existing race_season + race_round directory even if race_name differs"""

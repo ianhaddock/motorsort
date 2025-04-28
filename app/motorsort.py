@@ -60,74 +60,77 @@ def find_sprint_weekends(source_file_names, weekends):
     return sprint_weekends
 
 
-def parse_file_name(race,
-                    series_prefix,
-                    session_map,
-                    sprint_weekends,
-                    the_weekend_order,
-                    source_file_name
-                    ):
-
-    """parse source file names for keywords to build folder structures and
-    file names"""
-
-    file_name_path, file_extension = os.path.splitext(source_file_name)
-
-    source_file_name = os.path.basename(file_name_path.replace('.', ' '))
-
-    race.set_filetype(file_extension)
-
-    for key in series_prefix.keys():
-        if source_file_name.startswith(key):
-            race.set_race_series(series_prefix[key])
-
-    race_year = re.search("(20|19)[0-9][0-9]", source_file_name)
+def find_race_year(race: object) -> str:
+    """ Search for a four digit year, save to object, return remaining right
+    side of string. """
+    race_year = re.search("(20|19)[0-9][0-9]", race.get_race_info())
     if race_year:
         race.set_race_season(race_year.group())
-        race_name_index_start = source_file_name.index(race_year.group())+len(race_year.group())
     else:
         race.set_race_season('1970')
+    race_details = re.split(race.get_race_season(), race.get_race_info(), maxsplit=1)
+    race.set_race_info(race_details[-1])
+    return
 
-    race_round = re.search("Round.?[0-9][0-9]", source_file_name)
+
+def find_race_round(race: object) -> str:
+    """ Search for Round??, save to object, return remaining right side of
+    string. """
+    race_round = re.search("Round.?[0-9][0-9]", race.get_race_info())
     if race_round:
         race.set_race_round(race_round.group()[-2:])
-        race_name_index_start = source_file_name.index(race_round.group())+len(race_round.group())
     else:
         race.set_race_round('00')
+    race_details = re.split(race.get_race_round(), race.get_race_info(), maxsplit=1)
+    race.set_race_info(race_details[-1])
+    return
 
-    # remove USA from Formula 1 race name
-    if race.get_race_series() == "Formula 1" and 'USA' in source_file_name:
-        race_name_index_start = source_file_name.index('USA') + len('USA') + 1
 
-    # remove France from WEC race names - test for Le Mans files
-    if race.get_race_series() == "World Endurance Championship" and 'France' in source_file_name:
-        race_name_index_start = source_file_name.index('France') + len('France') + 1
+def find_race_series(race: object, series_prefix: list) -> str:
+    """Search for race series prefix, safe to object, return remaining right
+    side of string """
+    for key in series_prefix.keys():
+        if race.get_race_info().startswith(key):
+            race_details = re.split(key, race.get_race_info(), maxsplit=1)
+            race.set_race_series(series_prefix[key])
+            break
+    if race.get_race_series() == "Formula 1":
+        race_details = re.split("USA", race.get_race_info(), maxsplit=1)
+    if race.get_race_series() == "World Endurance Championship":
+        race_details = re.split("France", race.get_race_info(), maxsplit=1)
+    race.set_race_info(race_details[-1])
+    return
 
-    # sort race sessions
-    race_session = ""
+
+def find_race_session(race: object, session_map: list) -> str:
+    """ """
+    race_name = ""
+    race_session = "Unknown"
+    race_info = ""
     for key in session_map.keys():
-        if key in source_file_name.lower():
+        if key in race.get_race_info().replace('.', ' ').lower():
             if len(race_session) <= len(key):
                 race_session = session_map[key]
-                race.set_race_info(source_file_name[source_file_name.lower().index(key) + len(key) + 1:].strip())
-                # if no race Round was found, use the series name as the race name
-                try:
-                    race_name_index_start
-                except NameError:
-                    race.set_race_name(race.get_race_series())
-                else:
-                    race.set_race_name(source_file_name[race_name_index_start:source_file_name.lower().index(key) - 1].strip())
-
-    # set weekend event order
-    if race.get_race_series() == "Formula 1" and (race.get_race_season(), race.get_race_round()) in sprint_weekends:
-        race.set_weekend_order(str(the_weekend_order['sprint_order'].index(race_session)+1).zfill(2))
-    elif race.get_race_series() == "Formula 1":
-        race.set_weekend_order(str(the_weekend_order['regular_order'].index(race_session)+1).zfill(2))
-    else:
-        race.set_weekend_order(str(the_weekend_order['sportscar_order'].index(race_session)+1).zfill(2))
-
+                race_details = re.split(key, race.get_race_info(), flags=re.IGNORECASE)
+                race_name = race_details[0]
+                race_info = race_details[-1]
+                print(f'>>key>> {session_map[key]} >> {race_name} >> {race_info}')
+    race.set_race_name(race_name)
     race.set_race_session(race_session)
+    race.set_race_info(race_info)
+    return
 
+
+def find_weekend_order(race: object, sprint_weekends: list, the_weekend_order: list) -> str:
+    """ """
+    if race.get_race_series() == "Formula 1" and (race.get_race_season(), race.get_race_round()) in sprint_weekends:
+        race.set_weekend_order(str(the_weekend_order['sprint_order'].index(race.get_race_session())+1).zfill(2))
+    elif race.get_race_series() == "Formula 1":
+        race.set_weekend_order(str(the_weekend_order['regular_order'].index(race.get_race_session())+1).zfill(2))
+    else:
+        race.set_weekend_order(str(the_weekend_order['sportscar_order'].index(race.get_race_session())+1).zfill(2))
+    if race.get_weekend_order() == "":
+        race.set_weekend_order("Unknown")
     return
 
 
@@ -147,6 +150,7 @@ def link_files(race, source_file_name: str, copy_files: bool):
             raise SystemExit("ERROR: Can't link file: " + str(err))
         else:
             print("Linked: " + race.get_final_file_name())
+    return
 
 
 def build_images(race, font_list, track_path, flag_path, image_path):
@@ -166,6 +170,7 @@ def build_images(race, font_list, track_path, flag_path, image_path):
                             font_list,
                             image_path
                             )
+    return
 
 
 def main():
@@ -181,6 +186,9 @@ def main():
     except Exception as err:
         print(f'ERROR: Unable to read config.ini file: {err}')
         exit(1)
+    file_prefix = tuple(config.get('config', 'file_prefix').split(','))
+    file_types = tuple(config.get('config', 'file_types').split(','))
+    spnt_weekends = config.get('config', 'sprint_weekends').split(',')
 
     with open(config.get('json', 'series_prefix')) as file:
         series_prefix = json.load(file)
@@ -192,26 +200,30 @@ def main():
         font_list = json.load(file)
 
     source_file_names = get_file_list(source_path,
-                                      tuple(config.get('config', 'file_prefix').split(',')),
-                                      tuple(config.get('config', 'file_types').split(','))
+                                      file_prefix,
+                                      file_types
                                       )
-
     sprint_weekends = find_sprint_weekends(source_file_names,
-                                           config.get('config', 'sprint_weekends').split(',')
+                                           spnt_weekends
                                            )
 
+    # main loop
     for source_file_name in get_file_list(source_path,
-                                          tuple(config.get('config', 'file_prefix').split(',')),
-                                          tuple(config.get('config', 'file_types').split(','))
+                                          file_prefix,
+                                          file_types
                                           ):
         race = Weekend(os.getenv('MEDIA_DESTINATION_PATH', config.get('paths', 'destination_path')))
-        parse_file_name(race,
-                        series_prefix,
-                        session_map,
-                        sprint_weekends,
-                        the_weekend_order,
-                        source_file_name
-                        )
+
+        file_name_path, file_extension = os.path.splitext(source_file_name)
+        race.set_filetype(file_extension)
+        race.set_race_info(os.path.basename(file_name_path))
+
+        find_race_series(race, series_prefix)
+        find_race_year(race)
+        find_race_round(race)
+        find_race_session(race, session_map)
+        find_weekend_order(race, sprint_weekends, the_weekend_order)
+
         if not os.path.exists(race.get_destination_folder()):
             build_images(race,
                          font_list,
@@ -219,6 +231,7 @@ def main():
                          config.get('paths', 'flag_path'),
                          config.get('paths', 'image_path')
                          )
+
         if not os.path.exists(race.get_destination_full_path()):
             link_files(race,
                        source_file_name,
