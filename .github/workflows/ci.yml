@@ -8,7 +8,7 @@ on:
     branches: [main]
 
 jobs:
-  black_pylint_pytest:
+  tests-on-pull-request:
     runs-on: ubuntu-latest
 
     steps:
