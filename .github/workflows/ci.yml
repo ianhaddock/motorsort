@@ -46,8 +46,8 @@ jobs:
 
       - name: run pylint
         run: |
-          pylint app/*.py
-          # pylint tests/test_logic/*.py
+          pylint --rcfile pylint-config.toml app/*.py
+          # pylint --rcfile pylint-config.toml tests/test_logic/*.py
 
       - name: install pytest
         run: pip install pytest
