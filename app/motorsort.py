@@ -15,11 +15,10 @@ from weekend import Weekend
 def get_file_list(source_path, file_prefix, file_types) -> list:
     """return path & name of files matching extensions and prefix lists"""
 
-    file_list = []
-
     if not os.path.isdir(str(source_path)):
         raise SystemExit("ERROR, can't find source path: " + source_path)
 
+    file_list = []
     for root, _, files in os.walk(source_path):
         for file in files:
             if file.endswith(file_types) and file.startswith(file_prefix):
@@ -203,7 +202,7 @@ def main():
     sprint_weekends = find_sprint_weekends(source_file_names, spnt_weekends)
 
     # main loop
-    for source_file_name in get_file_list(source_path, file_prefix, file_types):
+    for source_file_name in source_file_names:
         race = Weekend(
             os.getenv("MEDIA_DESTINATION_PATH", config.get("paths", "destination_path"))
         )
