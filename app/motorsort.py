@@ -8,8 +8,8 @@ import json
 from shutil import which, copy2
 from datetime import datetime
 from configparser import ConfigParser
-from poster_maker import create_poster_image, create_background_image
-from weekend import Weekend
+from .poster_maker import create_poster_image, create_background_image
+from .weekend import Weekend
 
 
 def get_file_list(source_path, file_prefix, file_types) -> list:

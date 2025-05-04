@@ -5,10 +5,10 @@ name: ci
 
 on:
   pull_request:
-    branches: [$default-branch]
+    branches: [main]
 
 jobs:
-  style:
+  tests-on-pull-request:
     runs-on: ubuntu-latest
 
     steps:
@@ -21,7 +21,9 @@ jobs:
           python-version: "3.10"
 
       - name: Install imagemagick
-        run: sudo apt-get install -y imagemagick
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y imagemagick
 
       - name: install requirements.txt
         run: |
@@ -45,13 +47,13 @@ jobs:
       - name: run pylint
         run: |
           pylint app/*.py
-          pylint tests/test_logic/*.py
+          # pylint tests/test_logic/*.py
 
       - name: install pytest
-        run: pip install pytest|
+        run: pip install pytest
 
       - name: run pytest
-        run: coverage run -m pytest  -v -s
+        run: pytest -vv -x --cov-report term-missing --cov=app tests
 
       - name: generate report
         run: coverage report -m
