@@ -50,7 +50,7 @@ jobs:
           # pylint tests/test_logic/*.py
 
       - name: install pytest
-        run: pip install pytest|
+        run: pip install pytest
 
       - name: run pytest
         run: coverage run -m pytest  -v -s
