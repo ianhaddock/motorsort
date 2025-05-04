@@ -78,7 +78,7 @@ def create_poster_image(race, font_name, track_path, flag_path, image_path):
         race_name_annotate_offset = "+20+40"
         point_size_base = 120
     elif race.get_race_series() == "World Endurance Championship":
-        full_race_name = f"World\nEndurance\nChampionship\n{race.get_race_name()}\n{race.get_race_season()}"
+        full_race_name = f"WEC\n{race.get_race_name()}\n{race.get_race_season()}"
         race_name_font = font_name["titi-black"]
         race_name_interline_spacing = "-45"
         race_name_annotate_offset = "+20+10"
