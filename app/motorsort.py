@@ -8,8 +8,8 @@ import json
 from shutil import which, copy2
 from datetime import datetime
 from configparser import ConfigParser
-from .poster_maker import create_poster_image, create_background_image
-from .weekend import Weekend
+from poster_maker import create_poster_image, create_background_image
+from weekend import Weekend
 
 
 def get_file_list(source_path, file_prefix, file_types) -> list:
@@ -109,7 +109,7 @@ def find_race_session(race: object, session_map: list) -> str:
                 )
                 race_name = race_details[0].title()
                 race_info = race_details[-1].upper()
-                print(f">>key>> {session_map[key]} >> {race_name} >> {race_info}")
+                # print(f">>key>> {session_map[key]} >> {race_name} >> {race_info}")
     race.set_kv("race_name", race_name)
     race.set_kv("race_session", race_session)
     race.set_kv("race_info", race_info)
@@ -213,7 +213,7 @@ def main():
 
     # main loop
     for source_file_name in source_file_names:
-        print(f"> Source file name: {source_file_name}")
+        # print(f"> Source file name: {source_file_name}")
         race = Weekend(
             os.getenv("MEDIA_DESTINATION_PATH", config.get("paths", "destination_path"))
         )
