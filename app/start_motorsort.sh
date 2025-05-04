@@ -18,19 +18,19 @@ if [ -z "$(ls -A /custom/flags)" ]; then
     cp /config/flags/* /custom/flags/
 fi
 
-if [ ! -z /custom/series_prefix.json ]; then
+if [ ! -f /custom/series_prefix.json ]; then
     cp /config/series_prefix.json /custom/series_prefix.json
 fi
 
-if [ ! -z /custom/session_map.json ]; then
+if [ ! -f /custom/session_map.json ]; then
     cp /config/session_map.json /custom/session_map.json
 fi
 
-if [ ! -z /custom/weekend_order.json ]; then
+if [ ! -f /custom/weekend_order.json ]; then
     cp /config/weekend_order.json /custom/weekend_order.json
 fi
 
-if [ ! -z /custom/fonts.json ]; then
+if [ ! -f /custom/fonts.json ]; then
     cp /config/fonts.json /custom/fonts.json
 fi
 
