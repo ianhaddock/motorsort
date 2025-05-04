@@ -1,5 +1,5 @@
-[![Test](https://github.com/ianhaddock/motorsort/actions/workflows/test.yml/badge.svg)](https://github.com/ianhaddock/motorsort/actions/workflows/test.yml)
-[![Build](https://github.com/ianhaddock/motorsort/actions/workflows/build.yml/badge.svg)](https://github.com/ianhaddock/motorsort/actions/workflows/build.yml)
+[![.github/workflows/ci.yml](https://github.com/ianhaddock/motorsort/actions/workflows/ci.yml/badge.svg)](https://github.com/ianhaddock/motorsort/actions/workflows/ci.yml)
+[![.github/workflows/cd.yml](https://github.com/ianhaddock/motorsort/actions/workflows/cd.yml/badge.svg)](https://github.com/ianhaddock/motorsort/actions/workflows/cd.yml)
 
 # MotorSort
 MotorSort curates your motorsports video libraries for viewing in [PLEX][025]. MotorSort will auto-parse file names, generate event specific and _customizable_ poster and background images, and reformat filenames into a PLEX compatible folder hierarchy automatically.
@@ -11,7 +11,7 @@ MotorSort removes the manual processing and tedium involved in keeping your moto
 </p>
 
 ### Features
-* Stateless, self contained Docker image
+* Self contained Docker image
 * Formats filenames using the PLEX compatible, [Absolute-Series-Scanner][024] convention
 * Saves space by linking source files with the option to copy
 * Sorts media by race series, weekend, and session
@@ -24,6 +24,8 @@ MotorSort removes the manual processing and tedium involved in keeping your moto
 * Python
 * ImageMagick
 * Docker
+* Black
+* Pylint
 * Pytest
 
 
@@ -39,6 +41,8 @@ docker run \
     -v /mnt/my_files:/mnt/media \
     ghcr.io/ianhaddock/motorsort:latest
 ```
+
+A Docker compose file is also provided.
 
 ## Usage
 

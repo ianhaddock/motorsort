@@ -3,6 +3,10 @@
 # MacOS
 .DS_Store
 
+# vim
+*~
+*.swp
+
 # Project
 sourcefiles/*
 mediafiles/*
