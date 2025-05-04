@@ -8,7 +8,7 @@ on:
     branches: [main]
 
 jobs:
-  style, lint, test:
+  black_pylint_pytest:
     runs-on: ubuntu-latest
 
     steps:
