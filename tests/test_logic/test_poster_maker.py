@@ -6,7 +6,7 @@ import shutil
 import json
 from configparser import ConfigParser
 from poster_maker import create_poster_image, create_background_image
-from weekend import Weekend
+from app.weekend import Weekend
 
 config = ConfigParser()
 config.read("config/config.ini")

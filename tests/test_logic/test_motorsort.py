@@ -5,14 +5,14 @@ import shutil
 import json
 from configparser import ConfigParser
 import pytest
-from motorsort import (
+from app.motorsort import (
     main,
     get_file_list,
     find_sprint_weekends,
     build_images,
     link_files,
 )
-from weekend import Weekend
+from app.weekend import Weekend
 
 
 config = ConfigParser()
