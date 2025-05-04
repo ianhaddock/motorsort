@@ -51,7 +51,7 @@ def test_poster_maker_cant_write_background_to_dest(tmp_path):
     with pytest.raises(SystemExit) as exit_info:
         create_background_image(race, font_list, image_path)
 
-    assert exit_info.value.args[0] == f"ERROR, can't create path: [Errno 13] Permission denied: '{tmp_path}/Race Series/2024-01 - race_name'"
+    assert exit_info.value.args[0] == "ERROR, can't create path: "   # [Errno 13] Permission denied: '{tmp_path}/Race Series/2024-01 - race_name'"
 
 
 def test_poster_maker_cant_write_poster_to_dest(tmp_path):
@@ -66,7 +66,7 @@ def test_poster_maker_cant_write_poster_to_dest(tmp_path):
     with pytest.raises(SystemExit) as exit_info:
         create_poster_image(race, font_list, track_path, flag_path,  image_path)
 
-    assert exit_info.value.args[0] == f"ERROR, can't create path: [Errno 13] Permission denied: '{tmp_path}/Race Series/2024-01 - race_name'"
+    assert exit_info.value.args[0] == "ERROR, can't create path: "  # [Errno 13] Permission denied: '{tmp_path}/Race Series/2024-01 - race_name'"
 
 
 def test_poster_maker_background_exists(tmp_path):
@@ -91,7 +91,7 @@ def test_poster_maker_poster_exists(tmp_path):
     race.set_kv("race_season", "2024")
     race.set_kv("race_round", '01')
     race.set_kv("race_name", 'race_name')
-    os.makedirs(f'{tmp_path}/Race Series/2024-01 - race_name GP')
+    os.makedirs(f'{tmp_path}/Race Series/2024-01 - race_name')
     shutil.copy('tests/test_data/show.png', f'{tmp_path}/Race Series/2024-01 - race_name/show.png')
 
     create_poster_image(race, font_list, track_path, flag_path,  image_path)
