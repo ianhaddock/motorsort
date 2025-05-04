@@ -1,5 +1,5 @@
 #!/usr/bin/source python
-""" builds poster using imagemagic """
+"""builds poster using imagemagic"""
 
 import os
 import subprocess
@@ -67,11 +67,12 @@ def create_background_image(race, font_name, image_path):
 
 
 def create_poster_image(race, font_name, track_path, flag_path, image_path):
+    # disable too many local variables - pylint: disable=R0914
     """generates images with imageconvert"""
 
     # format title depending on race series
     if race.get_race_series() == "Formula 1":
-        full_race_name = f"{race.get_race_series().upper()}\n{race.get_race_name().upper()}\nGRAND PRIX\n{race.get_race_season()}"
+        full_race_name = f"Formula 1\n{race.get_race_name()}\n{race.get_race_season()}"
         race_name_font = font_name["black"]
         race_name_interline_spacing = "+2"
         race_name_annotate_offset = "+20+40"

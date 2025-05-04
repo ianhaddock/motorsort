@@ -1,8 +1,6 @@
 #!/usr/bin/source python
-""" Organize racing videos into seasons and create custom poster
- images. For use with a personal media server.
- 17 Dec 2023 """
-
+"""Organize racing videos into seasons and create custom poster
+images. For use with a PLEX personal media server. 17 Dec 2023"""
 
 import os
 import re
@@ -22,7 +20,7 @@ def get_file_list(source_path, file_prefix, file_types) -> list:
     if not os.path.isdir(str(source_path)):
         raise SystemExit("ERROR, can't find source path: " + source_path)
 
-    for root, dirs, files in os.walk(source_path):
+    for root, _, files in os.walk(source_path):
         for file in files:
             if file.endswith(file_types) and file.startswith(file_prefix):
                 file_list.append(os.path.join(root, file))
@@ -68,7 +66,6 @@ def find_race_year(race: object) -> str:
         race.set_race_season("1970")
     race_details = re.split(race.get_race_season(), race.get_race_info(), maxsplit=1)
     race.set_race_info(race_details[-1])
-    return
 
 
 def find_race_round(race: object) -> str:
@@ -81,7 +78,6 @@ def find_race_round(race: object) -> str:
         race.set_race_round("00")
     race_details = re.split(race.get_race_round(), race.get_race_info(), maxsplit=1)
     race.set_race_info(race_details[-1])
-    return
 
 
 def find_race_series(race: object, series_prefix: list) -> str:
@@ -97,32 +93,34 @@ def find_race_series(race: object, series_prefix: list) -> str:
     if race.get_race_series() == "World Endurance Championship":
         race_details = re.split("France", race.get_race_info(), maxsplit=1)
     race.set_race_info(race_details[-1])
-    return
 
 
 def find_race_session(race: object, session_map: list) -> str:
-    """ """
+    """find race session from dict, sort filename by name, info, and details"""
     race_name = ""
-    race_session = "Unknown"
+    race_session = ""
     race_info = ""
     for key in session_map.keys():
         if key in race.get_race_info().replace(".", " ").lower():
             if len(race_session) <= len(key):
                 race_session = session_map[key]
-                race_details = re.split(key, race.get_race_info(), flags=re.IGNORECASE)
-                race_name = race_details[0]
-                race_info = race_details[-1]
-        #      print(f'>>key>> {session_map[key]} >> {race_name} >> {race_info}')
+                race_details = re.split(
+                    key,
+                    race.get_race_info().replace(".", " ").lower(),
+                    flags=re.IGNORECASE,
+                )
+                race_name = race_details[0].title()
+                race_info = race_details[-1].upper()
+                print(f">>key>> {session_map[key]} >> {race_name} >> {race_info}")
     race.set_race_name(race_name)
     race.set_race_session(race_session)
     race.set_race_info(race_info)
-    return
 
 
 def find_weekend_order(
     race: object, sprint_weekends: list, the_weekend_order: list
 ) -> str:
-    """ """
+    """sort race session by race series order"""
     if (
         race.get_race_series() == "Formula 1"
         and (race.get_race_season(), race.get_race_round()) in sprint_weekends
@@ -144,44 +142,39 @@ def find_weekend_order(
                 the_weekend_order["sportscar_order"].index(race.get_race_session()) + 1
             ).zfill(2)
         )
-    if race.get_weekend_order() == "":
-        race.set_weekend_order("Unknown")
-    return
 
 
 def link_files(race, source_file_name: str, copy_files: bool):
-    """ """
+    """hardlink or copy files to final destination"""
     if copy_files:
         try:
             copy2(source_file_name, race.get_destination_full_path())
         except OSError as err:
-            raise SystemExit("ERROR: Can't copy file: " + str(err))
-        else:
-            print("Copied: " + race.get_final_file_name())
+            raise SystemExit("ERROR: Can't copy file: ") from err
+        print("Copied: " + race.get_final_file_name())
     else:
         try:
             os.link(source_file_name, race.get_destination_full_path())
         except OSError as err:
-            raise SystemExit("ERROR: Can't link file: " + str(err))
-        else:
-            print("Linked: " + race.get_final_file_name())
-    return
+            raise SystemExit("ERROR: Can't link file: ") from err
+        print("Linked: " + race.get_final_file_name())
 
 
 def build_images(race, font_list, track_path, flag_path, image_path):
-    """ """
+    """generate folder images"""
     try:
         os.makedirs(race.get_destination_folder(), exist_ok=True)
     except OSError as err:
-        raise SystemExit("ERROR: Can't create path: " + str(err))
+        raise SystemExit("ERROR: Can't create path: ") from err
 
     create_poster_image(race, font_list, track_path, flag_path, image_path)
     create_background_image(race, font_list, image_path)
-    return
 
 
 def main():
-    """Pull configurations, call functions to parse, build images, and link files."""
+    # disable too many local variables - pylint: disable=R0914
+    """Pull configurations, call functions to parse, build images,
+    and link files."""
 
     if not which("convert"):
         raise SystemExit("ERROR: Imagemagick convert not found in path.")
@@ -190,20 +183,20 @@ def main():
     config.read(f"{os.getenv('CONFIG_PATH', '/config')}/config.ini")
     try:
         source_path = os.getenv("MEDIA_SOURCE_PATH", config.get("paths", "source_path"))
-    except Exception as err:
-        print(f"ERROR: Unable to read config.ini file: {err}")
-        exit(1)
+    except OSError as err:
+        raise SystemExit("ERROR: Unable to read config.ini file: ") from err
+
     file_prefix = tuple(config.get("config", "file_prefix").split(","))
     file_types = tuple(config.get("config", "file_types").split(","))
     spnt_weekends = config.get("config", "sprint_weekends").split(",")
 
-    with open(config.get("json", "series_prefix")) as file:
+    with open(config.get("json", "series_prefix"), "r", encoding="utf-8") as file:
         series_prefix = json.load(file)
-    with open(config.get("json", "weekend_order")) as file:
+    with open(config.get("json", "weekend_order"), "r", encoding="utf-8") as file:
         the_weekend_order = json.load(file)
-    with open(config.get("json", "session_map")) as file:
+    with open(config.get("json", "session_map"), "r", encoding="utf-8") as file:
         session_map = json.load(file)
-    with open(config.get("json", "fonts")) as file:
+    with open(config.get("json", "fonts"), "r", encoding="utf-8") as file:
         font_list = json.load(file)
 
     source_file_names = get_file_list(source_path, file_prefix, file_types)

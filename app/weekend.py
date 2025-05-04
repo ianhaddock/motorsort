@@ -1,5 +1,5 @@
 #!/usr/bin/python
-""" motorsort weekend.py """
+"""motorsort weekend.py"""
 
 import glob
 
