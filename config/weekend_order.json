@@ -15,8 +15,7 @@
 "Race",
 "Race Analysis",
 "Race Notebook",
-"Onboard Channel",
-""],
+"Onboard Channel"],
 
 "regular_order":
 ["Free Practice 1",
@@ -30,8 +29,7 @@
 "Race",
 "Race Analysis",
 "Race Notebook",
-"Onboard Channel",
-""],
+"Onboard Channel"],
 
 "sportscar_order":
 ["Free Practice 1",
@@ -66,6 +64,5 @@
 "Race Pt23",
 "Race Pt24",
 "Highlights",
-"Review",
-""]
+"Review"]
 }

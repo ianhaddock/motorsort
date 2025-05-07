@@ -115,42 +115,22 @@ def find_race_session(race: object, session_map: list) -> str:
     race.set_kv("race_info", race_info)
 
 
-def find_weekend_order(
-    race: object, sprint_weekends: list, the_weekend_order: list
-) -> str:
+def find_weekend_order(race: object, sprint_weekends: list, the_weekend_order: list):
     """sort race session by race series order"""
-    if (
-        race.get_race_series() == "Formula 1"
-        and (race.get_race_season(), race.get_race_round()) in sprint_weekends
-    ):
-        race.set_kv(
-            "weekend_order",
-            (
-                str(
-                    the_weekend_order["sprint_order"].index(race.get_race_session()) + 1
-                ).zfill(2)
-            ),
-        )
-    elif race.get_race_series() == "Formula 1":
-        race.set_kv(
-            "weekend_order",
-            (
-                str(
-                    the_weekend_order["regular_order"].index(race.get_race_session())
-                    + 1
-                ).zfill(2)
-            ),
-        )
-    else:
-        race.set_kv(
-            "weekend_order",
-            (
-                str(
-                    the_weekend_order["sportscar_order"].index(race.get_race_session())
-                    + 1
-                ).zfill(2)
-            ),
-        )
+
+    sort_order = the_weekend_order["sportscar_order"]
+
+    if race.get_race_series() == "Formula 1":
+        if (race.get_race_season(), race.get_race_round()) in sprint_weekends:
+            sort_order = the_weekend_order["sprint_order"]
+        else:
+            sort_order = the_weekend_order["regular_order"]
+    try:
+        wknd_order = sort_order.index(race.get_race_session())
+    except ValueError as err:
+        raise ValueError("not found in weekend order") from err
+
+    race.set_kv("weekend_order", str(wknd_order + 1).zfill(2))
 
 
 def link_files(race, source_file_name: str, copy_files: bool):
@@ -226,7 +206,12 @@ def main():
         find_race_year(race)
         find_race_round(race)
         find_race_session(race, session_map)
-        find_weekend_order(race, sprint_weekends, the_weekend_order)
+
+        try:
+            find_weekend_order(race, sprint_weekends, the_weekend_order)
+        except ValueError:
+            print(f"ERROR: Can't parse file, skipping: {source_file_name}")
+            continue
 
         if not os.path.exists(race.get_destination_folder()):
             build_images(
