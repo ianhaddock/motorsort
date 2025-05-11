@@ -57,40 +57,36 @@ def find_sprint_weekends(source_file_names, weekends):
 def find_race_year(race: object) -> str:
     """Search for a four digit year, save to object, return remaining right
     side of string."""
-    race_year = re.search("(20|19)[0-9][0-9]", race.get_race_info())
+    filename = race.get_kv("race_info")
+    race_year = re.search("(20|19)[0-9][0-9]", filename)
     if race_year:
         race.set_kv("race_season", race_year.group())
+        race.set_kv("race_info", filename.replace(race_year.group(), "", 1))
     else:
         race.set_kv("race_season", "1970")
-    race_details = re.split(race.get_race_season(), race.get_race_info(), maxsplit=1)
-    race.set_kv("race_info", race_details[-1])
 
 
 def find_race_round(race: object) -> str:
     """Search for Round??, save to object, return remaining right side of
     string."""
-    race_round = re.search("Round.?[0-9][0-9]", race.get_race_info())
+    filename = race.get_kv("race_info")
+    race_round = re.search("Round.?[0-9][0-9]", filename)
     if race_round:
         race.set_kv("race_round", race_round.group()[-2:])
+        race.set_kv("race_info", filename.replace(race_round.group(), "", 1))
     else:
         race.set_kv("race_round", "00")
-    race_details = re.split(race.get_race_round(), race.get_race_info(), maxsplit=1)
-    race.set_kv("race_info", race_details[-1])
 
 
 def find_race_series(race: object, series_prefix: list) -> str:
     """Search for race series prefix, safe to object, return remaining right
     side of string"""
+    filename = race.get_kv("race_info")
     for key in series_prefix.keys():
-        if race.get_race_info().startswith(key):
-            race_details = re.split(key, race.get_race_info(), maxsplit=1)
+        if filename.startswith(key):
             race.set_kv("race_series", series_prefix[key])
+            race.set_kv("race_info", filename.replace(key, "", 1))
             break
-    if race.get_race_series() == "Formula 1":
-        race_details = re.split("USA", race.get_race_info(), maxsplit=1)
-    if race.get_race_series() == "World Endurance Championship":
-        race_details = re.split("France", race.get_race_info(), maxsplit=1)
-    race.set_kv("race_info", race_details[-1])
 
 
 def find_race_session(race: object, session_map: list) -> str:
@@ -99,17 +95,19 @@ def find_race_session(race: object, session_map: list) -> str:
     race_session = ""
     race_info = ""
     for key in session_map.keys():
-        if key in race.get_race_info().replace(".", " ").lower():
+        if key in race.get_kv("race_info").replace(".", " ").lower():
             if len(race_session) <= len(key):
                 race_session = session_map[key]
                 race_details = re.split(
                     key,
-                    race.get_race_info().replace(".", " ").lower(),
+                    race.get_kv("race_info").replace(".", " ").lower(),
                     flags=re.IGNORECASE,
                 )
                 race_name = race_details[0].title()
                 race_info = race_details[-1].upper()
-                # print(f">>key>> {session_map[key]} >> {race_name} >> {race_info}")
+                # print(
+                #     f">>key>> {session_map[key]} >race_name> {race_name} >race_info> {race_info}"
+                # )
     race.set_kv("race_name", race_name)
     race.set_kv("race_session", race_session)
     race.set_kv("race_info", race_info)
@@ -120,13 +118,13 @@ def find_weekend_order(race: object, sprint_weekends: list, the_weekend_order: l
 
     sort_order = the_weekend_order["sportscar_order"]
 
-    if race.get_race_series() == "Formula 1":
-        if (race.get_race_season(), race.get_race_round()) in sprint_weekends:
+    if race.get_kv("race_series") == "Formula 1":
+        if (race.get_kv("race_season"), race.get_kv("race_round")) in sprint_weekends:
             sort_order = the_weekend_order["sprint_order"]
         else:
             sort_order = the_weekend_order["regular_order"]
     try:
-        wknd_order = sort_order.index(race.get_race_session())
+        wknd_order = sort_order.index(race.get_kv("race_session"))
     except ValueError as err:
         raise ValueError("not found in weekend order") from err
 
@@ -202,8 +200,10 @@ def main():
         race.set_kv("file_extension", file_extension)
         race.set_kv("race_info", os.path.basename(file_name_path))
 
-        find_race_series(race, series_prefix)
+        # print(source_file_name)
+
         find_race_year(race)
+        find_race_series(race, series_prefix)
         find_race_round(race)
         find_race_session(race, session_map)
 
@@ -212,6 +212,13 @@ def main():
         except ValueError:
             print(f"ERROR: Can't parse file, skipping: {source_file_name}")
             continue
+
+        filename = race.get_kv("race_name")
+        # print(f">>>> filename: {filename}")
+        if race.get_kv("race_series") == "Formula 1":
+            race.set_kv("race_name", filename.replace("Usa", "", 1))
+        if race.get_kv("race_series") == "World Endurance Championship":
+            race.set_kv("race_name", filename.replace("France", "", 1))
 
         if not os.path.exists(race.get_destination_folder()):
             build_images(

@@ -26,10 +26,12 @@ def create_background_image(race, font_name, image_path):
         raise SystemExit("ERROR, can't create path: ") from err
 
     # prefer race name to race year to default
-    background_image = str(image_path + "/" + race.get_race_name() + "-background.jpg")
+    background_image = str(
+        image_path + "/" + race.get_kv("race_name") + "-background.jpg"
+    )
     if not os.path.isfile(background_image):
         background_image = str(
-            image_path + "/" + race.get_race_season() + "-background.jpg"
+            image_path + "/" + race.get_kv("race_season") + "-background.jpg"
         )
     if not os.path.isfile(background_image):
         background_image = str(image_path + "/background.jpg")
@@ -53,7 +55,7 @@ def create_background_image(race, font_name, image_path):
         "14",
         "-annotate",
         "+160+160",
-        race.get_race_round(),
+        race.get_kv("race_round"),
         background_destination,
     ]
 
@@ -71,20 +73,27 @@ def create_poster_image(race, font_name, track_path, flag_path, image_path):
     """generates images with imageconvert"""
 
     # format title depending on race series
-    if race.get_race_series() == "Formula 1":
-        full_race_name = f"Formula 1\n{race.get_race_name()}\n{race.get_race_season()}"
+    if race.get_kv("race_series") == "Formula 1":
+        r_series = race.get_kv("race_series").upper()
+        r_name = race.get_kv("race_name").upper()
+        full_race_name = (
+            f"{r_series}\n{r_name}\nGRAND PRIX\n{race.get_kv('race_season')}"
+        )
         race_name_font = font_name["black"]
         race_name_interline_spacing = "+2"
         race_name_annotate_offset = "+20+40"
         point_size_base = 120
-    elif race.get_race_series() == "World Endurance Championship":
-        full_race_name = f"WEC\n{race.get_race_name()}\n{race.get_race_season()}"
+    elif race.get_kv("race_series") == "World Endurance Championship":
+        r_series = race.get_kv("race_series").replace(" ", "\n")
+        full_race_name = (
+            f"{r_series}\n{race.get_kv('race_name')}\n{race.get_kv('race_season')}"
+        )
         race_name_font = font_name["titi-black"]
         race_name_interline_spacing = "-45"
         race_name_annotate_offset = "+20+10"
         point_size_base = 130
     else:
-        full_race_name = f"{race.get_race_series()}"
+        full_race_name = race.get_kv("race_series").replace(" ", "\n")
         race_name_font = font_name["titi-black"]
         race_name_interline_spacing = "-45"
         race_name_annotate_offset = "+20+10"
@@ -92,8 +101,8 @@ def create_poster_image(race, font_name, track_path, flag_path, image_path):
 
     destination_folder = race.get_destination_folder()
     race_poster_destination = str(race.get_destination_folder() + "/show.png")
-    track_map_image = str(track_path + "/" + race.get_race_name() + ".png")
-    race_flag = str(flag_path + "/" + race.get_race_name().lower() + ".png")
+    track_map_image = str(track_path + "/" + race.get_kv("race_name") + ".png")
+    race_flag = str(flag_path + "/" + race.get_kv("race_name").lower() + ".png")
 
     # if image already exists, dont recreate
     if os.path.isfile(race_poster_destination):
@@ -106,9 +115,11 @@ def create_poster_image(race, font_name, track_path, flag_path, image_path):
         raise SystemExit("ERROR, can't create path: ") from err
 
     # prefer race name to race year to default
-    poster_image = str(image_path + "/" + race.get_race_name() + "-poster.jpg")
+    poster_image = str(image_path + "/" + race.get_kv("race_name") + "-poster.jpg")
     if not os.path.isfile(poster_image):
-        poster_image = str(image_path + "/" + race.get_race_season() + "-poster.jpg")
+        poster_image = str(
+            image_path + "/" + race.get_kv("race_season") + "-poster.jpg"
+        )
     if not os.path.isfile(poster_image):
         poster_image = str(image_path + "/poster.jpg")
 
@@ -118,7 +129,7 @@ def create_poster_image(race, font_name, track_path, flag_path, image_path):
 
     # adjust race_name size if larger than the min, which is
     # the 'championship' part of the WEC title text.
-    point_size = str(point_size_base - (max(len(race.get_race_name()), 12) * 5))
+    point_size = str(point_size_base - (max(len(race.get_kv("race_name")), 12) * 5))
 
     # start building up the imagemagic command
     generate_race_poster_cmd = ["convert", poster_image, "-resize", "600x900!"]
@@ -193,7 +204,7 @@ def create_poster_image(race, font_name, track_path, flag_path, image_path):
             "2",
             "-annotate",
             "+10-20",
-            race.get_race_round(),
+            race.get_kv("race_round"),
             race_poster_destination,
         ]
     )

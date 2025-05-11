@@ -16,31 +16,15 @@ class Weekend:
         """set key value pairs for a race event"""
         self.event[key] = value.strip()
 
-    def get_race_session(self):
-        """get race session"""
-        return self.event["race_session"]
+    def get_kv(self, key: str) -> str:
+        """returns the value of a key"""
+        return self.event[key]
 
     def get_race_name(self):
         """get race name"""
         if self.event["race_series"] == "Formula 1":
             return f'{self.event["race_name"]} GP'
         return self.event["race_name"]
-
-    def get_race_info(self):
-        """get race info"""
-        return self.event["race_info"]
-
-    def get_race_round(self):
-        """get race round"""
-        return self.event["race_round"]
-
-    def get_race_series(self):
-        """get race season"""
-        return self.event["race_series"]
-
-    def get_race_season(self):
-        """return race season"""
-        return self.event["race_season"]
 
     def get_final_file_name(self):
         """build final file name"""
